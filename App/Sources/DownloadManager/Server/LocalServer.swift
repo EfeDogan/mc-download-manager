@@ -36,7 +36,7 @@ final class LocalServer {
         let params = NWParameters.tcp
         params.allowLocalEndpointReuse = true
         guard let nwPort = NWEndpoint.Port(rawValue: port) else {
-            throw DownloadFailure(message: String(localized: "Invalid port: \(port)"))
+            throw DownloadFailure(message: String(localized: "Invalid port: \(String(port))"))
         }
         params.requiredLocalEndpoint = NWEndpoint.hostPort(host: "127.0.0.1", port: nwPort)
         let l = try NWListener(using: params)

@@ -20,7 +20,8 @@ echo "▶ Tools (yt-dlp, ffmpeg)"
 [[ -x Tools/yt-dlp && -x Tools/ffmpeg ]] || scripts/fetch-tools.sh
 
 echo "▶ Icons"
-swiftc -O scripts/make_icons.swift -o "$BUILD/make_icons" 2>/dev/null
+mkdir -p "$BUILD"
+swiftc -O scripts/make_icons.swift -o "$BUILD/make_icons"
 "$BUILD/make_icons" "$BUILD/icons" >/dev/null
 cp "$BUILD"/icons/ext/*.png Extension/icons/
 mkdir -p App/Assets.xcassets/AppIcon.appiconset

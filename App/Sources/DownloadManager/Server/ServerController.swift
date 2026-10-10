@@ -39,10 +39,10 @@ final class ServerController: ObservableObject {
                 switch st {
                 case .ready:
                     self?.running = true
-                    self?.statusText = String(localized: "Listening on 127.0.0.1:\(port)")
+                    self?.statusText = String(localized: "Listening on 127.0.0.1:\(String(port))")
                 case .failed(let e):
                     self?.running = false
-                    self?.statusText = String(localized: "Error: \(e.localizedDescription) (port \(port) may be in use)")
+                    self?.statusText = String(localized: "Error: \(e.localizedDescription) (port \(String(port)) may be in use)")
                 case .cancelled:
                     self?.running = false
                     self?.statusText = String(localized: "Stopped")

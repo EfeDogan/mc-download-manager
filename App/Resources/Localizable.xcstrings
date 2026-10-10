@@ -202,42 +202,12 @@
         }
       }
     },
-    "Invalid port: %d": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Geçersiz port: %d"
-          }
-        }
-      }
-    },
     "Not started": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
             "value": "Başlatılmadı"
-          }
-        }
-      }
-    },
-    "Listening on 127.0.0.1:%d": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "127.0.0.1:%d dinleniyor"
-          }
-        }
-      }
-    },
-    "Error: %@ (port %d may be in use)": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hata: %@ (port %d kullanımda olabilir)"
           }
         }
       }
@@ -2188,6 +2158,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "Temizle"
+          }
+        }
+      }
+    },
+    "Listening on 127.0.0.1:%@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "127.0.0.1:%@ dinleniyor"
+          }
+        }
+      }
+    },
+    "Error: %1$@ (port %2$@ may be in use)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hata: %1$@ (port %2$@ kullanımda olabilir)"
+          }
+        }
+      }
+    },
+    "Invalid port: %@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçersiz port: %@"
           }
         }
       }

@@ -1,0 +1,2196 @@
+{
+  "sourceLanguage": "en",
+  "version": "1.0",
+  "strings": {
+    "Queued": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sırada"
+          }
+        }
+      }
+    },
+    "Connecting": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bağlanıyor"
+          }
+        }
+      }
+    },
+    "Downloading": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İndiriliyor"
+          }
+        }
+      }
+    },
+    "Paused": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duraklatıldı"
+          }
+        }
+      }
+    },
+    "Completed": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamamlandı"
+          }
+        }
+      }
+    },
+    "Error": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hata"
+          }
+        }
+      }
+    },
+    "Cancelled": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İptal edildi"
+          }
+        }
+      }
+    },
+    "Images": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resim"
+          }
+        }
+      }
+    },
+    "Music": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Müzik"
+          }
+        }
+      }
+    },
+    "Video": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video"
+          }
+        }
+      }
+    },
+    "Apps": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uygulama"
+          }
+        }
+      }
+    },
+    "Documents": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belge"
+          }
+        }
+      }
+    },
+    "Archives": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arşiv"
+          }
+        }
+      }
+    },
+    "Other": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diğer"
+          }
+        }
+      }
+    },
+    "Server returned HTTP %lld": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sunucu HTTP %lld döndürdü"
+          }
+        }
+      }
+    },
+    "Could not create file: %@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dosya oluşturulamadı: %@"
+          }
+        }
+      }
+    },
+    "Segment %lld could not be completed": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parça %lld tamamlanamadı"
+          }
+        }
+      }
+    },
+    "Invalid server response": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçersiz sunucu yanıtı"
+          }
+        }
+      }
+    },
+    "Connection closed early (%lld/%lld bytes)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bağlantı erken kapandı (%lld/%lld bayt)"
+          }
+        }
+      }
+    },
+    "yt-dlp exited with code %d": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "yt-dlp hata koduyla çıktı (%d)"
+          }
+        }
+      }
+    },
+    "Invalid port: %d": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçersiz port: %d"
+          }
+        }
+      }
+    },
+    "Not started": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Başlatılmadı"
+          }
+        }
+      }
+    },
+    "Listening on 127.0.0.1:%d": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "127.0.0.1:%d dinleniyor"
+          }
+        }
+      }
+    },
+    "Error: %@ (port %d may be in use)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hata: %@ (port %d kullanımda olabilir)"
+          }
+        }
+      }
+    },
+    "Stopped": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durduruldu"
+          }
+        }
+      }
+    },
+    "Could not start: %@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Başlatılamadı: %@"
+          }
+        }
+      }
+    },
+    "yt-dlp not found. Set its path in Settings or install it with `brew install yt-dlp`.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "yt-dlp bulunamadı. Ayarlar'dan yolunu belirtin veya `brew install yt-dlp` ile kurun."
+          }
+        }
+      }
+    },
+    "Download completed": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İndirme tamamlandı"
+          }
+        }
+      }
+    },
+    "%@/s": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@/sn"
+          }
+        }
+      }
+    },
+    "%lld s": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld sn"
+          }
+        }
+      }
+    },
+    "%lld min %lld s": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld dk %lld sn"
+          }
+        }
+      }
+    },
+    "%lld h %lld min": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld sa %lld dk"
+          }
+        }
+      }
+    },
+    "Search in the list": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listede ara"
+          }
+        }
+      }
+    },
+    "All": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tümü"
+          }
+        }
+      }
+    },
+    "Finished": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamamlanan"
+          }
+        }
+      }
+    },
+    "Unfinished": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamamlanmayan"
+          }
+        }
+      }
+    },
+    "Add URL": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL Ekle"
+          }
+        }
+      }
+    },
+    "Add a download by URL (⌘N)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL ile indirme ekle (⌘N)"
+          }
+        }
+      }
+    },
+    "Start Queue": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kuyruğu Başlat"
+          }
+        }
+      }
+    },
+    "Resume paused and failed downloads": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duraklatılan ve hatalı indirmeleri sürdür"
+          }
+        }
+      }
+    },
+    "Stop All": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tümünü Durdur"
+          }
+        }
+      }
+    },
+    "Pause all downloads": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tüm indirmeleri duraklat"
+          }
+        }
+      }
+    },
+    "Clear Finished": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bitenleri Temizle"
+          }
+        }
+      }
+    },
+    "Remove completed and cancelled items from the list": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamamlanan ve iptal edilenleri listeden kaldır"
+          }
+        }
+      }
+    },
+    "Settings": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayarlar"
+          }
+        }
+      }
+    },
+    "Settings (⌘,)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayarlar (⌘,)"
+          }
+        }
+      }
+    },
+    "Name": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ad"
+          }
+        }
+      }
+    },
+    "Size": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boyut"
+          }
+        }
+      }
+    },
+    "Status": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durum"
+          }
+        }
+      }
+    },
+    "Speed": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hız"
+          }
+        }
+      }
+    },
+    "Time Left": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kalan"
+          }
+        }
+      }
+    },
+    "Date Added": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eklenme"
+          }
+        }
+      }
+    },
+    "Add URL…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL Ekle…"
+          }
+        }
+      }
+    },
+    "Open Download Window": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İndirme Penceresini Aç"
+          }
+        }
+      }
+    },
+    "Pause": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duraklat"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İptal"
+          }
+        }
+      }
+    },
+    "Resume / Retry": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sürdür / Yeniden Dene"
+          }
+        }
+      }
+    },
+    "Copy URL": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL'yi Kopyala"
+          }
+        }
+      }
+    },
+    "Open": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aç"
+          }
+        }
+      }
+    },
+    "Show in Finder": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finder'da Göster"
+          }
+        }
+      }
+    },
+    "Remove from List": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listeden Kaldır"
+          }
+        }
+      }
+    },
+    "No downloads in this view": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu görünümde indirme yok"
+          }
+        }
+      }
+    },
+    "Download a file from your browser, drop a link here,\nor press ⌘N to enter a URL.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarayıcıdan bir dosya indirin, bir bağlantıyı buraya sürükleyin\nveya ⌘N ile URL girin."
+          }
+        }
+      }
+    },
+    "No matching downloads": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşleşen indirme yok"
+          }
+        }
+      }
+    },
+    "Browser bridge is running": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarayıcı köprüsü çalışıyor"
+          }
+        }
+      }
+    },
+    "Unfinished downloads": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamamlanmayan indirme sayısı"
+          }
+        }
+      }
+    },
+    "Total download speed": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toplam indirme hızı"
+          }
+        }
+      }
+    },
+    "Added": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eklendi"
+          }
+        }
+      }
+    },
+    "Error: %@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hata: %@"
+          }
+        }
+      }
+    },
+    "New Download": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yeni İndirme"
+          }
+        }
+      }
+    },
+    "One URL per line.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Her satıra bir URL yazabilirsiniz."
+          }
+        }
+      }
+    },
+    "Download video from page (yt-dlp)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sayfadaki videoyu indir (yt-dlp)"
+          }
+        }
+      }
+    },
+    "Connections: default (%lld)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bağlantı sayısı: varsayılan (%lld)"
+          }
+        }
+      }
+    },
+    "Connections: %lld": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bağlantı sayısı: %lld"
+          }
+        }
+      }
+    },
+    "Paste from Clipboard": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Panodan Yapıştır"
+          }
+        }
+      }
+    },
+    "Download": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İndir"
+          }
+        }
+      }
+    },
+    "General": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Genel"
+          }
+        }
+      }
+    },
+    "Browser": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarayıcı"
+          }
+        }
+      }
+    },
+    "Download folder": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İndirme klasörü"
+          }
+        }
+      }
+    },
+    "Choose…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seç…"
+          }
+        }
+      }
+    },
+    "Connections per download: %lld": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İndirme başına bağlantı: %lld"
+          }
+        }
+      }
+    },
+    "Each file is downloaded with up to this many parallel connections (4–10 recommended).": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Her dosya en fazla bu kadar paralel bağlantıyla indirilir (4–10 önerilir)."
+          }
+        }
+      }
+    },
+    "Concurrent downloads: %lld": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşzamanlı indirme: %lld"
+          }
+        }
+      }
+    },
+    "Start new downloads immediately": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eklenen indirmeleri hemen başlat"
+          }
+        }
+      }
+    },
+    "Show a notification when a download completes": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamamlanınca bildirim göster"
+          }
+        }
+      }
+    },
+    "Open the download window when a download starts": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İndirme başlayınca dosya penceresini aç"
+          }
+        }
+      }
+    },
+    "Close the download window automatically when completed": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dosya penceresini tamamlanınca otomatik kapat"
+          }
+        }
+      }
+    },
+    "Watch the clipboard for links and ask to download them": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Panodaki bağlantıları izle ve indirmek için sor"
+          }
+        }
+      }
+    },
+    "You can also paste a link into the main window with ⌘V to start a download.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ana pencereye ⌘V ile bağlantı yapıştırarak da indirme başlatabilirsiniz."
+          }
+        }
+      }
+    },
+    "Launch in the background at login": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oturum açıldığında arka planda başlat"
+          }
+        }
+      }
+    },
+    "The app must be running for the browser extension to capture downloads. It keeps running in the menu bar even when the window is closed.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarayıcı eklentisinin indirmeleri yakalayabilmesi için uygulamanın çalışıyor olması gerekir. Pencere kapatılsa bile uygulama menü çubuğunda çalışmaya devam eder."
+          }
+        }
+      }
+    },
+    "Local bridge": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yerel köprü"
+          }
+        }
+      }
+    },
+    "Port": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Port"
+          }
+        }
+      }
+    },
+    "The extension uses port 48213 by default. If you change it here, enter the same port in the extension settings.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eklenti varsayılan olarak 48213 portunu kullanır. Değiştirirseniz eklenti ayarlarından da aynı portu girin."
+          }
+        }
+      }
+    },
+    "Enable “MC Download Manager” in Safari ▸ Settings ▸ Extensions and allow it for all websites.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safari ▸ Ayarlar ▸ Uzantılar bölümünden “MC Download Manager” uzantısını etkinleştirin ve tüm web siteleri için izin verin."
+          }
+        }
+      }
+    },
+    "Open Safari Extension Settings": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safari Uzantı Ayarlarını Aç"
+          }
+        }
+      }
+    },
+    "Chrome / Chromium-based browsers": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chrome / Chromium tabanlı tarayıcılar"
+          }
+        }
+      }
+    },
+    "Open chrome://extensions, turn on “Developer mode”, choose “Load unpacked” and select the folder below.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "chrome://extensions sayfasında “Geliştirici modu”nu açın, “Paketlenmemiş öğe yükle” ile aşağıdaki klasörü seçin."
+          }
+        }
+      }
+    },
+    "Show Folder": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klasörü Göster"
+          }
+        }
+      }
+    },
+    "Custom yt-dlp path (empty = bundled)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Özel yt-dlp yolu (boş = gömülü)"
+          }
+        }
+      }
+    },
+    "Using: %@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kullanılan: %@"
+          }
+        }
+      }
+    },
+    "yt-dlp not found": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "yt-dlp bulunamadı"
+          }
+        }
+      }
+    },
+    "ffmpeg: %@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ffmpeg: %@"
+          }
+        }
+      }
+    },
+    "ffmpeg not found (merging video and audio will not work)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ffmpeg bulunamadı (video+ses birleştirme çalışmaz)"
+          }
+        }
+      }
+    },
+    "Format": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Format"
+          }
+        }
+      }
+    },
+    "yt-dlp -f value": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "yt-dlp -f değeri"
+          }
+        }
+      }
+    },
+    "Examples: bv*+ba/b (best), bv*[height<=1080]+ba/b (up to 1080p), ba (audio only)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Örnekler: bv*+ba/b (en iyi), bv*[height<=1080]+ba/b (1080p'ye kadar), ba (yalnızca ses)"
+          }
+        }
+      }
+    },
+    "This download was removed from the list.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu indirme listeden kaldırıldı."
+          }
+        }
+      }
+    },
+    "<< Hide Details": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "<< Detayları Gizle"
+          }
+        }
+      }
+    },
+    "Show Details >>": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detayları Göster >>"
+          }
+        }
+      }
+    },
+    "Resume": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sürdür"
+          }
+        }
+      }
+    },
+    "Close window when completed": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamamlanınca pencereyi kapat"
+          }
+        }
+      }
+    },
+    "URL": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL"
+          }
+        }
+      }
+    },
+    "File size": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dosya boyutu"
+          }
+        }
+      }
+    },
+    "Unknown": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bilinmiyor"
+          }
+        }
+      }
+    },
+    "Downloaded": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İndirilen"
+          }
+        }
+      }
+    },
+    "Transfer rate": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktarım hızı"
+          }
+        }
+      }
+    },
+    "Time left": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kalan süre"
+          }
+        }
+      }
+    },
+    "Resume capability": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sürdürülebilir"
+          }
+        }
+      }
+    },
+    "Yes": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Evet"
+          }
+        }
+      }
+    },
+    "No": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hayır"
+          }
+        }
+      }
+    },
+    "Save to": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kayıt yeri"
+          }
+        }
+      }
+    },
+    "Downloading with yt-dlp…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "yt-dlp ile indiriliyor…"
+          }
+        }
+      }
+    },
+    "Receiving data…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Veri alınıyor…"
+          }
+        }
+      }
+    },
+    "Location": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Konum"
+          }
+        }
+      }
+    },
+    "Close": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapat"
+          }
+        }
+      }
+    },
+    "Start positions and download progress by connections": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bağlantılara göre başlangıç konumları ve ilerleme"
+          }
+        }
+      }
+    },
+    "N.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "N."
+          }
+        }
+      }
+    },
+    "Start": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Başlangıç"
+          }
+        }
+      }
+    },
+    "Info": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bilgi"
+          }
+        }
+      }
+    },
+    "Sending GET…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GET gönderiliyor…"
+          }
+        }
+      }
+    },
+    "Receiving data… (single stream)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Veri alınıyor… (tek akış)"
+          }
+        }
+      }
+    },
+    "yt-dlp output": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "yt-dlp çıktısı"
+          }
+        }
+      }
+    },
+    "Waiting…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bekleniyor…"
+          }
+        }
+      }
+    },
+    "New Download…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yeni İndirme…"
+          }
+        }
+      }
+    },
+    "%lld downloading · %@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld indirme · %@"
+          }
+        }
+      }
+    },
+    "No active downloads": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktif indirme yok"
+          }
+        }
+      }
+    },
+    "Bridge is running": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Köprü çalışıyor"
+          }
+        }
+      }
+    },
+    "Bridge is not running": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Köprü çalışmıyor"
+          }
+        }
+      }
+    },
+    "Show Window": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pencereyi Göster"
+          }
+        }
+      }
+    },
+    "Pause All": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tümünü Duraklat"
+          }
+        }
+      }
+    },
+    "Resume All": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tümünü Sürdür"
+          }
+        }
+      }
+    },
+    "Quit": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çık"
+          }
+        }
+      }
+    },
+    "A link was copied. Download it?": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir bağlantı kopyalandı. İndirilsin mi?"
+          }
+        }
+      }
+    },
+    "Download the pasted link?": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yapıştırılan bağlantı indirilsin mi?"
+          }
+        }
+      }
+    },
+    "%lld links were copied. Download them?": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld bağlantı kopyalandı. İndirilsin mi?"
+          }
+        }
+      }
+    },
+    "Download the %lld pasted links?": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yapıştırılan %lld bağlantı indirilsin mi?"
+          }
+        }
+      }
+    },
+    "Download Video (yt-dlp)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video İndir (yt-dlp)"
+          }
+        }
+      }
+    },
+    "Download as File": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dosya Olarak İndir"
+          }
+        }
+      }
+    },
+    "Ignore": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yok say"
+          }
+        }
+      }
+    },
+    "Stop watching the clipboard": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Panoyu izlemeyi bırak"
+          }
+        }
+      }
+    },
+    "Move File to Trash and Remove": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dosyayı Çöp Kutusuna Taşı ve Listeden Kaldır"
+          }
+        }
+      }
+    },
+    "Other extensions": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diğer uzantılar"
+          }
+        }
+      }
+    },
+    "e.g. torrent, srt, ttf": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "örn. torrent, srt, ttf"
+          }
+        }
+      }
+    },
+    "Welcome to MC Download Manager": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MC Download Manager'a hoş geldiniz"
+          }
+        }
+      }
+    },
+    "Which file types should be captured?": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hangi dosya türleri yakalansın?"
+          }
+        }
+      }
+    },
+    "Browser downloads and copied links with these extensions are handed to the app. Everything else stays in the browser. You can change this later in Settings ▸ File Types.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu uzantılara sahip tarayıcı indirmeleri ve kopyalanan bağlantılar uygulamaya aktarılır. Diğer her şey tarayıcıda kalır. Bunu daha sonra Ayarlar ▸ Dosya Türleri bölümünden değiştirebilirsiniz."
+          }
+        }
+      }
+    },
+    "Continue": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Devam"
+          }
+        }
+      }
+    },
+    "File Types": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dosya Türleri"
+          }
+        }
+      }
+    },
+    "Captured file types": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yakalanan dosya türleri"
+          }
+        }
+      }
+    },
+    "Browser downloads and copied links with these extensions are handed to the app. Everything else stays in the browser.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu uzantılara sahip tarayıcı indirmeleri ve kopyalanan bağlantılar uygulamaya aktarılır. Diğer her şey tarayıcıda kalır."
+          }
+        }
+      }
+    },
+    "Organize downloads into category subfolders (Video, Music, Archives…)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İndirmeleri kategori alt klasörlerinde grupla (Video, Müzik, Arşiv…)"
+          }
+        }
+      }
+    },
+    "Downloads": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İndirmeler"
+          }
+        }
+      }
+    },
+    "Show": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Göster"
+          }
+        }
+      }
+    },
+    "Connections": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bağlantılar"
+          }
+        }
+      }
+    },
+    "Behaviour": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Davranış"
+          }
+        }
+      }
+    },
+    "Updates": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güncellemeler"
+          }
+        }
+      }
+    },
+    "Only links that point to a captured file type trigger the prompt. You can also paste a link into the main window with ⌘V.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yalnızca yakalanan dosya türlerinden birine işaret eden bağlantılar soru açar. Ana pencereye ⌘V ile bağlantı yapıştırarak da indirme başlatabilirsiniz."
+          }
+        }
+      }
+    },
+    "Check for updates automatically (GitHub Releases)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güncellemeleri otomatik denetle (GitHub Releases)"
+          }
+        }
+      }
+    },
+    "Current version: %@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mevcut sürüm: %@"
+          }
+        }
+      }
+    },
+    "Latest release: %@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Son sürüm: %@"
+          }
+        }
+      }
+    },
+    "Last checked: %@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Son denetim: %@"
+          }
+        }
+      }
+    },
+    "Checking…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denetleniyor…"
+          }
+        }
+      }
+    },
+    "Check Now": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şimdi Denetle"
+          }
+        }
+      }
+    },
+    "Browser Extensions": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarayıcı Eklentileri"
+          }
+        }
+      }
+    },
+    "Extension is enabled in Safari": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eklenti Safari'de etkin"
+          }
+        }
+      }
+    },
+    "Extension is not enabled in Safari": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eklenti Safari'de etkin değil"
+          }
+        }
+      }
+    },
+    "Extension state unknown": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eklenti durumu bilinmiyor"
+          }
+        }
+      }
+    },
+    "Refresh": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yenile"
+          }
+        }
+      }
+    },
+    "Enable in Safari…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safari'de Etkinleştir…"
+          }
+        }
+      }
+    },
+    "Repair": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Onar"
+          }
+        }
+      }
+    },
+    "Ad-hoc signed builds also need Safari ▸ Develop ▸ Allow Unsigned Extensions. “Repair” re-registers the extension with the system.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ad-hoc imzalı derlemelerde ayrıca Safari ▸ Geliştirici ▸ İmzasız uzantılara izin ver gerekir. “Onar” eklentiyi sisteme yeniden kaydeder."
+          }
+        }
+      }
+    },
+    "No Chromium-based browser found in /Applications.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "/Applications içinde Chromium tabanlı tarayıcı bulunamadı."
+          }
+        }
+      }
+    },
+    "Install / Repair…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kur / Onar…"
+          }
+        }
+      }
+    },
+    "Chrome does not allow apps to install extensions silently. “Install” copies the extension to a stable folder, opens the browser's extensions page and reveals the folder: turn on Developer mode and choose “Load unpacked”.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chrome, uygulamaların eklentileri sessizce kurmasına izin vermez. “Kur” eklentiyi sabit bir klasöre kopyalar, tarayıcının eklentiler sayfasını açar ve klasörü gösterir: Geliştirici modunu açıp “Paketlenmemiş öğe yükle”yi seçin."
+          }
+        }
+      }
+    },
+    "Opened %@. Turn on Developer mode, click “Load unpacked” and select the revealed folder.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ açıldı. Geliştirici modunu açın, “Paketlenmemiş öğe yükle”ye tıklayın ve gösterilen klasörü seçin."
+          }
+        }
+      }
+    },
+    "Settings…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayarlar…"
+          }
+        }
+      }
+    },
+    "Check for Updates…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güncellemeleri Denetle…"
+          }
+        }
+      }
+    },
+    "Install the browser extensions?": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarayıcı eklentileri kurulsun mu?"
+          }
+        }
+      }
+    },
+    "The extensions let Safari and Chrome hand their downloads to MC Download Manager and capture videos on pages. You can do this later from Settings ▸ Browser Extensions.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eklentiler sayesinde Safari ve Chrome indirmelerini MC Download Manager'a aktarır ve sayfalardaki videolar yakalanır. Bunu daha sonra Ayarlar ▸ Tarayıcı Eklentileri bölümünden de yapabilirsiniz."
+          }
+        }
+      }
+    },
+    "Safari — the extension is built in; it only needs to be enabled in Safari's settings.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safari — eklenti uygulamanın içinde gelir; yalnızca Safari ayarlarından etkinleştirilmesi gerekir."
+          }
+        }
+      }
+    },
+    "%@ — the extensions page opens; turn on Developer mode and choose “Load unpacked” for the revealed folder.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ — eklentiler sayfası açılır; Geliştirici modunu açıp gösterilen klasör için “Paketlenmemiş öğe yükle”yi seçin."
+          }
+        }
+      }
+    },
+    "Done. Enable the extension in Safari, and load the revealed folder in your Chromium browser.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamam. Safari'de eklentiyi etkinleştirin ve Chromium tarayıcınızda gösterilen klasörü yükleyin."
+          }
+        }
+      }
+    },
+    "Back": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geri"
+          }
+        }
+      }
+    },
+    "Not Now": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şimdi Değil"
+          }
+        }
+      }
+    },
+    "Finish": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bitir"
+          }
+        }
+      }
+    },
+    "Install Extensions": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eklentileri Kur"
+          }
+        }
+      }
+    },
+    "No release information available yet.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Henüz sürüm bilgisi yok."
+          }
+        }
+      }
+    },
+    "MC Download Manager %@ is available": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MC Download Manager %@ sürümü yayınlandı"
+          }
+        }
+      }
+    },
+    "You are using version %@.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kullandığınız sürüm: %@."
+          }
+        }
+      }
+    },
+    "Download Update": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güncellemeyi İndir"
+          }
+        }
+      }
+    },
+    "Open Release Page": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sürüm Sayfasını Aç"
+          }
+        }
+      }
+    },
+    "Later": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sonra"
+          }
+        }
+      }
+    },
+    "Skip This Version": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Sürümü Atla"
+          }
+        }
+      }
+    },
+    "Could not check for updates": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güncellemeler denetlenemedi"
+          }
+        }
+      }
+    },
+    "You're up to date": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güncelsiniz"
+          }
+        }
+      }
+    },
+    "MC Download Manager %@ is the latest version.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MC Download Manager %@ en güncel sürüm."
+          }
+        }
+      }
+    },
+    "Sign in to your account, then click “Save Cookies”.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hesabınıza giriş yapın, ardından “Çerezleri Kaydet”e tıklayın."
+          }
+        }
+      }
+    },
+    "Save Cookies": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çerezleri Kaydet"
+          }
+        }
+      }
+    },
+    "Site Login": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Site Girişi"
+          }
+        }
+      }
+    },
+    "Signed-in pages: %@. Click “Save Cookies” when done.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Açık sayfa: %@. İşiniz bitince “Çerezleri Kaydet”e tıklayın."
+          }
+        }
+      }
+    },
+    "Saved %lld cookies. yt-dlp will use them for video downloads.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld çerez kaydedildi. yt-dlp video indirmelerinde bunları kullanacak."
+          }
+        }
+      }
+    },
+    "Site login (YouTube age verification, members-only videos)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Site girişi (YouTube yaş doğrulaması, üyelere özel videolar)"
+          }
+        }
+      }
+    },
+    "Some videos require a signed-in account. Sign in once in the built-in browser window; the saved cookies are passed to yt-dlp for video downloads. Downloads started from the browser extension already carry the browser's cookies.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bazı videolar oturum açmış bir hesap gerektirir. Uygulama içi tarayıcı penceresinde bir kez giriş yapın; kaydedilen çerezler video indirmelerinde yt-dlp'ye aktarılır. Tarayıcı eklentisinden başlatılan indirmeler zaten tarayıcının çerezlerini taşır."
+          }
+        }
+      }
+    },
+    "Signed in: %@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giriş yapıldı: %@"
+          }
+        }
+      }
+    },
+    "%lld cookies saved %@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld çerez kaydedildi: %@"
+          }
+        }
+      }
+    },
+    "Not signed in": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giriş yapılmadı"
+          }
+        }
+      }
+    },
+    "Sign in to YouTube…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "YouTube'a Giriş Yap…"
+          }
+        }
+      }
+    },
+    "Clear": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Temizle"
+          }
+        }
+      }
+    }
+  }
+}

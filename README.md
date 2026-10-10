@@ -1,0 +1,105 @@
+<p align="center">
+  <img src="docs/icon.png" width="128" alt="MC Download Manager icon">
+</p>
+
+<h1 align="center">MC Download Manager</h1>
+
+<p align="center">
+  A fast, open-source download manager for macOS.<br>
+  Captures Safari and Chrome downloads, accelerates them with up to 16 parallel connections and downloads videos from web pages.
+</p>
+
+<p align="center">
+  <a href="README.tr.md">🇹🇷 Türkçe</a> · <a href="https://github.com/mstcvk/mc-download-manager/releases">Releases</a> · <a href="#building-from-source">Build</a>
+</p>
+
+---
+
+Everything ships in a single `.app`: the Safari extension, the Chrome extension, `yt-dlp` and `ffmpeg` are bundled.
+Open the DMG, drag the app to *Applications*, done. The interface is in **English** and **Turkish** (follows the system language).
+
+## Features
+
+- **Multi-connection downloads** — files are split into HTTP `Range` requests (8 connections by default, 1–16 configurable).
+  Falls back to a single stream when the server does not support ranges; adapts the connection count on `429`/`503` throttling.
+- **Pause / resume** — segment state is persisted on disk, so downloads continue where they left off even after a restart.
+- **Browser integration** — one shared WebExtension for Safari and Chrome (plus Chromium-based browsers).
+  The browser download is cancelled and handed to the app together with cookies, `Referer` and `User-Agent`.
+- **Video downloads** — `<video>`, `.m3u8` and `.mpd` streams on the page are detected; "Download video from this page" uses the bundled
+  yt-dlp (with ffmpeg merging). Browser cookies are passed to yt-dlp for sites that require a login.
+- **Clipboard** — copy a link and the app asks whether to download it; paste a link into the main window with ⌘V.
+- **UI** — sidebar categories (Images, Music, Video, Apps, Documents, Archives…), sortable table, search,
+  an IDM-style per-download window (connection table, segment bar, auto-close option), menu-bar item, notifications.
+- **Runs in the background** — optional launch at login; the browser bridge stays up when the window is closed.
+
+<p align="center">
+  <img src="docs/main.png" width="720" alt="Main window"><br>
+  <img src="docs/detail.png" width="520" alt="Download window">
+</p>
+
+## Installation
+
+1. Download the DMG from [Releases](https://github.com/mstcvk/mc-download-manager/releases), open it and drag **MC Download Manager.app** to *Applications*.
+   - Builds that are not notarized trigger a Gatekeeper warning on first launch: *System Settings ▸ Privacy & Security ▸ "Open Anyway"*.
+2. **Safari:** *Safari ▸ Settings ▸ Extensions ▸ MC Download Manager* → enable and allow for all websites.
+   - For ad-hoc signed builds Safari also requires *Develop ▸ Allow Unsigned Extensions* (not needed for Developer ID signed builds).
+3. **Chrome:** open `chrome://extensions`, turn on *Developer mode*, choose *Load unpacked* and select the folder shown in the app under
+   *Settings ▸ Browser ▸ Show Folder* (`ChromeExtension` inside the app bundle).
+
+The app runs a tiny HTTP bridge on `127.0.0.1:48213` that only accepts requests from browser extensions (`Origin` check).
+
+## Building from source
+
+Requirements: macOS 13+, Xcode 15+, [xcodegen](https://github.com/yonaskolb/XcodeGen) (`brew install xcodegen`).
+
+```bash
+scripts/fetch-tools.sh   # downloads universal yt-dlp and ffmpeg (arm64 + x86_64) into Tools/
+scripts/build.sh         # Release build, code signing and build/MC Download Manager <version>.dmg
+```
+
+For development run `xcodegen generate` and open `MCDownloadManager.xcodeproj`.
+
+Developer ID signing and notarization:
+
+```bash
+CODESIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)" NOTARY_PROFILE=notary scripts/build.sh
+```
+
+The GitHub Actions workflow (`.github/workflows/build.yml`) builds a DMG on every push and attaches it to the release on `v*` tags.
+
+## Project layout
+
+```
+App/Sources/DownloadManager/
+  Engine/SegmentedDownloader.swift   multi-connection HTTP downloader (URLSession, Range, adaptive concurrency)
+  Engine/VideoDownloader.swift       yt-dlp wrapper (progress parsing, cookie file)
+  Engine/DownloadStore.swift         queue, persistence, speed measurement
+  Engine/ClipboardWatcher.swift      clipboard monitoring and ⌘V handling
+  Server/LocalServer.swift           minimal HTTP server on Network.framework
+  Server/ServerController.swift      /ping /download /downloads /action endpoints
+  Views/                             SwiftUI (main window, download window, settings)
+App/Resources/Localizable.xcstrings  English (base) + Turkish strings
+SafariExtension/                     Safari Web Extension target (native messaging launches the app)
+Extension/                           shared WebExtension (manifest v3, background, content, popup, _locales)
+scripts/                             fetch-tools.sh, build.sh, make_icons.swift
+project.yml                          xcodegen project spec
+```
+
+### Bridge API
+
+| Endpoint | Description |
+|---|---|
+| `GET /ping` | version, yt-dlp availability, active download count |
+| `POST /download` | `{url, filename?, referer?, userAgent?, cookieHeader?, cookies?[], kind: "file"\|"video", segments?}` |
+| `GET /downloads` | status of the last 50 downloads |
+| `POST /action` | `{id, action: "pause"\|"resume"\|"cancel"\|"remove"}` |
+
+## Contributing
+
+Issues and pull requests are welcome. Translations live in `App/Resources/Localizable.xcstrings` and `Extension/_locales/`.
+
+## License
+
+The code is licensed under the MIT License (see `LICENSE`). Bundled binaries keep their own licenses:
+[yt-dlp](https://github.com/yt-dlp/yt-dlp) (Unlicense) and [FFmpeg](https://ffmpeg.org) (static build from martin-riedl.de, GPL).
+If you distribute builds with the GPL ffmpeg binary, keep the source-availability obligation in mind, or point `scripts/fetch-tools.sh` to an LGPL build.

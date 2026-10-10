@@ -6,6 +6,27 @@ import Network
 final class ServerController: ObservableObject {
     @Published var statusText = String(localized: "Not started")
     @Published var running = false
+    /// Last time each browser's extension talked to the bridge (keys: safari, chrome, brave, other).
+    @Published var extensionConnections: [String: Date] = [:]
+
+    func isExtensionConnected(_ browser: String, within seconds: TimeInterval = 120) -> Bool {
+        guard let d = extensionConnections[browser] else { return false }
+        return Date().timeIntervalSince(d) < seconds
+    }
+
+    private func noteConnection(_ req: HTTPRequest) {
+        guard let origin = req.headers["origin"], !origin.isEmpty else { return }
+        var browser = "other"
+        if origin.hasPrefix("safari-web-extension://") { browser = "safari" }
+        else if origin.hasPrefix("chrome-extension://") { browser = "chrome" }
+        if let q = req.path.split(separator: "?", maxSplits: 1).last, req.path.contains("?") {
+            for pair in q.split(separator: "&") {
+                let kv = pair.split(separator: "=", maxSplits: 1)
+                if kv.count == 2, kv[0] == "browser" { browser = String(kv[1]).lowercased() }
+            }
+        }
+        extensionConnections[browser] = Date()
+    }
 
     private var server: LocalServer?
     private let store: DownloadStore
@@ -73,6 +94,7 @@ final class ServerController: ObservableObject {
         guard Self.originAllowed(req.headers["origin"]) else {
             return .json(["ok": false, "error": "origin not allowed"], status: 403)
         }
+        noteConnection(req)
         let path = req.path.split(separator: "?", maxSplits: 1).first.map(String.init) ?? req.path
 
         switch (req.method, path) {
@@ -96,6 +118,9 @@ final class ServerController: ObservableObject {
                     "speed": $0.speed,
                     "total": $0.totalBytes,
                     "received": $0.receivedBytes,
+                    "stage": $0.stage,
+                    "error": $0.errorMessage ?? "",
+                    "log": String($0.log.suffix(3000)),
                 ]
             }
             return .json(["ok": true, "items": list])

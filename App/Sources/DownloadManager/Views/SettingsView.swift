@@ -122,57 +122,35 @@ struct BrowserSettings: View {
     @EnvironmentObject var settings: AppSettings
     @EnvironmentObject var server: ServerController
     @State private var safariEnabled: Bool?
-    @State private var chromium = BrowserIntegration.installedChromiumBrowsers
-    @State private var installMessage: String?
+    @State private var browsers = BrowserIntegration.installedBrowsers
 
     var body: some View {
         Form {
-            Section("Safari") {
-                HStack {
-                    Circle().fill(safariEnabled == true ? .green : (safariEnabled == false ? .orange : .gray)).frame(width: 8, height: 8)
-                    if safariEnabled == true {
-                        Text("Extension is enabled in Safari")
-                    } else if safariEnabled == false {
-                        Text("Extension is not enabled in Safari")
-                    } else {
-                        Text("Extension state unknown")
-                    }
-                    Spacer()
-                    Button("Refresh") { refreshSafari() }
-                }
-                HStack {
-                    Button("Enable in Safari…") { BrowserIntegration.openSafariExtensionPreferences() }
-                    Button("Repair") {
-                        BrowserIntegration.repairSafariExtension { refreshSafari() }
-                    }
-                }
-                Text("Ad-hoc signed builds also need Safari ▸ Develop ▸ Allow Unsigned Extensions. “Repair” re-registers the extension with the system.")
-                    .font(.caption).foregroundStyle(.secondary)
-            }
-            Section("Chrome / Chromium-based browsers") {
-                if chromium.isEmpty {
-                    Text("No Chromium-based browser found in /Applications.").foregroundStyle(.secondary)
-                } else {
-                    ForEach(chromium) { b in
-                        HStack {
-                            Image(nsImage: NSWorkspace.shared.icon(forFile: b.appURL.path)).resizable().frame(width: 20, height: 20)
-                            Text(b.name)
-                            Spacer()
-                            Button("Install / Repair…") { install(in: b) }
-                        }
-                    }
-                }
-                Text("Chrome does not allow apps to install extensions silently. “Install” copies the extension to a stable folder, opens the browser's extensions page and reveals the folder: turn on Developer mode and choose “Load unpacked”.")
+            Section("Browser extensions") {
+                Text("The guided setup walks you through each installed browser one at a time: Safari (built in, just enable it), Google Chrome and Brave (loaded from a folder).")
                     .font(.caption).foregroundStyle(.secondary)
                 HStack {
-                    Text(BrowserIntegration.installedExtensionFolder.path).font(.caption).lineLimit(1).truncationMode(.middle)
-                    Spacer()
-                    Button("Show Folder") {
-                        let f = (try? BrowserIntegration.installUnpackedExtension()) ?? BrowserIntegration.bundledExtensionFolder
-                        NSWorkspace.shared.activateFileViewerSelecting([f])
+                    Button { ExtensionWizardWindow.shared.show(server: server) } label: {
+                        Label("Open Setup Wizard…", systemImage: "wand.and.stars")
+                    }
+                    Button("Refresh Status") { refresh() }
+                }
+                ForEach(browsers) { b in
+                    HStack(spacing: 10) {
+                        if let icon = b.icon { Image(nsImage: icon).resizable().frame(width: 20, height: 20) }
+                        Text(b.name)
+                        Spacer()
+                        statusLabel(for: b)
                     }
                 }
-                if let installMessage { Text(installMessage).font(.caption).foregroundStyle(.secondary) }
+                HStack {
+                    Text(BrowserIntegration.pluginsRoot.path).font(.caption).lineLimit(1).truncationMode(.middle)
+                    Spacer()
+                    Button("Show Plugin Folder") {
+                        try? FileManager.default.createDirectory(at: BrowserIntegration.pluginsRoot, withIntermediateDirectories: true)
+                        BrowserIntegration.revealInFinder(BrowserIntegration.pluginsRoot)
+                    }
+                }
             }
             Section("Local bridge") {
                 HStack {
@@ -186,19 +164,35 @@ struct BrowserSettings: View {
             }
         }
         .formStyle(.grouped)
-        .onAppear { refreshSafari() }
+        .onAppear { refresh() }
     }
 
-    private func refreshSafari() {
+    @ViewBuilder
+    private func statusLabel(for b: BrowserIntegration.Kind) -> some View {
+        let connected = server.isExtensionConnected(b.rawValue, within: 3600)
+        if b == .safari {
+            if safariEnabled == true {
+                Label("Enabled", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
+            } else if safariEnabled == false {
+                Label("Not enabled", systemImage: "circle.dashed").foregroundStyle(.secondary)
+            } else {
+                Text("…").foregroundStyle(.secondary)
+            }
+        } else if connected {
+            Label("Connected", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
+        } else if BrowserIntegration.filesPrepared(for: b) {
+            Label("Files prepared, not loaded yet", systemImage: "circle.dashed").foregroundStyle(.secondary)
+        } else {
+            Label("Not installed", systemImage: "circle.dashed").foregroundStyle(.secondary)
+        }
+    }
+
+    private func refresh() {
+        browsers = BrowserIntegration.installedBrowsers
         Task {
             let state = await BrowserIntegration.safariExtensionEnabled()
             await MainActor.run { safariEnabled = state }
         }
-    }
-
-    private func install(in b: BrowserIntegration.ChromiumBrowser) {
-        BrowserIntegration.openExtensionsPage(in: b)
-        installMessage = String(localized: "Opened \(b.name). Turn on Developer mode, click “Load unpacked” and select the revealed folder.")
     }
 }
 
@@ -266,10 +260,30 @@ struct VideoSettings: View {
                     Text("ffmpeg not found (merging video and audio will not work)").font(.caption).foregroundStyle(.red)
                 }
             }
-            Section("Format") {
-                TextField("yt-dlp -f value", text: $settings.videoFormat)
-                Text("Examples: bv*+ba/b (best), bv*[height<=1080]+ba/b (up to 1080p), ba (audio only)")
+            Section("Default format") {
+                Picker("Container", selection: $settings.videoContainer) {
+                    Text("MP4 (H.264/AAC, plays everywhere)").tag("mp4")
+                    Text("MKV").tag("mkv")
+                    Text("WebM").tag("webm")
+                    Text("Original (no conversion)").tag("original")
+                }
+                Picker("Maximum resolution", selection: $settings.videoMaxHeight) {
+                    Text("Best available").tag(0)
+                    Text("2160p (4K)").tag(2160)
+                    Text("1440p").tag(1440)
+                    Text("1080p").tag(1080)
+                    Text("720p").tag(720)
+                    Text("480p").tag(480)
+                    Text("360p").tag(360)
+                    Divider()
+                    Text("Audio only (M4A)").tag(-1)
+                    Text("Audio only (MP3)").tag(-2)
+                }
+                Text("Default: MP4 at up to 1080p. Streams are merged with the bundled ffmpeg.")
                     .font(.caption).foregroundStyle(.secondary)
+                TextField("Custom yt-dlp -f expression (overrides the pickers)", text: $settings.videoFormat)
+                Text("Effective arguments: \(settings.ytdlpFormatArguments.joined(separator: " "))")
+                    .font(.caption).foregroundStyle(.secondary).textSelection(.enabled)
             }
         }
         .formStyle(.grouped)

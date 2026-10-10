@@ -39,7 +39,7 @@ struct DownloadDetailView: View {
                     withAnimation { showDetails.toggle() }
                     DetailWindowManager.shared.resize(id: id, compact: !showDetails)
                 }
-                Toggle("Close window when completed", isOn: $settings.autoCloseDetail)
+                Toggle("Close when completed", isOn: $settings.autoCloseDetail)
                     .toggleStyle(.checkbox)
                     .font(.callout)
                 Spacer()
@@ -108,7 +108,9 @@ struct DownloadDetailView: View {
 
     private func statusText(_ item: DownloadItem) -> String {
         switch item.state {
-        case .downloading: return item.kind == .video ? String(localized: "Downloading with yt-dlp…") : String(localized: "Receiving data…")
+        case .downloading:
+            if item.kind == .video { return item.stage.isEmpty ? String(localized: "Downloading with yt-dlp…") : item.stage }
+            return String(localized: "Receiving data…")
         case .failed: return item.errorMessage ?? String(localized: "Error")
         default: return item.state.label
         }

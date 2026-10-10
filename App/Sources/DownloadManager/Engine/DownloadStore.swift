@@ -25,6 +25,8 @@ final class DownloadStore: ObservableObject {
     let settings: AppSettings
     private var downloaders: [UUID: SegmentedDownloader] = [:]
     private var videoProcesses: [UUID: Process] = [:]
+    /// yt-dlp downloads several files (video, audio): bytes completed in earlier phases + approx total.
+    private var videoPhase: [UUID: (base: Int64, lastDownloaded: Int64, approxTotal: Int64)] = [:]
     private var samples: [UUID: (bytes: Int64, time: Date)] = [:]
     private var timer: Timer?
     private var saveWork: DispatchWorkItem?
@@ -234,17 +236,25 @@ final class DownloadStore: ObservableObject {
             pumpQueue()
             return
         }
-        update(id) { $0.state = .downloading; $0.errorMessage = nil; $0.log = ""; $0.receivedBytes = 0; $0.speed = 0 }
+        update(id) { $0.state = .downloading; $0.errorMessage = nil; $0.log = ""; $0.receivedBytes = 0; $0.speed = 0; $0.totalBytes = -1; $0.stage = String(localized: "Fetching video information…") }
         let outDir = destinationDirectory(for: item)
         try? FileManager.default.createDirectory(at: outDir, withIntermediateDirectories: true)
         let proc = VideoDownloader.run(
-            executable: exe, url: item.url, outputDir: outDir, format: settings.videoFormat,
+            executable: exe, url: item.url, outputDir: outDir, formatArgs: settings.ytdlpFormatArguments,
             headers: item.headers, cookieFile: item.cookieFile,
             onProgress: { [weak self] p in
                 DispatchQueue.main.async {
-                    self?.update(id) {
-                        $0.receivedBytes = p.downloaded
-                        if p.total > 0 { $0.totalBytes = p.total }
+                    guard let self else { return }
+                    var ph = self.videoPhase[id] ?? (0, 0, -1)
+                    if p.downloaded < ph.lastDownloaded { ph.base += ph.lastDownloaded }   // new file started
+                    ph.lastDownloaded = p.downloaded
+                    self.videoPhase[id] = ph
+                    let received = ph.base + p.downloaded
+                    self.update(id) {
+                        $0.receivedBytes = received
+                        let phaseTotal = p.total > 0 ? ph.base + p.total : -1
+                        $0.totalBytes = max(ph.approxTotal, phaseTotal, received)
+                        $0.speed = p.speed
                     }
                 }
             },
@@ -252,8 +262,21 @@ final class DownloadStore: ObservableObject {
                 DispatchQueue.main.async {
                     self?.update(id) {
                         $0.log = String(($0.log + line + "\n").suffix(6000))
+                        if let st = VideoDownloader.stage(for: line) { $0.stage = st }
+                        if line.hasPrefix("MCFMT|"), let n = Double(line.split(separator: "|", omittingEmptySubsequences: false).dropFirst(5).first ?? ""), n > 0 {
+                            var ph = self?.videoPhase[id] ?? (0, 0, -1)
+                            ph.approxTotal = Int64(n)
+                            self?.videoPhase[id] = ph
+                            if $0.totalBytes < Int64(n) { $0.totalBytes = Int64(n) }
+                        }
                         if let r = line.range(of: "Destination: ") {
-                            $0.fileName = URL(fileURLWithPath: String(line[r.upperBound...])).lastPathComponent
+                            // Show the final title; strip yt-dlp's intermediate ".f137" format suffix.
+                            var name = URL(fileURLWithPath: String(line[r.upperBound...])).lastPathComponent
+                            if let m = name.range(of: "\\.f[0-9]+[-a-z0-9]*(?=\\.[a-z0-9]+$)", options: .regularExpression) { name.removeSubrange(m) }
+                            $0.fileName = name
+                        }
+                        if line.hasPrefix("[Merger] Merging formats into \""), let q1 = line.firstIndex(of: "\""), let q2 = line.lastIndex(of: "\""), q1 < q2 {
+                            $0.fileName = URL(fileURLWithPath: String(line[line.index(after: q1)..<q2])).lastPathComponent
                         }
                     }
                 }
@@ -262,10 +285,12 @@ final class DownloadStore: ObservableObject {
                 DispatchQueue.main.async { self?.handleVideoFinish(id: id, result) }
             })
         videoProcesses[id] = proc
+        videoPhase[id] = (0, 0, -1)
     }
 
     private func handleVideoFinish(id: UUID, _ result: Result<String?, Error>) {
         videoProcesses[id] = nil
+        videoPhase[id] = nil
         guard let i = index(of: id) else { return }
         var item = items[i]
         guard item.state == .downloading else { return }   // kullanıcı duraklattı/iptal etti
@@ -371,7 +396,7 @@ final class DownloadStore: ObservableObject {
     private func tick() {
         let now = Date()
         var activeIDs = Set<UUID>()
-        for i in items.indices where items[i].state == .downloading {
+        for i in items.indices where items[i].state == .downloading && items[i].kind != .video {
             let id = items[i].id
             activeIDs.insert(id)
             let bytes = items[i].receivedBytes

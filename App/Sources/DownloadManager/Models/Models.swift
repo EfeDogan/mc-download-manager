@@ -54,6 +54,7 @@ struct DownloadItem: Identifiable, Codable, Equatable {
     // Kalıcı olmayan alanlar
     var speed: Double = 0
     var log: String = ""
+    var stage: String = ""      // yt-dlp: current phase (downloading video/audio, merging…)
 
     enum CodingKeys: String, CodingKey {
         case id, url, fileName, directory, kind, state, totalBytes, receivedBytes, supportsRanges,

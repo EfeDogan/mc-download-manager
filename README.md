@@ -23,10 +23,12 @@ Open the DMG, drag the app to *Applications*, done. The interface is in **Englis
 - **Multi-connection downloads** — files are split into HTTP `Range` requests (8 connections by default, 1–16 configurable).
   Falls back to a single stream when the server does not support ranges; adapts the connection count on `429`/`503` throttling.
 - **Pause / resume** — segment state is persisted on disk, so downloads continue where they left off even after a restart.
-- **Browser integration** — one shared WebExtension for Safari and Chrome (plus Chromium-based browsers).
-  The browser download is cancelled and handed to the app together with cookies, `Referer` and `User-Agent`.
+- **Browser integration** — one shared WebExtension for Safari, Google Chrome and Brave. A step-by-step setup wizard handles each browser
+  one at a time (extension files are placed in `~/Downloads/MC Download Manager/Browser Plugins/`).
+  The browser download is cancelled and handed to the app together with cookies, `Referer` and `User-Agent`; captured file types are configurable.
 - **Video downloads** — `<video>`, `.m3u8` and `.mpd` streams on the page are detected; "Download video from this page" uses the bundled
-  yt-dlp (with ffmpeg merging). Browser cookies are passed to yt-dlp for sites that require a login.
+  yt-dlp (with ffmpeg merging). Default output is MP4 up to 1080p (container and resolution configurable). Browser cookies are passed to
+  yt-dlp, and an in-app sign-in window handles age-restricted videos. yt-dlp can be updated from GitHub with one click.
 - **Clipboard** — copy a link and the app asks whether to download it; paste a link into the main window with ⌘V.
 - **UI** — sidebar categories (Images, Music, Video, Apps, Documents, Archives…), sortable table, search,
   an IDM-style per-download window (connection table, segment bar, auto-close option), menu-bar item, notifications.

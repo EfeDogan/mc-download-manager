@@ -2,53 +2,89 @@ import AppKit
 import Foundation
 import SafariServices
 
-/// Installs / repairs the browser extensions.
-/// - Safari: the extension ships inside the app; "install" means enabling it in Safari's preferences.
-/// - Chromium browsers: the unpacked extension is copied to a stable folder, the browser's extensions page
-///   is opened and a step-by-step guide is shown (Chrome does not allow silent installs outside the Web Store).
+/// Browser extension helpers. Supported browsers for the guided setup: Safari, Google Chrome, Brave.
 enum BrowserIntegration {
     static let safariExtensionID = "com.mesutcevik.mcdownloadmanager.safari"
-    /// Set this once the extension is published on the Chrome Web Store; "Install" then opens the store page.
+    /// Set this once the extension is published on the Chrome Web Store; the wizard then links to it.
     static let chromeWebStoreURL: URL? = nil
 
-    struct ChromiumBrowser: Identifiable, Hashable {
-        let id: String          // bundle id
-        let name: String
-        let appURL: URL
-        let extensionsURL: String
-    }
+    enum Kind: String, CaseIterable, Identifiable {
+        case safari, chrome, brave
+        var id: String { rawValue }
 
-    private static let knownChromium: [(String, String, String)] = [
-        ("com.google.Chrome", "Google Chrome", "chrome://extensions"),
-        ("com.brave.Browser", "Brave", "brave://extensions"),
-        ("com.microsoft.edgemac", "Microsoft Edge", "edge://extensions"),
-        ("company.thebrowser.Browser", "Arc", "arc://extensions"),
-        ("com.vivaldi.Vivaldi", "Vivaldi", "vivaldi://extensions"),
-        ("com.operasoftware.Opera", "Opera", "opera://extensions"),
-        ("org.chromium.Chromium", "Chromium", "chrome://extensions"),
-        ("com.google.Chrome.canary", "Chrome Canary", "chrome://extensions"),
-    ]
-
-    static var installedChromiumBrowsers: [ChromiumBrowser] {
-        knownChromium.compactMap { id, name, ext in
-            guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: id) else { return nil }
-            return ChromiumBrowser(id: id, name: name, appURL: url, extensionsURL: ext)
+        var name: String {
+            switch self {
+            case .safari: return "Safari"
+            case .chrome: return "Google Chrome"
+            case .brave: return "Brave"
+            }
         }
+        var bundleID: String {
+            switch self {
+            case .safari: return "com.apple.Safari"
+            case .chrome: return "com.google.Chrome"
+            case .brave: return "com.brave.Browser"
+            }
+        }
+        var extensionsPageURL: String {
+            switch self {
+            case .safari: return ""
+            case .chrome: return "chrome://extensions"
+            case .brave: return "brave://extensions"
+            }
+        }
+        var isChromium: Bool { self != .safari }
+        var appURL: URL? { NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) }
+        var isInstalled: Bool { appURL != nil }
+        var icon: NSImage? { appURL.map { NSWorkspace.shared.icon(forFile: $0.path) } }
     }
 
-    /// Bundled unpacked extension (inside the app).
+    /// Installed browsers in setup order.
+    static var installedBrowsers: [Kind] { Kind.allCases.filter(\.isInstalled) }
+
+    private static let queue = DispatchQueue(label: "dm.browser-integration", qos: .userInitiated)
+
+    // MARK: Files
+
+    /// Unpacked extension shipped inside the app.
     static var bundledExtensionFolder: URL {
         if let override = ProcessInfo.processInfo.environment["MCDM_EXTENSION_DIR"] { return URL(fileURLWithPath: override) }
         return Bundle.main.bundleURL.appendingPathComponent("Contents/Resources/ChromeExtension")
     }
 
-    /// Stable copy outside the app bundle so "Load unpacked" keeps working across app updates.
-    static var installedExtensionFolder: URL {
-        let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        return base.appendingPathComponent("MC Download Manager/ChromeExtension", isDirectory: true)
+    /// ~/Downloads/MC Download Manager/Browser Plugins
+    static var pluginsRoot: URL {
+        URL(fileURLWithPath: AppSettings.defaultDownloadDir).appendingPathComponent("Browser Plugins", isDirectory: true)
     }
 
-    private static let queue = DispatchQueue(label: "dm.browser-integration", qos: .userInitiated)
+    static func pluginFolder(for kind: Kind) -> URL {
+        pluginsRoot.appendingPathComponent(kind.name, isDirectory: true)
+    }
+
+    /// Copies the unpacked extension into the browser's plugin folder. Returns the folder.
+    @discardableResult
+    static func prepareFiles(for kind: Kind) throws -> URL {
+        let fm = FileManager.default
+        let dest = pluginFolder(for: kind)
+        try fm.createDirectory(at: pluginsRoot, withIntermediateDirectories: true)
+        if fm.fileExists(atPath: dest.path) { try fm.removeItem(at: dest) }
+        try fm.copyItem(at: bundledExtensionFolder, to: dest)
+        let readme = """
+        MC Download Manager — \(kind.name) extension
+
+        1. Open \(kind.extensionsPageURL) in \(kind.name).
+        2. Turn on "Developer mode" (top right).
+        3. Click "Load unpacked" and select this folder.
+
+        Do not move or delete this folder while the extension is installed.
+        """
+        try? readme.write(to: dest.appendingPathComponent("README.txt"), atomically: true, encoding: .utf8)
+        return dest
+    }
+
+    static func filesPrepared(for kind: Kind) -> Bool {
+        FileManager.default.fileExists(atPath: pluginFolder(for: kind).appendingPathComponent("manifest.json").path)
+    }
 
     // MARK: Safari
 
@@ -71,8 +107,7 @@ enum BrowserIntegration {
         }
     }
 
-    /// Re-registers the app and its extension with the system (helps when Safari does not list it).
-    /// Runs in the background; `completion` is called on the main thread.
+    /// Re-registers the app and its extension with the system. Runs in the background.
     static func repairSafariExtension(completion: (() -> Void)? = nil) {
         let appPath = Bundle.main.bundleURL.path
         let appex = Bundle.main.bundleURL.appendingPathComponent("Contents/PlugIns/MC Download Manager Extension.appex").path
@@ -86,60 +121,23 @@ enum BrowserIntegration {
 
     // MARK: Chromium
 
-    /// Copies the unpacked extension to the stable folder. Returns the folder.
-    @discardableResult
-    static func installUnpackedExtension() throws -> URL {
-        let fm = FileManager.default
-        let dest = installedExtensionFolder
-        try fm.createDirectory(at: dest.deletingLastPathComponent(), withIntermediateDirectories: true)
-        if fm.fileExists(atPath: dest.path) { try fm.removeItem(at: dest) }
-        try fm.copyItem(at: bundledExtensionFolder, to: dest)
-        return dest
-    }
-
-    /// Opens the browser's extensions page, reveals the folder and shows a short guide.
-    static func openExtensionsPage(in browser: ChromiumBrowser, showGuide: Bool = true) {
-        if let store = chromeWebStoreURL {
-            NSWorkspace.shared.open([store], withApplicationAt: browser.appURL, configuration: NSWorkspace.OpenConfiguration())
-            return
-        }
-        let folder = (try? installUnpackedExtension()) ?? bundledExtensionFolder
-        // Same mechanism as `open -a "Google Chrome" chrome://extensions` (works whether or not the browser runs).
+    /// Opens the browser's extensions page (same mechanism as `open -a <Browser> chrome://extensions`).
+    static func openExtensionsPage(in kind: Kind) {
+        guard kind.isChromium, let appURL = kind.appURL, let url = URL(string: kind.extensionsPageURL) else { return }
         let cfg = NSWorkspace.OpenConfiguration()
         cfg.activates = true
-        if let url = URL(string: browser.extensionsURL) {
-            NSWorkspace.shared.open([url], withApplicationAt: browser.appURL, configuration: cfg) { _, error in
-                if error != nil { run("/usr/bin/open", ["-a", browser.appURL.path, browser.extensionsURL]) }
-            }
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-            NSWorkspace.shared.activateFileViewerSelecting([folder])
-            if showGuide {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { showLoadUnpackedGuide(browser: browser, folder: folder) }
-            }
+        NSWorkspace.shared.open([url], withApplicationAt: appURL, configuration: cfg) { _, error in
+            if error != nil { queue.async { run("/usr/bin/open", ["-a", appURL.path, kind.extensionsPageURL]) } }
         }
     }
 
-    private static func showLoadUnpackedGuide(browser: ChromiumBrowser, folder: URL) {
-        let alert = NSAlert()
-        alert.messageText = String(localized: "Finish installing in \(browser.name)")
-        alert.informativeText = String(localized: """
-        \(browser.name) does not allow apps to install extensions automatically. On the extensions page that just opened:
+    static func revealInFinder(_ url: URL) {
+        NSWorkspace.shared.activateFileViewerSelecting([url])
+    }
 
-        1. Turn on “Developer mode” (top right).
-        2. Click “Load unpacked”.
-        3. Select this folder (press ⇧⌘G in the file dialog and paste the path):
-
-        \(folder.path)
-        """)
-        alert.addButton(withTitle: String(localized: "Copy Folder Path"))
-        alert.addButton(withTitle: String(localized: "Done"))
-        alert.window.level = .floating
-        NSApp.activate(ignoringOtherApps: true)
-        if alert.runModal() == .alertFirstButtonReturn {
-            NSPasteboard.general.clearContents()
-            NSPasteboard.general.setString(folder.path, forType: .string)
-        }
+    static func copyToClipboard(_ text: String) {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(text, forType: .string)
     }
 
     @discardableResult

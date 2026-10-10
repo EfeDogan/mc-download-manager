@@ -10,7 +10,9 @@ final class AppSettings: ObservableObject {
     @Published var serverPort: Int { didSet { defaults.set(serverPort, forKey: "serverPort") } }
     @Published var downloadDirectory: String { didSet { defaults.set(downloadDirectory, forKey: "downloadDirectory") } }
     @Published var ytdlpPath: String { didSet { defaults.set(ytdlpPath, forKey: "ytdlpPath") } }
-    @Published var videoFormat: String { didSet { defaults.set(videoFormat, forKey: "videoFormat") } }
+    @Published var videoFormat: String { didSet { defaults.set(videoFormat, forKey: "videoFormat") } }   // custom -f (overrides pickers when non-empty)
+    @Published var videoContainer: String { didSet { defaults.set(videoContainer, forKey: "videoContainer") } } // mp4 | mkv | webm | original
+    @Published var videoMaxHeight: Int { didSet { defaults.set(videoMaxHeight, forKey: "videoMaxHeight") } }   // 0 = best, -1 = audio m4a, -2 = audio mp3
     @Published var autoStart: Bool { didSet { defaults.set(autoStart, forKey: "autoStart") } }
     @Published var notifyOnComplete: Bool { didSet { defaults.set(notifyOnComplete, forKey: "notifyOnComplete") } }
     @Published var showDetailOnStart: Bool { didSet { defaults.set(showDetailOnStart, forKey: "showDetailOnStart") } }
@@ -36,7 +38,9 @@ final class AppSettings: ObservableObject {
         serverPort = defaults.object(forKey: "serverPort") as? Int ?? 48213
         downloadDirectory = defaults.string(forKey: "downloadDirectory") ?? Self.defaultDownloadDir
         ytdlpPath = defaults.string(forKey: "ytdlpPath") ?? ""
-        videoFormat = defaults.string(forKey: "videoFormat") ?? "bv*+ba/b"
+        videoFormat = defaults.string(forKey: "videoFormat") ?? ""
+        videoContainer = defaults.string(forKey: "videoContainer") ?? "mp4"
+        videoMaxHeight = defaults.object(forKey: "videoMaxHeight") as? Int ?? 1080
         autoStart = defaults.object(forKey: "autoStart") as? Bool ?? true
         notifyOnComplete = defaults.object(forKey: "notifyOnComplete") as? Bool ?? true
         showDetailOnStart = defaults.object(forKey: "showDetailOnStart") as? Bool ?? true
@@ -47,5 +51,31 @@ final class AppSettings: ObservableObject {
         onboardingDone = defaults.object(forKey: "onboardingDone") as? Bool ?? false
         organizeByCategory = defaults.object(forKey: "organizeByCategory") as? Bool ?? true
         checkForUpdates = defaults.object(forKey: "checkForUpdates") as? Bool ?? true
+    }
+
+    /// yt-dlp arguments for the chosen format/quality.
+    var ytdlpFormatArguments: [String] {
+        let custom = videoFormat.trimmingCharacters(in: .whitespaces)
+        if !custom.isEmpty { return ["-f", custom, "--merge-output-format", videoContainer == "original" ? "mkv" : videoContainer] }
+        if videoMaxHeight == -1 { return ["-f", "ba/b", "-x", "--audio-format", "m4a", "--audio-quality", "0"] }
+        if videoMaxHeight == -2 { return ["-f", "ba/b", "-x", "--audio-format", "mp3", "--audio-quality", "0"] }
+        let h = videoMaxHeight > 0 ? "[height<=\(videoMaxHeight)]" : ""
+        var expr: String
+        var args: [String] = []
+        switch videoContainer {
+        case "mp4":
+            // Prefer H.264 + AAC so the file plays everywhere (QuickTime, iOS); fall back to anything and merge into mp4.
+            expr = "bv*\(h)[vcodec^=avc1]+ba[acodec^=mp4a]/bv*\(h)[ext=mp4]+ba[ext=m4a]/bv*\(h)+ba/b\(h)/b"
+            args = ["--merge-output-format", "mp4", "--remux-video", "mp4"]
+        case "webm":
+            expr = "bv*\(h)[ext=webm]+ba[ext=webm]/bv*\(h)+ba/b\(h)/b"
+            args = ["--merge-output-format", "webm"]
+        case "mkv":
+            expr = "bv*\(h)+ba/b\(h)/b"
+            args = ["--merge-output-format", "mkv"]
+        default:
+            expr = "bv*\(h)+ba/b\(h)/b"
+        }
+        return ["-f", expr] + args
     }
 }

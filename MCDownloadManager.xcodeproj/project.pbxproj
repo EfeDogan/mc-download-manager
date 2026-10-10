@@ -19,6 +19,7 @@
 		44F49E39CFE7425265B8E67D /* BrowserIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 039A6DF1CFE03501E9B0A401 /* BrowserIntegration.swift */; };
 		4ABFFD403AF2BD3F56116B71 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC0FDA8C0D811D2E0C9C87E /* SettingsView.swift */; };
 		4B9C5DA5C0E78F4E2DA41104 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7BCC539B595281956E1B71FF /* Assets.xcassets */; };
+		4D60CF95BED45A682E1D3DC8 /* ExtensionSetupWizard.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4315A5826C2F72F4247D931 /* ExtensionSetupWizard.swift */; };
 		4F8297DE8356AAF844B0E183 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07140FDF4FFB084659EE61A2 /* UpdateChecker.swift */; };
 		52467EE3A9CCE7E5FA63A492 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B4E2AC443B11C6AD0C77DAE /* ContentView.swift */; };
 		5249B9F20D88E077F8483891 /* _locales in Resources */ = {isa = PBXBuildFile; fileRef = 9B6380AF715E1141FD889709 /* _locales */; };
@@ -93,6 +94,7 @@
 		AB398706B5B1AF31514846CB /* LocalServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalServer.swift; sourceTree = "<group>"; };
 		B63E5127C8210C9C6CE88CB8 /* content.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = content.js; sourceTree = "<group>"; };
 		CDA15CED2682BF59E18C3E09 /* SegmentedDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedDownloader.swift; sourceTree = "<group>"; };
+		D4315A5826C2F72F4247D931 /* ExtensionSetupWizard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionSetupWizard.swift; sourceTree = "<group>"; };
 		D63B5A8793FD88DB85E01AB5 /* SafariExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SafariExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE44A8B381BE7A3293C1D8DC /* ServerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerController.swift; sourceTree = "<group>"; };
 		F030B7DDEA243129E7D6EEB2 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
@@ -202,6 +204,7 @@
 				2722F3847C9938FE82AE52A6 /* CaptureTypesView.swift */,
 				3B4E2AC443B11C6AD0C77DAE /* ContentView.swift */,
 				3C449D1F34DAA3E448231E2A /* DownloadDetailView.swift */,
+				D4315A5826C2F72F4247D931 /* ExtensionSetupWizard.swift */,
 				9DD9E371341F53169BBB893E /* Formatters.swift */,
 				8AC0FDA8C0D811D2E0C9C87E /* SettingsView.swift */,
 			);
@@ -392,6 +395,7 @@
 				52467EE3A9CCE7E5FA63A492 /* ContentView.swift in Sources */,
 				A88422645DD9A03CCC3056AB /* DownloadDetailView.swift in Sources */,
 				07792A4DCF88CF4FB361FDAD /* DownloadStore.swift in Sources */,
+				4D60CF95BED45A682E1D3DC8 /* ExtensionSetupWizard.swift in Sources */,
 				8E5349391D8DF88F50F012EE /* Formatters.swift in Sources */,
 				AC784500F340D94A3AC04673 /* LocalServer.swift in Sources */,
 				780C3DB40CB6A6C5BEB669F4 /* Models.swift in Sources */,

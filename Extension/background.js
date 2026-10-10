@@ -6,6 +6,7 @@ const t = (k, subs) => { try { return api.i18n.getMessage(k, subs) || k; } catch
 const IS_SAFARI = typeof browser !== 'undefined' && !!browser.runtime.sendNativeMessage && !chrome.downloads?.onDeterminingFilename;
 
 const DEFAULTS = { port: 48213, intercept: true, minSizeMB: 0, sniff: true };
+const BROWSER = IS_SAFARI ? 'safari' : (navigator.brave ? 'brave' : (/Edg\//.test(navigator.userAgent) ? 'edge' : 'chrome'));
 
 const MEDIA_EXT = /\.(mp4|m4v|webm|mkv|mov|avi|flv|mp3|m4a|aac|ogg|opus|wav|flac)(\?|#|$)/i;
 const FRAGMENT = /\.(ts|m4s|m4f|cmfv|cmfa|fmp4|init)(\?|#|$)|[/_.-](seg|segment|chunk|frag|fragment)[-_]?\d+/i;
@@ -28,7 +29,7 @@ async function ping(settings) {
   try {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), 1200);
-    const r = await fetch(base(settings) + '/ping', { signal: ctrl.signal, cache: 'no-store' });
+    const r = await fetch(base(settings) + '/ping?browser=' + BROWSER, { signal: ctrl.signal, cache: 'no-store' });
     clearTimeout(t);
     if (!r.ok) return null;
     return await r.json();
@@ -257,8 +258,8 @@ function createMenus() {
     });
   } catch {}
 }
-api.runtime.onInstalled.addListener(createMenus);
-api.runtime.onStartup?.addListener(createMenus);
+api.runtime.onInstalled.addListener(() => { createMenus(); ping(); });
+api.runtime.onStartup?.addListener(() => { createMenus(); ping(); });
 menus?.onClicked.addListener((info, tab) => {
   if (info.menuItemId === 'dm-link') {
     const url = info.linkUrl || info.srcUrl;

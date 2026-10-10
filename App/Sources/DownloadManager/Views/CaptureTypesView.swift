@@ -30,13 +30,13 @@ struct CaptureTypesEditor: View {
     }
 }
 
-/// First-launch flow: 1) file types  2) browser extensions.
+/// First-launch flow: 1) file types  2) browser extensions (opens the guided wizard).
 struct OnboardingView: View {
     @EnvironmentObject var settings: AppSettings
+    @EnvironmentObject var server: ServerController
     @Environment(\.dismiss) private var dismiss
     @State private var step = 0
-    @State private var chromium = BrowserIntegration.installedChromiumBrowsers
-    @State private var installed = false
+    private let browsers = BrowserIntegration.installedBrowsers
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -58,52 +58,35 @@ struct OnboardingView: View {
                 Divider()
                 Toggle("Watch the clipboard for links and ask to download them", isOn: $settings.watchClipboard)
             } else {
-                Text("The extensions let Safari and Chrome hand their downloads to MC Download Manager and capture videos on pages. You can do this later from Settings ▸ Browser Extensions.")
+                Text("The extensions let your browsers hand their downloads to MC Download Manager and capture videos on pages. A guided setup walks you through each browser, one at a time. You can run it later from Settings ▸ Browser Extensions.")
                     .font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                 VStack(alignment: .leading, spacing: 8) {
-                    Label("Safari — the extension is built in; it only needs to be enabled in Safari's settings.", systemImage: "safari")
-                    ForEach(chromium) { b in
-                        Label("\(b.name) — the extensions page opens; turn on Developer mode and choose “Load unpacked” for the revealed folder.", systemImage: "globe")
+                    ForEach(browsers) { b in
+                        HStack(spacing: 8) {
+                            if let icon = b.icon { Image(nsImage: icon).resizable().frame(width: 18, height: 18) }
+                            Text(b.name)
+                        }
                     }
                 }
                 .font(.callout)
-                if installed {
-                    Text("Done. Enable the extension in Safari, and load the revealed folder in your Chromium browser.")
-                        .font(.callout).foregroundStyle(.green)
-                }
             }
             HStack {
-                if step == 1 {
-                    Button("Back") { step = 0 }
-                }
+                if step == 1 { Button("Back") { step = 0 } }
                 Spacer()
                 if step == 0 {
                     Button("Continue") { step = 1 }.keyboardShortcut(.defaultAction)
                 } else {
                     Button("Not Now") { finish() }.keyboardShortcut(.cancelAction)
-                    Button(installed ? "Finish" : "Install Extensions") {
-                        if installed { finish() } else { installAll() }
+                    Button("Start Setup") {
+                        finish()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { ExtensionWizardWindow.shared.show(server: server) }
                     }
-                    .disabled(false)
                     .keyboardShortcut(.defaultAction)
                 }
             }
         }
         .padding(22)
         .frame(width: 560)
-    }
-
-    private func installAll() {
-        installed = true
-        BrowserIntegration.repairSafariExtension {
-            BrowserIntegration.openSafariExtensionPreferences()
-        }
-        // Chromium browsers one after another so the guide dialogs do not pile up.
-        for (i, b) in chromium.enumerated() {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5 + Double(i) * 0.5) {
-                BrowserIntegration.openExtensionsPage(in: b, showGuide: i == chromium.count - 1)
-            }
-        }
     }
 
     private func finish() {

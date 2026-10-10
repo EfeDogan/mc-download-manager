@@ -71,11 +71,42 @@ enum VideoDownloader {
         var speed: Double
     }
 
+    /// Turns a yt-dlp log line into a user-facing phase description, if it marks a new phase.
+    static func stage(for line: String) -> String? {
+        if line.hasPrefix("[download] Destination:") {
+            let name = line.replacingOccurrences(of: "[download] Destination: ", with: "")
+            let lower = name.lowercased()
+            // yt-dlp names intermediate files <title>.f<formatid>.<ext>
+            if let r = lower.range(of: "\\.f[0-9]+[-a-z0-9]*\\.(m4a|webm|opus|mp3|aac|ogg)$", options: .regularExpression), r.upperBound == lower.endIndex {
+                return String(localized: "Downloading audio…")
+            }
+            if lower.range(of: "\\.f[0-9]+[-a-z0-9]*\\.[a-z0-9]+$", options: .regularExpression) != nil {
+                return String(localized: "Downloading video…")
+            }
+            return String(localized: "Downloading…")
+        }
+        if line.hasPrefix("[Merger]") { return String(localized: "Merging video and audio (ffmpeg)…") }
+        if line.hasPrefix("[VideoRemuxer]") || line.hasPrefix("[VideoConvertor]") { return String(localized: "Converting container (ffmpeg)…") }
+        if line.hasPrefix("[ExtractAudio]") { return String(localized: "Extracting audio (ffmpeg)…") }
+        if line.hasPrefix("MCFMT|") {
+            let p = line.split(separator: "|", omittingEmptySubsequences: false).map(String.init)
+            guard p.count >= 6 else { return nil }
+            var parts: [String] = []
+            if p[1] != "NA", !p[1].isEmpty { parts.append(p[1]) }
+            if p[2] != "NA" { parts.append(p[2].uppercased()) }
+            if let v = p[3].split(separator: ".").first, p[3] != "NA", p[3] != "none" { parts.append(String(v)) }
+            if let n = Double(p[5]), n > 0 { parts.append("~" + Fmt.size(Int64(n))) }
+            return String(localized: "Selected: \(parts.joined(separator: " · "))")
+        }
+        if line.contains("has already been downloaded") { return String(localized: "File already downloaded") }
+        return nil
+    }
+
     @discardableResult
     static func run(executable: String,
                     url: URL,
                     outputDir: URL,
-                    format: String,
+                    formatArgs: [String],
                     headers: [String: String],
                     cookieFile: String?,
                     onProgress: @escaping (Progress) -> Void,
@@ -85,16 +116,16 @@ enum VideoDownloader {
         let p = Process()
         p.executableURL = URL(fileURLWithPath: executable)
         var args = [
-            "--newline", "--no-playlist", "--no-colors", "--progress", "--no-simulate", "--no-mtime",
+            "--newline", "--no-playlist", "--no-colors", "--progress", "--no-simulate", "--no-mtime", "--no-quiet",
             "--no-check-certificates",
             "-N", "4",
-            "--merge-output-format", "mp4",
-            "-f", format,
             "-o", outputDir.appendingPathComponent("%(title).150B [%(id)s].%(ext)s").path,
             "--progress-template",
             "download:DMP|%(progress.downloaded_bytes)s|%(progress.total_bytes)s|%(progress.total_bytes_estimate)s|%(progress.speed)s",
             "--print", "after_move:filepath",
+            "--print", "before_dl:MCFMT|%(resolution)s|%(ext)s|%(vcodec)s|%(acodec)s|%(filesize_approx)s|%(format_id)s|%(duration)s",
         ]
+        args += formatArgs
         if let ff = locateFfmpeg() { args += ["--ffmpeg-location", ff] }
         if let ua = headers["User-Agent"], !ua.isEmpty { args += ["--user-agent", ua] }
         if let ref = headers["Referer"], !ref.isEmpty { args += ["--referer", ref] }
@@ -108,7 +139,7 @@ enum VideoDownloader {
         p.standardOutput = out
         p.standardError = err
 
-        let lock = NSLock()
+        let lock = NSRecursiveLock()   // drain() holds it while handle() re-enters for finalPath/lastError
         var finalPath: String?
         var lastError: String?
         var outBuf = Data()
@@ -145,25 +176,28 @@ enum VideoDownloader {
             }
         }
 
+        // EOF on both pipes is signalled through the group; termination waits for it (with a timeout)
+        // instead of a blocking readDataToEndOfFile(), which can hang if a grandchild keeps the pipe open.
+        let eof = DispatchGroup()
+        eof.enter(); eof.enter()
         out.fileHandleForReading.readabilityHandler = { fh in
             let d = fh.availableData
-            if d.isEmpty { fh.readabilityHandler = nil; return }
+            if d.isEmpty { fh.readabilityHandler = nil; eof.leave(); return }
             lock.lock(); drain(&outBuf, d, isError: false); lock.unlock()
         }
         err.fileHandleForReading.readabilityHandler = { fh in
             let d = fh.availableData
-            if d.isEmpty { fh.readabilityHandler = nil; return }
+            if d.isEmpty { fh.readabilityHandler = nil; eof.leave(); return }
             lock.lock(); drain(&errBuf, d, isError: true); lock.unlock()
         }
 
         p.terminationHandler = { proc in
+            _ = eof.wait(timeout: .now() + 3)
             out.fileHandleForReading.readabilityHandler = nil
             err.fileHandleForReading.readabilityHandler = nil
-            let restOut = out.fileHandleForReading.readDataToEndOfFile()
-            let restErr = err.fileHandleForReading.readDataToEndOfFile()
             lock.lock()
-            drain(&outBuf, restOut + Data([0x0A]), isError: false)
-            drain(&errBuf, restErr + Data([0x0A]), isError: true)
+            drain(&outBuf, Data([0x0A]), isError: false)
+            drain(&errBuf, Data([0x0A]), isError: true)
             let path = finalPath
             let errText = lastError
             lock.unlock()

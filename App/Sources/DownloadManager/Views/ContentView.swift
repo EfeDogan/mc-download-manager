@@ -311,6 +311,7 @@ struct StatusCell: View {
         case .failed: return String(localized: "Error: \(item.errorMessage ?? "")")
         case .downloading, .paused, .probing:
             let pct = item.totalBytes > 0 ? "\(Int(item.progress * 100))% " : ""
+            if item.kind == .video, item.state == .downloading, !item.stage.isEmpty { return pct + item.stage }
             return pct + item.state.label
         case .cancelled: return String(localized: "Cancelled")
         }

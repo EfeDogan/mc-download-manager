@@ -1002,36 +1002,6 @@
         }
       }
     },
-    "Format": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Format"
-          }
-        }
-      }
-    },
-    "yt-dlp -f value": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "yt-dlp -f değeri"
-          }
-        }
-      }
-    },
-    "Examples: bv*+ba/b (best), bv*[height<=1080]+ba/b (up to 1080p), ba (audio only)": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Örnekler: bv*+ba/b (en iyi), bv*[height<=1080]+ba/b (1080p'ye kadar), ba (yalnızca ses)"
-          }
-        }
-      }
-    },
     "This download was removed from the list.": {
       "localizations": {
         "tr": {
@@ -1068,16 +1038,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sürdür"
-          }
-        }
-      }
-    },
-    "Close window when completed": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tamamlanınca pencereyi kapat"
           }
         }
       }
@@ -1712,112 +1672,12 @@
         }
       }
     },
-    "Extension is enabled in Safari": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Eklenti Safari'de etkin"
-          }
-        }
-      }
-    },
-    "Extension is not enabled in Safari": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Eklenti Safari'de etkin değil"
-          }
-        }
-      }
-    },
-    "Extension state unknown": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Eklenti durumu bilinmiyor"
-          }
-        }
-      }
-    },
     "Refresh": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
             "value": "Yenile"
-          }
-        }
-      }
-    },
-    "Enable in Safari…": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Safari'de Etkinleştir…"
-          }
-        }
-      }
-    },
-    "Repair": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Onar"
-          }
-        }
-      }
-    },
-    "Ad-hoc signed builds also need Safari ▸ Develop ▸ Allow Unsigned Extensions. “Repair” re-registers the extension with the system.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ad-hoc imzalı derlemelerde ayrıca Safari ▸ Geliştirici ▸ İmzasız uzantılara izin ver gerekir. “Onar” eklentiyi sisteme yeniden kaydeder."
-          }
-        }
-      }
-    },
-    "No Chromium-based browser found in /Applications.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "/Applications içinde Chromium tabanlı tarayıcı bulunamadı."
-          }
-        }
-      }
-    },
-    "Install / Repair…": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kur / Onar…"
-          }
-        }
-      }
-    },
-    "Chrome does not allow apps to install extensions silently. “Install” copies the extension to a stable folder, opens the browser's extensions page and reveals the folder: turn on Developer mode and choose “Load unpacked”.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Chrome, uygulamaların eklentileri sessizce kurmasına izin vermez. “Kur” eklentiyi sabit bir klasöre kopyalar, tarayıcının eklentiler sayfasını açar ve klasörü gösterir: Geliştirici modunu açıp “Paketlenmemiş öğe yükle”yi seçin."
-          }
-        }
-      }
-    },
-    "Opened %@. Turn on Developer mode, click “Load unpacked” and select the revealed folder.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ açıldı. Geliştirici modunu açın, “Paketlenmemiş öğe yükle”ye tıklayın ve gösterilen klasörü seçin."
           }
         }
       }
@@ -1862,36 +1722,6 @@
         }
       }
     },
-    "Safari — the extension is built in; it only needs to be enabled in Safari's settings.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Safari — eklenti uygulamanın içinde gelir; yalnızca Safari ayarlarından etkinleştirilmesi gerekir."
-          }
-        }
-      }
-    },
-    "%@ — the extensions page opens; turn on Developer mode and choose “Load unpacked” for the revealed folder.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ — eklentiler sayfası açılır; Geliştirici modunu açıp gösterilen klasör için “Paketlenmemiş öğe yükle”yi seçin."
-          }
-        }
-      }
-    },
-    "Done. Enable the extension in Safari, and load the revealed folder in your Chromium browser.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tamam. Safari'de eklentiyi etkinleştirin ve Chromium tarayıcınızda gösterilen klasörü yükleyin."
-          }
-        }
-      }
-    },
     "Back": {
       "localizations": {
         "tr": {
@@ -1918,16 +1748,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bitir"
-          }
-        }
-      }
-    },
-    "Install Extensions": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Eklentileri Kur"
           }
         }
       }
@@ -2292,16 +2112,6 @@
         }
       }
     },
-    "Finish installing in %@": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ içinde kurulumu tamamlayın"
-          }
-        }
-      }
-    },
     "%1$@ does not allow apps to install extensions automatically. On the extensions page that just opened:\n\n1. Turn on “Developer mode” (top right).\n2. Click “Load unpacked”.\n3. Select this folder (press ⇧⌘G in the file dialog and paste the path):\n\n%2$@": {
       "localizations": {
         "tr": {
@@ -2328,6 +2138,656 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tamam"
+          }
+        }
+      }
+    },
+    "Browser %lld of %lld · Step %lld of %lld": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarayıcı %lld / %lld · Adım %lld / %lld"
+          }
+        }
+      }
+    },
+    "Skip This Browser": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Tarayıcıyı Atla"
+          }
+        }
+      }
+    },
+    "Next Browser": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sonraki Tarayıcı"
+          }
+        }
+      }
+    },
+    "Next": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İleri"
+          }
+        }
+      }
+    },
+    "The Safari extension is built into the app": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safari eklentisi uygulamanın içinde gelir"
+          }
+        }
+      }
+    },
+    "Nothing needs to be downloaded. The extension only has to be enabled once in Safari's settings. This button registers the extension with macOS and opens the Safari extension settings.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiçbir şey indirmeniz gerekmez. Eklentinin yalnızca Safari ayarlarından bir kez etkinleştirilmesi gerekir. Bu düğme eklentiyi macOS'a kaydeder ve Safari uzantı ayarlarını açar."
+          }
+        }
+      }
+    },
+    "Builds without a Developer ID signature also need Safari ▸ Develop ▸ Allow Unsigned Extensions. If the Develop menu is hidden: Safari ▸ Settings ▸ Advanced ▸ “Show features for web developers”.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Developer ID imzası olmayan derlemelerde ayrıca Safari ▸ Geliştirici ▸ İmzasız uzantılara izin ver gerekir. Geliştirici menüsü görünmüyorsa: Safari ▸ Ayarlar ▸ İleri Düzey ▸ “Web geliştiricileri için özellikleri göster”."
+          }
+        }
+      }
+    },
+    "Enable “MC Download Manager” in Safari": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safari'de “MC Download Manager”ı etkinleştirin"
+          }
+        }
+      }
+    },
+    "In Safari ▸ Settings ▸ Extensions, tick the checkbox next to MC Download Manager. When Safari asks for website access, choose “Always Allow on Every Website” so downloads on all sites are captured.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safari ▸ Ayarlar ▸ Uzantılar bölümünde MC Download Manager'ın yanındaki kutuyu işaretleyin. Safari web sitesi erişimi sorduğunda tüm sitelerdeki indirmelerin yakalanması için “Her Web Sitesinde Her Zaman İzin Ver”i seçin."
+          }
+        }
+      }
+    },
+    "Not enabled yet — this updates automatically": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Henüz etkin değil — bu durum otomatik güncellenir"
+          }
+        }
+      }
+    },
+    "Open Safari Extension Settings Again": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safari Uzantı Ayarlarını Yeniden Aç"
+          }
+        }
+      }
+    },
+    "Safari is ready": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safari hazır"
+          }
+        }
+      }
+    },
+    "Download a file in Safari or click the MC Download Manager toolbar button to see captured videos. The toolbar button's popup should show “Connected”.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safari'de bir dosya indirin veya yakalanan videoları görmek için araç çubuğundaki MC Download Manager düğmesine tıklayın. Düğmenin açılır penceresi “Bağlı” göstermeli."
+          }
+        }
+      }
+    },
+    "Extension has connected to the app": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eklenti uygulamaya bağlandı"
+          }
+        }
+      }
+    },
+    "Waiting for the extension to connect (open the popup once)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eklentinin bağlanması bekleniyor (açılır pencereyi bir kez açın)"
+          }
+        }
+      }
+    },
+    "Prepare the extension files": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eklenti dosyalarını hazırlayın"
+          }
+        }
+      }
+    },
+    "%@ does not allow apps to install extensions automatically, so the extension is loaded from a folder. The files are placed in:": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@, uygulamaların eklentileri otomatik kurmasına izin vermez; bu yüzden eklenti bir klasörden yüklenir. Dosyalar şuraya yerleştirilir:"
+          }
+        }
+      }
+    },
+    "Prepare Files": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dosyaları Hazırla"
+          }
+        }
+      }
+    },
+    "Files are ready": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dosyalar hazır"
+          }
+        }
+      }
+    },
+    "Click “Prepare Files”": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“Dosyaları Hazırla”ya tıklayın"
+          }
+        }
+      }
+    },
+    "Keep this folder in place; the browser loads the extension from it.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu klasörü yerinde tutun; tarayıcı eklentiyi buradan yükler."
+          }
+        }
+      }
+    },
+    "Open the extensions page and turn on Developer mode": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eklentiler sayfasını açın ve Geliştirici modunu etkinleştirin"
+          }
+        }
+      }
+    },
+    "Click the button below. On the page that opens, switch on “Developer mode” in the top right corner.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aşağıdaki düğmeye tıklayın. Açılan sayfada sağ üst köşedeki “Geliştirici modu”nu açın."
+          }
+        }
+      }
+    },
+    "Open %@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ adresini aç"
+          }
+        }
+      }
+    },
+    "Or install from the Chrome Web Store": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ya da Chrome Web Store'dan kurun"
+          }
+        }
+      }
+    },
+    "Load the extension folder": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eklenti klasörünü yükleyin"
+          }
+        }
+      }
+    },
+    "Click “Load unpacked” on the extensions page. In the file dialog press ⇧⌘G, paste the folder path below and press Return, then click “Select”.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eklentiler sayfasında “Paketlenmemiş öğe yükle”ye tıklayın. Dosya penceresinde ⇧⌘G basın, aşağıdaki klasör yolunu yapıştırıp Return'e basın, ardından “Seç”e tıklayın."
+          }
+        }
+      }
+    },
+    "Copied": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kopyalandı"
+          }
+        }
+      }
+    },
+    "%@ is ready": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ hazır"
+          }
+        }
+      }
+    },
+    "Pin MC Download Manager to the toolbar (puzzle icon ▸ pin). Its popup should show “Connected”. Downloads of the captured file types are now handed to the app.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MC Download Manager'ı araç çubuğuna sabitleyin (yapboz simgesi ▸ sabitle). Açılır penceresi “Bağlı” göstermeli. Yakalanan dosya türlerindeki indirmeler artık uygulamaya aktarılır."
+          }
+        }
+      }
+    },
+    "Waiting for the extension to connect (it connects right after loading)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eklentinin bağlanması bekleniyor (yüklendikten hemen sonra bağlanır)"
+          }
+        }
+      }
+    },
+    "Browser Extension Setup": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarayıcı Eklentisi Kurulumu"
+          }
+        }
+      }
+    },
+    "Browser extensions": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarayıcı eklentileri"
+          }
+        }
+      }
+    },
+    "The guided setup walks you through each installed browser one at a time: Safari (built in, just enable it), Google Chrome and Brave (loaded from a folder).": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yönlendirmeli kurulum, kurulu tarayıcıları tek tek ele alır: Safari (gömülü, yalnızca etkinleştirin), Google Chrome ve Brave (klasörden yüklenir)."
+          }
+        }
+      }
+    },
+    "Open Setup Wizard…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kurulum Sihirbazını Aç…"
+          }
+        }
+      }
+    },
+    "Refresh Status": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durumu Yenile"
+          }
+        }
+      }
+    },
+    "Enabled": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Etkin"
+          }
+        }
+      }
+    },
+    "Not enabled": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Etkin değil"
+          }
+        }
+      }
+    },
+    "Connected": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bağlı"
+          }
+        }
+      }
+    },
+    "Files prepared, not loaded yet": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dosyalar hazır, henüz yüklenmedi"
+          }
+        }
+      }
+    },
+    "Not installed": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kurulu değil"
+          }
+        }
+      }
+    },
+    "Show Plugin Folder": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eklenti Klasörünü Göster"
+          }
+        }
+      }
+    },
+    "The extensions let your browsers hand their downloads to MC Download Manager and capture videos on pages. A guided setup walks you through each browser, one at a time. You can run it later from Settings ▸ Browser Extensions.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eklentiler sayesinde tarayıcılarınız indirmelerini MC Download Manager'a aktarır ve sayfalardaki videolar yakalanır. Yönlendirmeli kurulum her tarayıcıyı tek tek ele alır. Bunu daha sonra Ayarlar ▸ Tarayıcı Eklentileri bölümünden de çalıştırabilirsiniz."
+          }
+        }
+      }
+    },
+    "Start Setup": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kurulumu Başlat"
+          }
+        }
+      }
+    },
+    "Downloading audio…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ses indiriliyor…"
+          }
+        }
+      }
+    },
+    "Downloading video…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video indiriliyor…"
+          }
+        }
+      }
+    },
+    "Downloading…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İndiriliyor…"
+          }
+        }
+      }
+    },
+    "Merging video and audio (ffmpeg)…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video ve ses birleştiriliyor (ffmpeg)…"
+          }
+        }
+      }
+    },
+    "Converting container (ffmpeg)…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapsayıcı dönüştürülüyor (ffmpeg)…"
+          }
+        }
+      }
+    },
+    "Extracting audio (ffmpeg)…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ses ayıklanıyor (ffmpeg)…"
+          }
+        }
+      }
+    },
+    "File already downloaded": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dosya zaten indirilmiş"
+          }
+        }
+      }
+    },
+    "Fetching video information…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video bilgileri alınıyor…"
+          }
+        }
+      }
+    },
+    "Default format": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Varsayılan format"
+          }
+        }
+      }
+    },
+    "Container": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapsayıcı"
+          }
+        }
+      }
+    },
+    "MP4 (H.264/AAC, plays everywhere)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MP4 (H.264/AAC, her yerde oynar)"
+          }
+        }
+      }
+    },
+    "Original (no conversion)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orijinal (dönüştürme yok)"
+          }
+        }
+      }
+    },
+    "Maximum resolution": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En yüksek çözünürlük"
+          }
+        }
+      }
+    },
+    "Best available": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mevcut en iyi"
+          }
+        }
+      }
+    },
+    "Audio only (M4A)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yalnızca ses (M4A)"
+          }
+        }
+      }
+    },
+    "Audio only (MP3)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yalnızca ses (MP3)"
+          }
+        }
+      }
+    },
+    "Default: MP4 at up to 1080p. Streams are merged with the bundled ffmpeg.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Varsayılan: en fazla 1080p MP4. Akışlar gömülü ffmpeg ile birleştirilir."
+          }
+        }
+      }
+    },
+    "Custom yt-dlp -f expression (overrides the pickers)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Özel yt-dlp -f ifadesi (seçicileri geçersiz kılar)"
+          }
+        }
+      }
+    },
+    "Effective arguments: %@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kullanılan argümanlar: %@"
+          }
+        }
+      }
+    },
+    "Close when completed": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamamlanınca kapat"
+          }
+        }
+      }
+    },
+    "Selected: %@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seçilen: %@"
           }
         }
       }

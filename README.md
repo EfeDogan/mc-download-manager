@@ -67,6 +67,18 @@ CODESIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)" NOTARY_PROFILE=
 
 The GitHub Actions workflow (`.github/workflows/build.yml`) builds a DMG on every push and attaches it to the release on `v*` tags.
 
+### Publishing the Chrome extension to the Web Store
+
+Chrome only installs extensions silently from the Chrome Web Store, so until the extension is published the app guides users through
+*Developer mode ▸ Load unpacked*. To publish:
+
+```bash
+scripts/pack-extension.sh      # → build/mc-download-manager-chrome-<version>.zip
+```
+
+Upload the zip in the [Chrome Web Store developer console](https://chrome.google.com/webstore/devconsole), then set
+`BrowserIntegration.chromeWebStoreURL` to the store page; "Install" will open it directly.
+
 ## Project layout
 
 ```

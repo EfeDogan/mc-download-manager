@@ -84,6 +84,7 @@ struct OnboardingView: View {
                     Button(installed ? "Finish" : "Install Extensions") {
                         if installed { finish() } else { installAll() }
                     }
+                    .disabled(false)
                     .keyboardShortcut(.defaultAction)
                 }
             }
@@ -93,12 +94,16 @@ struct OnboardingView: View {
     }
 
     private func installAll() {
-        BrowserIntegration.repairSafariExtension()
-        BrowserIntegration.openSafariExtensionPreferences()
-        for b in chromium {
-            BrowserIntegration.openExtensionsPage(in: b)
-        }
         installed = true
+        BrowserIntegration.repairSafariExtension {
+            BrowserIntegration.openSafariExtensionPreferences()
+        }
+        // Chromium browsers one after another so the guide dialogs do not pile up.
+        for (i, b) in chromium.enumerated() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5 + Double(i) * 0.5) {
+                BrowserIntegration.openExtensionsPage(in: b, showGuide: i == chromium.count - 1)
+            }
+        }
     }
 
     private func finish() {

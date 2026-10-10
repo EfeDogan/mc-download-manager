@@ -2291,6 +2291,46 @@
           }
         }
       }
+    },
+    "Finish installing in %@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ içinde kurulumu tamamlayın"
+          }
+        }
+      }
+    },
+    "%1$@ does not allow apps to install extensions automatically. On the extensions page that just opened:\n\n1. Turn on “Developer mode” (top right).\n2. Click “Load unpacked”.\n3. Select this folder (press ⇧⌘G in the file dialog and paste the path):\n\n%2$@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, uygulamaların eklentileri otomatik kurmasına izin vermez. Az önce açılan eklentiler sayfasında:\n\n1. “Geliştirici modu”nu açın (sağ üst).\n2. “Paketlenmemiş öğe yükle”ye tıklayın.\n3. Şu klasörü seçin (dosya penceresinde ⇧⌘G basıp yolu yapıştırın):\n\n%2$@"
+          }
+        }
+      }
+    },
+    "Copy Folder Path": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klasör Yolunu Kopyala"
+          }
+        }
+      }
+    },
+    "Done": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamam"
+          }
+        }
+      }
     }
   }
 }

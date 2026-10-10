@@ -143,8 +143,7 @@ struct BrowserSettings: View {
                 HStack {
                     Button("Enable in Safari…") { BrowserIntegration.openSafariExtensionPreferences() }
                     Button("Repair") {
-                        BrowserIntegration.repairSafariExtension()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { refreshSafari() }
+                        BrowserIntegration.repairSafariExtension { refreshSafari() }
                     }
                 }
                 Text("Ad-hoc signed builds also need Safari ▸ Develop ▸ Allow Unsigned Extensions. “Repair” re-registers the extension with the system.")

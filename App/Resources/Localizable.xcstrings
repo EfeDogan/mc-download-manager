@@ -232,16 +232,6 @@
         }
       }
     },
-    "yt-dlp not found. Set its path in Settings or install it with `brew install yt-dlp`.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "yt-dlp bulunamadı. Ayarlar'dan yolunu belirtin veya `brew install yt-dlp` ile kurun."
-          }
-        }
-      }
-    },
     "Download completed": {
       "localizations": {
         "tr": {
@@ -2188,6 +2178,116 @@
           "stringUnit": {
             "state": "translated",
             "value": "Geçersiz port: %@"
+          }
+        }
+      }
+    },
+    "yt-dlp not found. Use “Install yt-dlp” in Settings ▸ Video.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "yt-dlp bulunamadı. Ayarlar ▸ Video bölümündeki “yt-dlp'yi Kur” düğmesini kullanın."
+          }
+        }
+      }
+    },
+    "Downloading yt-dlp…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "yt-dlp indiriliyor…"
+          }
+        }
+      }
+    },
+    "Verifying…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Doğrulanıyor…"
+          }
+        }
+      }
+    },
+    "The downloaded yt-dlp binary could not be executed.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İndirilen yt-dlp ikilisi çalıştırılamadı."
+          }
+        }
+      }
+    },
+    "yt-dlp %@ installed.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "yt-dlp %@ kuruldu."
+          }
+        }
+      }
+    },
+    "Install failed: %@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kurulum başarısız: %@"
+          }
+        }
+      }
+    },
+    "yt-dlp %@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "yt-dlp %@"
+          }
+        }
+      }
+    },
+    "Installing…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kuruluyor…"
+          }
+        }
+      }
+    },
+    "Install yt-dlp": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "yt-dlp'yi Kur"
+          }
+        }
+      }
+    },
+    "Update yt-dlp": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "yt-dlp'yi Güncelle"
+          }
+        }
+      }
+    },
+    "yt-dlp and ffmpeg are bundled with the app. “Update” downloads the latest yt-dlp release from GitHub into Application Support and uses it instead of the bundled copy. Update when YouTube downloads stop working.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "yt-dlp ve ffmpeg uygulamayla birlikte gelir. “Güncelle”, GitHub'daki en son yt-dlp sürümünü Application Support klasörüne indirir ve gömülü kopya yerine onu kullanır. YouTube indirmeleri çalışmamaya başlarsa güncelleyin."
           }
         }
       }

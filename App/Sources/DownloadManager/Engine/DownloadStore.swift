@@ -229,7 +229,7 @@ final class DownloadStore: ObservableObject {
         guard let exe = VideoDownloader.locateYtDlp(custom: settings.ytdlpPath) else {
             update(id) {
                 $0.state = .failed
-                $0.errorMessage = String(localized: "yt-dlp not found. Set its path in Settings or install it with `brew install yt-dlp`.")
+                $0.errorMessage = String(localized: "yt-dlp not found. Use “Install yt-dlp” in Settings ▸ Video.")
             }
             pumpQueue()
             return

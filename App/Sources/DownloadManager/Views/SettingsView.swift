@@ -208,6 +208,7 @@ struct BrowserSettings: View {
 struct VideoSettings: View {
     @EnvironmentObject var settings: AppSettings
     @ObservedObject private var login = SiteLoginManager.shared
+    @ObservedObject private var installer = ToolInstaller.shared
 
     var body: some View {
         Form {
@@ -232,13 +233,33 @@ struct VideoSettings: View {
             }
             Section("yt-dlp") {
                 HStack {
+                    if let found = VideoDownloader.locateYtDlp(custom: settings.ytdlpPath) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            if let v = installer.installedVersion {
+                                Text("yt-dlp \(v)")
+                            } else {
+                                Text("yt-dlp")
+                            }
+                            Text(found).font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle)
+                        }
+                    } else {
+                        Text("yt-dlp not found").foregroundStyle(.red)
+                    }
+                    Spacer()
+                    Button(installer.busy ? "Installing…" : (VideoDownloader.locateYtDlp(custom: settings.ytdlpPath) == nil ? "Install yt-dlp" : "Update yt-dlp")) {
+                        installer.installOrUpdateYtDlp { _ in installer.refreshVersion(custom: settings.ytdlpPath) }
+                    }
+                    .disabled(installer.busy)
+                }
+                if installer.busy {
+                    ProgressView(value: installer.progress).progressViewStyle(.linear)
+                }
+                if let m = installer.message { Text(m).font(.caption).foregroundStyle(.secondary) }
+                Text("yt-dlp and ffmpeg are bundled with the app. “Update” downloads the latest yt-dlp release from GitHub into Application Support and uses it instead of the bundled copy. Update when YouTube downloads stop working.")
+                    .font(.caption).foregroundStyle(.secondary)
+                HStack {
                     TextField("Custom yt-dlp path (empty = bundled)", text: $settings.ytdlpPath)
                     Button("Choose…") { chooseYtDlp() }
-                }
-                if let found = VideoDownloader.locateYtDlp(custom: settings.ytdlpPath) {
-                    Text("Using: \(found)").font(.caption).foregroundStyle(.secondary)
-                } else {
-                    Text("yt-dlp not found").font(.caption).foregroundStyle(.red)
                 }
                 if let ff = VideoDownloader.locateFfmpeg() {
                     Text("ffmpeg: \(ff)").font(.caption).foregroundStyle(.secondary)
@@ -253,6 +274,7 @@ struct VideoSettings: View {
             }
         }
         .formStyle(.grouped)
+        .onAppear { installer.refreshVersion(custom: settings.ytdlpPath) }
     }
 
     private func chooseYtDlp() {

@@ -11,6 +11,7 @@ enum VideoDownloader {
     static func locateYtDlp(custom: String) -> String? {
         let candidates = [
             custom,
+            ToolInstaller.userYtDlpPath,
             helpersDirectory.appendingPathComponent("yt-dlp").path,
             "/opt/homebrew/bin/yt-dlp",
             "/usr/local/bin/yt-dlp",

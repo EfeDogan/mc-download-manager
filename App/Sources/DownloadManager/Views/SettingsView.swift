@@ -172,6 +172,9 @@ struct BrowserSettings: View {
         }
         .formStyle(.grouped)
         .onAppear { refresh() }
+        // Keep the status live: the wizard, Safari and the extensions change it while this pane is open.
+        .onReceive(Timer.publish(every: 3, on: .main, in: .common).autoconnect()) { _ in refresh() }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in refresh() }
     }
 
     @ViewBuilder

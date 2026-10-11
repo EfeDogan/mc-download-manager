@@ -110,8 +110,10 @@ struct ExtensionSetupWizard: View {
             Button {
                 BrowserIntegration.repairSafariExtension { BrowserIntegration.openSafariExtensionPreferences() }
             } label: { Label("Open Safari Extension Settings", systemImage: "safari") }
-            Text("Builds without a Developer ID signature also need Safari ▸ Develop ▸ Allow Unsigned Extensions. If the Develop menu is hidden: Safari ▸ Settings ▸ Advanced ▸ “Show features for web developers”.")
-                .font(.caption).foregroundStyle(.secondary)
+            if !BrowserIntegration.isSignedWithAppleCertificate {
+                Text("Builds without a Developer ID signature also need Safari ▸ Develop ▸ Allow Unsigned Extensions. If the Develop menu is hidden: Safari ▸ Settings ▸ Advanced ▸ “Show features for web developers”.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
         case 1:
             stepTitle("Enable “MC Download Manager” in Safari")
             Text("In Safari ▸ Settings ▸ Extensions, tick the checkbox next to MC Download Manager. When Safari asks for website access, choose “Always Allow on Every Website” so downloads on all sites are captured.")
@@ -221,7 +223,7 @@ final class ExtensionWizardWindow {
         w.contentView = NSHostingView(rootView: root)
         w.isReleasedWhenClosed = false
         w.center()
-        w.level = .floating
+        // Normal level: Safari / System Settings opened from the wizard must come in front of it.
         window = w
         w.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)

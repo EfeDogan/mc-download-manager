@@ -1,5 +1,6 @@
 import AppKit
 import Foundation
+import Security
 import SafariServices
 
 /// Browser extension helpers. Supported browsers for the guided setup: Safari, Google Chrome, Brave.
@@ -94,6 +95,17 @@ enum BrowserIntegration {
                 cont.resume(returning: state?.isEnabled)
             }
         }
+    }
+
+    /// True when the app is signed with an Apple-issued certificate (Developer ID or Apple Development),
+    /// i.e. Safari loads the extension without "Allow Unsigned Extensions". Ad-hoc builds have no team.
+    static var isSignedWithAppleCertificate: Bool {
+        var code: SecStaticCode?
+        guard SecStaticCodeCreateWithPath(Bundle.main.bundleURL as CFURL, [], &code) == errSecSuccess, let code else { return false }
+        var info: CFDictionary?
+        guard SecCodeCopySigningInformation(code, SecCSFlags(rawValue: kSecCSSigningInformation), &info) == errSecSuccess,
+              let dict = info as? [String: Any] else { return false }
+        return (dict[kSecCodeInfoTeamIdentifier as String] as? String)?.isEmpty == false
     }
 
     static func openSafariExtensionPreferences() {

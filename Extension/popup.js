@@ -71,12 +71,77 @@ async function loadMedia() {
   }
 }
 
+// ---------- Downloads (progress list) ----------
+const seenActive = new Set();   // ids that were active while this popup was open → keep showing their final state
+const STATE_LABEL = { queued: 'stateQueued', paused: 'statePaused', probing: 'stateProbing', completed: 'stateCompleted', failed: 'stateFailed', cancelled: 'stateCancelled' };
+let dlTimer = null;
+
+async function loadDownloads() {
+  const all = (await send({ type: 'downloads' })) || [];
+  const shown = all.filter((d) => {
+    if (d.state === 'downloading' || d.state === 'probing') { seenActive.add(d.id); return true; }
+    if (d.state === 'queued' || d.state === 'paused') return true;
+    return seenActive.has(d.id);
+  });
+  const ul = $('dl');
+  $('noDl').classList.toggle('hidden', shown.length > 0);
+  // Rebuild only when the set of rows changes; otherwise update in place to keep buttons clickable.
+  const ids = shown.map((d) => d.id).join('|');
+  if (ul.dataset.ids !== ids) { ul.innerHTML = ''; ul.dataset.ids = ids; for (const d of shown) ul.appendChild(buildRow(d)); }
+  for (const d of shown) updateRow(d);
+}
+
+function buildRow(d) {
+  const li = document.createElement('li'); li.dataset.id = d.id;
+  const info = document.createElement('div'); info.className = 'info';
+  const name = document.createElement('div'); name.className = 'name';
+  const bar = document.createElement('div'); bar.className = 'bar'; bar.appendChild(Object.assign(document.createElement('div'), { className: 'fill' }));
+  const meta = document.createElement('div'); meta.className = 'meta';
+  info.append(name, bar, meta);
+  const actions = document.createElement('div'); actions.className = 'actions';
+  const toggle = document.createElement('button'); toggle.className = 'icon toggle';
+  toggle.onclick = () => send({ type: 'action', id: d.id, action: toggle.dataset.action }).then(loadDownloads);
+  const cancel = document.createElement('button'); cancel.className = 'icon cancel'; cancel.textContent = '✕'; cancel.title = t('popupCancel');
+  cancel.onclick = () => send({ type: 'action', id: d.id, action: cancel.dataset.action || 'cancel' }).then(loadDownloads);
+  actions.append(toggle, cancel);
+  li.append(info, actions);
+  return li;
+}
+
+function updateRow(d) {
+  const li = $('dl').querySelector(`li[data-id="${d.id}"]`); if (!li) return;
+  li.querySelector('.name').textContent = d.name; li.querySelector('.name').title = d.name;
+  const active = d.state === 'downloading' || d.state === 'probing';
+  const pct = d.total > 0 ? Math.min(100, Math.round((100 * d.received) / d.total)) : (d.state === 'completed' ? 100 : 0);
+  const bar = li.querySelector('.bar');
+  bar.className = 'bar' + (active && d.total <= 0 ? ' indeterminate' : '') + (d.state === 'completed' ? ' done' : '') + (d.state === 'failed' ? ' failed' : '');
+  bar.querySelector('.fill').style.width = (active && d.total <= 0) ? '' : pct + '%';
+  const parts = [];
+  if (d.state === 'downloading') {
+    if (d.total > 0) parts.push(pct + '%', fmtSize(d.received) + ' / ' + fmtSize(d.total));
+    if (d.speed > 0) parts.push(fmtSize(d.speed) + '/s');
+    if (d.stage) parts.push(d.stage);
+  } else {
+    parts.push(d.stage && active ? d.stage : t(STATE_LABEL[d.state] || d.state));
+    if (d.state === 'failed' && d.error) parts.push(d.error);
+  }
+  li.querySelector('.meta').textContent = parts.join(' · ');
+  const toggle = li.querySelector('.toggle'), cancel = li.querySelector('.cancel');
+  const terminal = d.state === 'completed' || d.state === 'failed' || d.state === 'cancelled';
+  toggle.classList.toggle('hidden', terminal);
+  if (active) { toggle.textContent = '❚❚'; toggle.title = t('popupPause'); toggle.dataset.action = 'pause'; }
+  else { toggle.textContent = '▶'; toggle.title = t('popupResume'); toggle.dataset.action = 'resume'; }
+  cancel.dataset.action = terminal ? 'remove' : 'cancel';
+  cancel.title = terminal ? t('popupRemove') : t('popupCancel');
+}
+
 $('pageVideo').onclick = async () => {
   tab = tab || (await currentTab());
   if (!tab?.url) return;
   $('pageVideo').textContent = t('popupSending');
   const r = await send({ type: 'download', url: tab.url, referer: tab.url, kind: 'video' });
   $('pageVideo').textContent = r && r.ok ? t('popupStarted') : t('popupFailed');
+  loadDownloads();
   setTimeout(() => ($('pageVideo').textContent = t('popupPageVideo')), 2500);
 };
 $('pageLink').onclick = async () => {
@@ -96,3 +161,5 @@ $('minSize').onchange = (e) => send({ type: 'setSettings', settings: { minSizeMB
 
 refresh();
 loadMedia();
+loadDownloads();
+dlTimer = setInterval(loadDownloads, 1000);

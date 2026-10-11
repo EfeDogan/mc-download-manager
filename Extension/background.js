@@ -22,6 +22,10 @@ async function setSettings(patch) {
   await api.storage.local.set({ settings: { ...cur, ...patch } });
 }
 const base = (s) => `http://127.0.0.1:${s.port}`;
+// Custom header = proof the request comes from an extension: ordinary web pages cannot send it
+// without a CORS preflight, and the bridge only grants CORS to extension origins. Chrome omits the
+// Origin header on extension GET requests that are covered by host permissions, so Origin alone is not enough.
+const BRIDGE_HEADERS = { 'X-MCDM-Extension': BROWSER };
 
 // ---------- App communication ----------
 async function ping(settings) {
@@ -29,13 +33,79 @@ async function ping(settings) {
   try {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), 1200);
-    const r = await fetch(base(settings) + '/ping?browser=' + BROWSER, { signal: ctrl.signal, cache: 'no-store' });
+    const r = await fetch(base(settings) + '/ping?browser=' + BROWSER, { signal: ctrl.signal, cache: 'no-store', headers: BRIDGE_HEADERS });
     clearTimeout(t);
     if (!r.ok) return null;
-    return await r.json();
+    const app = await r.json();
+    if (app && app.active > 0) startProgress();
+    return app;
   } catch {
     return null;
   }
+}
+
+// ---------- Download progress: toolbar badge + popup list ----------
+async function bridgeJSON(path, init) {
+  const settings = await getSettings();
+  const r = await fetch(base(settings) + path, { cache: 'no-store', ...init, headers: { ...BRIDGE_HEADERS, ...(init?.headers || {}) } });
+  return r.json();
+}
+async function getDownloads() {
+  try { const j = await bridgeJSON('/downloads'); return (j && j.items) || []; } catch { return []; }
+}
+async function downloadAction(id, action) {
+  try {
+    const j = await bridgeJSON('/action', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, action }) });
+    tickProgress();
+    return j;
+  } catch (e) { return { ok: false, error: String(e) }; }
+}
+const ACTIVE_STATES = new Set(['downloading', 'probing']);
+let progressTimer = null;
+let badgeShown = false;
+async function setGlobalBadge(text, color) {
+  try { await api.action.setBadgeText({ text }); if (color) await api.action.setBadgeBackgroundColor({ color }); } catch {}
+}
+// Per-tab media counts override the global badge; while downloads run, every tab falls back to the global text.
+async function useGlobalBadgeOnAllTabs(on) {
+  try {
+    const tabs = await api.tabs.query({});
+    for (const tab of tabs) {
+      if (on) { try { await api.action.setBadgeText({ tabId: tab.id, text: null }); } catch {} }
+      else { const list = await readMedia(tab.id); try { await api.action.setBadgeText({ tabId: tab.id, text: list.length ? String(list.length) : '' }); } catch {} }
+    }
+  } catch {}
+}
+async function tickProgress() {
+  const list = await getDownloads();
+  const active = list.filter((i) => ACTIVE_STATES.has(i.state));
+  if (active.length) {
+    const measurable = active.filter((i) => i.total > 0);
+    let text = '…';
+    if (active.length > 1) text = active.length + '↓';
+    else if (measurable.length) {
+      const total = measurable.reduce((a, i) => a + i.total, 0);
+      const got = measurable.reduce((a, i) => a + Math.min(i.received, i.total), 0);
+      text = Math.round((100 * got) / total) + '%';
+    }
+    if (!badgeShown) { badgeShown = true; await useGlobalBadgeOnAllTabs(true); }
+    await setGlobalBadge(text, '#2f6feb');
+  } else {
+    stopProgress();
+    if (badgeShown) {
+      badgeShown = false;
+      await setGlobalBadge('✓', '#2ebd59');
+      setTimeout(async () => { await setGlobalBadge('', '#2f6feb'); await useGlobalBadgeOnAllTabs(false); }, 4000);
+    }
+  }
+}
+function startProgress() {
+  if (progressTimer) return;
+  tickProgress();
+  progressTimer = setInterval(tickProgress, 1500);  // each fetch keeps the MV3 worker alive while something runs
+}
+function stopProgress() {
+  if (progressTimer) { clearInterval(progressTimer); progressTimer = null; }
 }
 
 async function cookiesFor(url) {
@@ -70,11 +140,12 @@ async function sendToApp({ url, filename, referer, kind }) {
   };
   try {
     const r = await fetch(base(settings) + '/download', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
+      method: 'POST', headers: { 'Content-Type': 'application/json', ...BRIDGE_HEADERS }, body: JSON.stringify(payload),
     });
     const j = await r.json();
     if (!j.ok) throw new Error(j.error || 'app error');
     notify(kind === 'video' ? t('notifVideoTitle') : t('notifSentTitle'), filename || url);
+    startProgress();
     return { ok: true };
   } catch (e) {
     notify(t('notifOfflineTitle'), t('notifOfflineBody'));
@@ -282,6 +353,8 @@ api.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           break;
         }
         case 'getMedia': sendResponse(await readMedia(msg.tabId)); break;
+        case 'downloads': sendResponse(await getDownloads()); break;
+        case 'action': sendResponse(await downloadAction(msg.id, msg.action)); break;
         case 'download': sendResponse(await sendToApp(msg)); break;
         case 'setSettings': await setSettings(msg.settings || {}); sendResponse({ ok: true }); break;
         case 'launchApp': sendResponse({ ok: await launchApp() }); break;

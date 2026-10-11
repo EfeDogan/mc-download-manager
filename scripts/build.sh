@@ -13,7 +13,23 @@ APP_NAME="MC Download Manager"
 BUILD="$ROOT/build"
 DERIVED="$BUILD/DerivedData"
 EXPORT="$BUILD/release"
-IDENTITY="${CODESIGN_IDENTITY:--}"          # "-" = ad-hoc
+# Signing identity: explicit CODESIGN_IDENTITY, else the best certificate in the keychain
+# (Developer ID Application → Apple Development → ad-hoc "-"). Apple Development is enough for this Mac
+# (Safari loads the extension without "Allow Unsigned Extensions"); distribution to others needs Developer ID.
+pick_identity() {
+  local ids; ids="$(security find-identity -v -p codesigning 2>/dev/null)"
+  local id
+  id="$(printf '%s\n' "$ids" | sed -n 's/.*"\(Developer ID Application: [^"]*\)".*/\1/p' | head -1)"
+  [[ -n "$id" ]] && { echo "$id"; return; }
+  id="$(printf '%s\n' "$ids" | sed -n 's/.*"\(Apple Development: [^"]*\)".*/\1/p' | head -1)"
+  [[ -n "$id" ]] && { echo "$id"; return; }
+  echo "-"
+}
+IDENTITY="${CODESIGN_IDENTITY:-$(pick_identity)}"
+# Notarization profile (xcrun notarytool store-credentials). Defaults to the local profile when it exists.
+if [[ -z "${NOTARY_PROFILE:-}" && "$IDENTITY" != "-" ]] && xcrun notarytool history --keychain-profile "mc-download-manager" >/dev/null 2>&1; then
+  NOTARY_PROFILE="mc-download-manager"
+fi
 VERSION="$(sed -n 's/.*MARKETING_VERSION: "\(.*\)"/\1/p' project.yml | head -1)"
 
 echo "▶ Tools (yt-dlp, ffmpeg)"
@@ -46,6 +62,8 @@ APP="$EXPORT/$APP_NAME.app"
 [[ -d "$APP" ]] || { echo "✗ App was not produced"; exit 1; }
 
 echo "▶ Code signing ($IDENTITY)"
+# Notarization requires a secure timestamp; ad-hoc signatures cannot have one.
+if [[ "$IDENTITY" == "-" ]]; then TS="--timestamp=none"; else TS="--timestamp"; fi
 HELPER_ENT="$BUILD/helpers.entitlements"
 cat > "$HELPER_ENT" <<'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -58,15 +76,24 @@ cat > "$HELPER_ENT" <<'PLIST'
 PLIST
 # Inside-out: helper binaries → extension → app
 for bin in "$APP/Contents/Helpers/"*; do
-  [[ -f "$bin" ]] && codesign --force --options runtime --timestamp=none --entitlements "$HELPER_ENT" --sign "$IDENTITY" "$bin"
+  [[ -f "$bin" ]] && codesign --force --options runtime $TS --entitlements "$HELPER_ENT" --sign "$IDENTITY" "$bin"
 done
-codesign --force --options runtime --timestamp=none \
+codesign --force --options runtime $TS \
   --entitlements SafariExtension/SafariExtension.entitlements \
   --sign "$IDENTITY" "$APP/Contents/PlugIns/$APP_NAME Extension.appex"
-codesign --force --options runtime --timestamp=none \
+codesign --force --options runtime $TS \
   --entitlements App/App.entitlements \
   --sign "$IDENTITY" "$APP"
 codesign --verify --deep --strict "$APP" && echo "  signature verified"
+
+if [[ -n "${NOTARY_PROFILE:-}" && "$IDENTITY" != "-" ]]; then
+  echo "▶ Notarization — app ($NOTARY_PROFILE)"
+  ZIP="$BUILD/$APP_NAME.zip"
+  rm -f "$ZIP"; ditto -c -k --keepParent "$APP" "$ZIP"
+  xcrun notarytool submit "$ZIP" --keychain-profile "$NOTARY_PROFILE" --wait
+  xcrun stapler staple "$APP"
+  rm -f "$ZIP"
+fi
 
 echo "▶ DMG"
 DMG="$BUILD/$APP_NAME $VERSION.dmg"
@@ -93,10 +120,14 @@ TXT
 hdiutil create -volname "$APP_NAME" -srcfolder "$STAGE" -ov -format UDZO -quiet "$DMG"
 rm -rf "$STAGE"
 
+if [[ "$IDENTITY" != "-" ]]; then
+  codesign --force --timestamp --sign "$IDENTITY" "$DMG"
+fi
 if [[ -n "${NOTARY_PROFILE:-}" && "$IDENTITY" != "-" ]]; then
-  echo "▶ Notarization ($NOTARY_PROFILE)"
+  echo "▶ Notarization — DMG ($NOTARY_PROFILE)"
   xcrun notarytool submit "$DMG" --keychain-profile "$NOTARY_PROFILE" --wait
   xcrun stapler staple "$DMG"
+  spctl -a -vv -t open --context context:primary-signature "$DMG" 2>&1 | sed -n '1p'
 fi
 
 echo "✓ Ready: $DMG"

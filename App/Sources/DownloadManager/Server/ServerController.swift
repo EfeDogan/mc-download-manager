@@ -15,10 +15,12 @@ final class ServerController: ObservableObject {
     }
 
     private func noteConnection(_ req: HTTPRequest) {
-        guard let origin = req.headers["origin"], !origin.isEmpty else { return }
         var browser = "other"
-        if origin.hasPrefix("safari-web-extension://") { browser = "safari" }
-        else if origin.hasPrefix("chrome-extension://") { browser = "chrome" }
+        if let origin = req.headers["origin"] {
+            if origin.hasPrefix("safari-web-extension://") { browser = "safari" }
+            else if origin.hasPrefix("chrome-extension://") { browser = "chrome" }
+        }
+        if let h = req.headers["x-mcdm-extension"]?.lowercased(), ["safari", "chrome", "brave", "edge"].contains(h) { browser = h }
         if let q = req.path.split(separator: "?", maxSplits: 1).last, req.path.contains("?") {
             for pair in q.split(separator: "&") {
                 let kv = pair.split(separator: "=", maxSplits: 1)
@@ -91,6 +93,17 @@ final class ServerController: ObservableObject {
             || origin.hasPrefix("moz-extension://")
     }
 
+    /// Extension requests either carry an extension Origin (Safari, Chrome POST) or — when Chrome omits the
+    /// Origin header for GETs covered by host permissions — no Origin at all plus the X-MCDM-Extension header.
+    /// A web page cannot produce the second form: custom headers force a CORS preflight, and the preflight's
+    /// Origin is a web origin that is rejected here.
+    static func extensionRequest(_ req: HTTPRequest) -> Bool {
+        let origin = req.headers["origin"]
+        if originAllowed(origin) { return true }
+        let hasHeader = !(req.headers["x-mcdm-extension"] ?? "").isEmpty
+        return origin == nil && hasHeader
+    }
+
     private func hostAllowed(_ host: String?) -> Bool {
         guard let host = host?.lowercased() else { return false }
         let port = UInt16(clamping: max(1024, min(65535, settings.serverPort)))
@@ -98,7 +111,7 @@ final class ServerController: ObservableObject {
     }
 
     private func handle(_ req: HTTPRequest) -> HTTPResponse {
-        guard Self.originAllowed(req.headers["origin"]), hostAllowed(req.headers["host"]) else {
+        guard Self.extensionRequest(req), hostAllowed(req.headers["host"]) else {
             return .json(["ok": false, "error": "forbidden"], status: 403)
         }
         if req.method == "OPTIONS" { return .json(["ok": true]) }

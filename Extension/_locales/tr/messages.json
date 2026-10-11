@@ -104,5 +104,41 @@
   },
   "kindMedia": {
     "message": "medya"
+  },
+  "popupDownloadsTitle": {
+    "message": "İndirmeler"
+  },
+  "popupNoDownloads": {
+    "message": "Aktif indirme yok. Başlatılan indirmeler ilerlemesini burada ve araç çubuğu rozetinde gösterir."
+  },
+  "stateQueued": {
+    "message": "Sırada"
+  },
+  "statePaused": {
+    "message": "Duraklatıldı"
+  },
+  "stateProbing": {
+    "message": "Başlatılıyor…"
+  },
+  "stateCompleted": {
+    "message": "Tamamlandı"
+  },
+  "stateFailed": {
+    "message": "Başarısız"
+  },
+  "stateCancelled": {
+    "message": "İptal edildi"
+  },
+  "popupPause": {
+    "message": "Duraklat"
+  },
+  "popupResume": {
+    "message": "Sürdür"
+  },
+  "popupCancel": {
+    "message": "İptal"
+  },
+  "popupRemove": {
+    "message": "Listeden kaldır"
   }
 }

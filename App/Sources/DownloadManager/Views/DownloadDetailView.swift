@@ -247,8 +247,10 @@ final class DetailWindowManager {
     static let completedHeight: CGFloat = 250
 
     func show(id: UUID, store: DownloadStore) {
+        AppPresence.shared.showInDock()
         if let w = windows[id] {
             w.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
             return
         }
         let root = DownloadDetailView(id: id)
@@ -272,6 +274,11 @@ final class DetailWindowManager {
         }
         w.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+        // The policy switch and the system's activation can race; order front once more on the next turn.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            w.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+        }
     }
 
     func close(id: UUID) {

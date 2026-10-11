@@ -100,8 +100,13 @@ struct MenuBarLabel: View {
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
-        Image(store.activeCount > 0 ? "MenuBarIconActive" : "MenuBarIcon")
-            .renderingMode(.template)
+        HStack(spacing: 3) {
+            Image(store.activeCount > 0 ? "MenuBarIconActive" : "MenuBarIcon")
+                .renderingMode(.template)
+            if store.activeCount > 0, let p = store.overallProgress {
+                Text("\(Int(p * 100))%").font(.system(size: 11, weight: .medium)).monospacedDigit()
+            }
+        }
             .onReceive(NotificationCenter.default.publisher(for: .showMainWindow)) { _ in
                 openWindow(id: "main")
                 NSApp.activate(ignoringOtherApps: true)
@@ -153,6 +158,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     func applicationDidFinishLaunching(_ notification: Notification) {
         AppPresence.shared.finishLaunch()
         LoginItem.registerByDefaultIfNeeded()
+        if AppSettings.shared.onboardingDone { Self.sharedStore?.prepareDownloadFolder() }
         if Bundle.main.bundleURL.pathExtension == "app" {
             let center = UNUserNotificationCenter.current()
             center.delegate = self

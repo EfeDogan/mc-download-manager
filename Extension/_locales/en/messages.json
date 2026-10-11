@@ -104,5 +104,41 @@
   },
   "kindMedia": {
     "message": "media"
+  },
+  "popupDownloadsTitle": {
+    "message": "Downloads"
+  },
+  "popupNoDownloads": {
+    "message": "No active downloads. Started downloads show their progress here and on the toolbar badge."
+  },
+  "stateQueued": {
+    "message": "Queued"
+  },
+  "statePaused": {
+    "message": "Paused"
+  },
+  "stateProbing": {
+    "message": "Starting…"
+  },
+  "stateCompleted": {
+    "message": "Completed"
+  },
+  "stateFailed": {
+    "message": "Failed"
+  },
+  "stateCancelled": {
+    "message": "Cancelled"
+  },
+  "popupPause": {
+    "message": "Pause"
+  },
+  "popupResume": {
+    "message": "Resume"
+  },
+  "popupCancel": {
+    "message": "Cancel"
+  },
+  "popupRemove": {
+    "message": "Remove from list"
   }
 }

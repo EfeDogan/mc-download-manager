@@ -57,6 +57,22 @@ final class DownloadStore: ObservableObject {
     }
 
     var activeCount: Int { items.filter { $0.state.isActive }.count }
+    /// Byte-weighted progress of active downloads with a known size (nil when nothing measurable is running).
+    var overallProgress: Double? {
+        let measurable = items.filter { $0.state.isActive && $0.totalBytes > 0 }
+        guard !measurable.isEmpty else { return nil }
+        let total = measurable.reduce(Int64(0)) { $0 + $1.totalBytes }
+        let received = measurable.reduce(Int64(0)) { $0 + min($1.receivedBytes, $1.totalBytes) }
+        return total > 0 ? Double(received) / Double(total) : nil
+    }
+
+    /// Touches the download folder so macOS asks for Downloads-folder access now (first run / setup),
+    /// not in the middle of the first download — where the system prompt pushed the download window behind the browser.
+    func prepareDownloadFolder() {
+        let dir = URL(fileURLWithPath: settings.downloadDirectory)
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        _ = try? FileManager.default.contentsOfDirectory(atPath: dir.path)
+    }
     var totalSpeed: Double { items.filter { $0.state == .downloading }.reduce(0) { $0 + $1.speed } }
 
     private func index(of id: UUID) -> Int? { items.firstIndex { $0.id == id } }

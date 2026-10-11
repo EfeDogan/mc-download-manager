@@ -25,3 +25,11 @@ li .meta { color: var(--muted); font-size: 11px; }
 details label { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 6px 0; }
 details input { width: 90px; }
 summary { cursor: pointer; color: var(--muted); }
+.bar { height: 4px; border-radius: 2px; background: var(--line); margin: 4px 0 2px; overflow: hidden; }
+.bar .fill { height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+.bar.indeterminate .fill { width: 30%; animation: slide 1.2s infinite linear; }
+.bar.done .fill { background: #2ebd59; }
+.bar.failed .fill { background: #c33; }
+@keyframes slide { from { margin-left: -30%; } to { margin-left: 100%; } }
+li .actions { display: flex; gap: 4px; }
+button.icon { width: 28px; margin: 0; padding: 3px 0; font-size: 12px; line-height: 1.2; }

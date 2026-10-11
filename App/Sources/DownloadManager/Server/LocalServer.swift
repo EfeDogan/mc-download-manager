@@ -106,8 +106,11 @@ final class LocalServer {
         if let origin, localServerAllowedOrigin(origin) {
             head += "Access-Control-Allow-Origin: \(origin)\r\n"
                 + "Vary: Origin\r\n"
-                + "Access-Control-Allow-Headers: Content-Type\r\n"
+                + "Access-Control-Allow-Headers: Content-Type, X-MCDM-Extension\r\n"
                 + "Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n"
+                // Chrome Private/Local Network Access preflights for loopback targets.
+                + "Access-Control-Allow-Private-Network: true\r\n"
+                + "Access-Control-Allow-Local-Network: true\r\n"
         }
         head += "Connection: close\r\n\r\n"
         var out = Data(head.utf8)

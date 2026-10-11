@@ -6,7 +6,7 @@
 
 <p align="center">
   macOS için hızlı, açık kaynaklı bir indirme yöneticisi.<br>
-  Safari ve Chrome indirmelerini yakalar, 16'ya kadar paralel bağlantıyla hızlandırır ve sayfalardaki videoları indirir.
+  Safari, Chrome ve Firefox indirmelerini yakalar, 16'ya kadar paralel bağlantıyla hızlandırır ve sayfalardaki videoları indirir.
 </p>
 
 <p align="center">
@@ -20,7 +20,7 @@
 
 ---
 
-Her şey tek bir `.app` içinde gelir: Safari uzantısı, Chrome uzantısı, `yt-dlp` ve `ffmpeg` uygulamaya gömülüdür.
+Her şey tek bir `.app` içinde gelir: Safari uzantısı, Chrome ve Firefox eklentileri, `yt-dlp` ve `ffmpeg` uygulamaya gömülüdür.
 DMG'yi açıp uygulamayı *Applications* klasörüne sürüklemek yeterlidir. Arayüz **İngilizce** ve **Türkçe**dir (sistem dilini izler).
 
 ## Özellikler
@@ -28,7 +28,7 @@ DMG'yi açıp uygulamayı *Applications* klasörüne sürüklemek yeterlidir. Ar
 - **Çok parçalı indirme** — dosya HTTP `Range` isteklerine bölünür (varsayılan 8 bağlantı, 1–16 arası ayarlanabilir).
   Sunucu `Range` desteklemiyorsa tek akışa düşer; `429`/`503` sınırlamalarında bağlantı sayısı adaptif olarak azaltılır.
 - **Duraklat / sürdür** — parça durumları diske yazılır; uygulama yeniden açılsa bile kaldığı yerden devam eder.
-- **Tarayıcı entegrasyonu** — Safari, Google Chrome ve Brave için tek kaynaklı WebExtension. Adım adım kurulum sihirbazı her tarayıcıyı
+- **Tarayıcı entegrasyonu** — Safari, Google Chrome, Brave ve Firefox için tek kaynaklı WebExtension. Adım adım kurulum sihirbazı her tarayıcıyı
   tek tek ele alır (eklenti dosyaları `~/Downloads/MC Download Manager/Browser Plugins/` altına yerleştirilir).
   Tarayıcıdaki indirme iptal edilip çerezler, `Referer` ve `User-Agent` ile birlikte uygulamaya iletilir; yakalanan dosya türleri ayarlanabilir.
 - **Video indirme** — sayfadaki `<video>`, `.m3u8` ve `.mpd` akışları yakalanır; "Bu sayfadaki videoyu indir" gömülü yt-dlp'yi
@@ -62,6 +62,8 @@ Güncellemek için `brew upgrade --cask mc-download-manager`. Ardından aşağı
    - Ad-hoc imzalı derlemelerde Safari ayrıca *Geliştirici ▸ İmzasız uzantılara izin ver* seçeneğini ister (Developer ID ile imzalı sürümlerde gerekmez).
 3. **Chrome:** `chrome://extensions` ▸ *Geliştirici modu* ▸ *Paketlenmemiş öğe yükle* ▸ uygulama içindeki
    *Ayarlar ▸ Tarayıcı ▸ "Klasörü Göster"* ile açılan `ChromeExtension` klasörünü seçin.
+4. **Firefox:** *Ayarlar ▸ Tarayıcı Eklentileri ▸ Kurulum Sihirbazını Aç… ▸ Firefox'a Ekle*. Eklenti Mozilla tarafından imzalıdır ve
+   uygulamayla birlikte gelir; Firefox bir kez onay ister ve eklentiyi kalıcı olarak kurar (Firefox 140 veya üstü).
 
 Uygulama `127.0.0.1:48213` üzerinde yalnızca tarayıcı uzantılarından (`Origin` denetimi) istek kabul eden küçük bir HTTP köprüsü çalıştırır.
 
@@ -100,6 +102,20 @@ scripts/pack-extension.sh      # → build/mc-download-manager-chrome-<sürüm>.
 
 Zip'i [Chrome Web Store geliştirici konsoluna](https://chrome.google.com/webstore/devconsole) yükleyin, ardından
 `BrowserIntegration.chromeWebStoreURL` değerini mağaza sayfası yapın; "Kur" doğrudan mağazayı açar.
+
+### Firefox eklentisini imzalama
+
+Firefox'un normal sürümü yalnızca Mozilla tarafından imzalanmış eklentileri kurar. `scripts/build.sh`, `scripts/pack-firefox.sh`
+betiğini çalıştırır: bu betik manifest'in Firefox sürümünü (`background.scripts`, `browser_specific_settings.gecko`) üretir ve
+[AMO API anahtarları](https://addons.mozilla.org/developers/addon/api/key/) varsa eklentiyi listelenmemiş (unlisted) olarak
+imzalatıp (her sürüm için bir kez) `FirefoxExtension.xpi` adıyla uygulamaya ekler. Anahtarları anahtar zincirine kaydedin:
+
+```bash
+security add-generic-password -s mc-download-manager-amo -a issuer -w 'user:…'
+security add-generic-password -s mc-download-manager-amo -a secret -w '…'
+```
+
+Anahtar yoksa imzasız eklenti eklenir; Firefox onu yalnızca `about:debugging` üzerinden geçici olarak yükleyebilir.
 
 ## Köprü API'si
 

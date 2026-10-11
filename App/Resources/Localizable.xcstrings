@@ -3031,6 +3031,126 @@
           }
         }
       }
+    },
+    "Add the extension to Firefox": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eklentiyi Firefox'a ekleyin"
+          }
+        }
+      }
+    },
+    "The Firefox add-on is included in the app and signed by Mozilla. Click the button below; Firefox opens and asks “Add MC Download Manager?”. Click “Add”.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Firefox eklentisi uygulamanın içinde gelir ve Mozilla tarafından imzalanmıştır. Aşağıdaki düğmeye tıklayın; Firefox açılır ve “MC Download Manager eklensin mi?” diye sorar. “Ekle”ye tıklayın."
+          }
+        }
+      }
+    },
+    "Add to Firefox": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Firefox'a Ekle"
+          }
+        }
+      }
+    },
+    "To capture downloads in private windows too, tick “Allow this extension to run in Private Windows” in the confirmation that follows.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gizli pencerelerdeki indirmeleri de yakalamak için ardından gelen onayda “Bu uzantının gizli pencerelerde çalışmasına izin ver” kutusunu işaretleyin."
+          }
+        }
+      }
+    },
+    "Load the extension temporarily": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eklentiyi geçici olarak yükleyin"
+          }
+        }
+      }
+    },
+    "This build contains an unsigned Firefox add-on. Firefox only loads it temporarily: it is removed when Firefox quits. On the page that opens, click “Load Temporary Add-on…” and select the file below.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu derlemede imzasız bir Firefox eklentisi var. Firefox onu yalnızca geçici olarak yükler: Firefox kapanınca kaldırılır. Açılan sayfada “Geçici Eklenti Yükle…” düğmesine tıklayıp aşağıdaki dosyayı seçin."
+          }
+        }
+      }
+    },
+    "Open about:debugging": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "about:debugging'i Aç"
+          }
+        }
+      }
+    },
+    "Firefox add-on not included": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Firefox eklentisi dahil değil"
+          }
+        }
+      }
+    },
+    "This build of the app does not contain the Firefox add-on. Build it with scripts/pack-firefox.sh, or install the release version of the app.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uygulamanın bu derlemesinde Firefox eklentisi yok. scripts/pack-firefox.sh ile oluşturun ya da uygulamanın yayın sürümünü kurun."
+          }
+        }
+      }
+    },
+    "Firefox is ready": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Firefox hazır"
+          }
+        }
+      }
+    },
+    "Pin MC Download Manager to the toolbar (puzzle icon ▸ gear ▸ Pin to Toolbar). Its popup should show “Connected”. Downloads of the captured file types are now handed to the app.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MC Download Manager'ı araç çubuğuna sabitleyin (yapboz simgesi ▸ dişli ▸ Araç Çubuğuna Sabitle). Açılır penceresinde “Bağlandı” görünmelidir. Yakalanan dosya türlerinin indirmeleri artık uygulamaya aktarılır."
+          }
+        }
+      }
+    },
+    "The guided setup walks you through each installed browser one at a time: Safari (built in, just enable it), Google Chrome and Brave (loaded from a folder), Firefox (signed add-on, one click).": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rehberli kurulum, kurulu her tarayıcıda sizi adım adım yönlendirir: Safari (yerleşik, yalnızca etkinleştirin), Google Chrome ve Brave (klasörden yüklenir), Firefox (imzalı eklenti, tek tık)."
+          }
+        }
+      }
     }
   }
 }

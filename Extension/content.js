@@ -8,12 +8,17 @@
 
   let state = { online: false, clickIntercept: false, settings: { intercept: true } };
 
+  // Firefox's browser.runtime.sendMessage only returns a promise (a callback argument is rejected).
+  const IS_FIREFOX = typeof browser !== 'undefined' && String(browser.runtime.getURL('')).startsWith('moz-extension:');
+
   function refresh() {
+    const apply = (r) => { if (r) state = r; };
     try {
-      api.runtime.sendMessage({ type: 'status' }, (r) => {
-        if (api.runtime.lastError || !r) return;
-        state = r;
-      });
+      if (IS_FIREFOX) {
+        browser.runtime.sendMessage({ type: 'status' }).then(apply, () => {});
+      } else {
+        api.runtime.sendMessage({ type: 'status' }, (r) => { if (!api.runtime.lastError) apply(r); });
+      }
     } catch {}
   }
   refresh();

@@ -1,12 +1,14 @@
-// MC Download Manager bridge extension — background script (Chrome MV3 / Safari)
+// MC Download Manager bridge extension — background script (Chrome MV3 / Safari / Firefox)
 'use strict';
 
 const api = typeof browser !== 'undefined' ? browser : chrome;
 const t = (k, subs) => { try { return api.i18n.getMessage(k, subs) || k; } catch { return k; } };
-const IS_SAFARI = typeof browser !== 'undefined' && !!browser.runtime.sendNativeMessage && !chrome.downloads?.onDeterminingFilename;
+// Firefox (and its forks) serve extension pages from moz-extension:// URLs; works in content scripts too.
+const IS_FIREFOX = typeof browser !== 'undefined' && String(browser.runtime.getURL('')).startsWith('moz-extension:');
+const IS_SAFARI = !IS_FIREFOX && typeof browser !== 'undefined' && !!browser.runtime.sendNativeMessage && !chrome.downloads?.onDeterminingFilename;
 
 const DEFAULTS = { port: 48213, intercept: true, minSizeMB: 0, sniff: true };
-const BROWSER = IS_SAFARI ? 'safari' : (navigator.brave ? 'brave' : (/Edg\//.test(navigator.userAgent) ? 'edge' : 'chrome'));
+const BROWSER = IS_FIREFOX ? 'firefox' : IS_SAFARI ? 'safari' : (navigator.brave ? 'brave' : (/Edg\//.test(navigator.userAgent) ? 'edge' : 'chrome'));
 
 const MEDIA_EXT = /\.(mp4|m4v|webm|mkv|mov|avi|flv|mp3|m4a|aac|ogg|opus|wav|flac)(\?|#|$)/i;
 const FRAGMENT = /\.(ts|m4s|m4f|cmfv|cmfa|fmp4|init)(\?|#|$)|[/_.-](seg|segment|chunk|frag|fragment)[-_]?\d+/i;
@@ -191,6 +193,13 @@ async function interceptDownload(item) {
   if (!matchesCaptureTypes(app, item.filename || '', url)) return false;
 
   try { await api.downloads.cancel(item.id); } catch {}
+  if (IS_FIREFOX) {
+    // A small file can finish before the app has answered; delete the browser's duplicate copy.
+    try {
+      const [d] = await api.downloads.search({ id: item.id });
+      if (d && d.state === 'complete' && d.exists !== false) await api.downloads.removeFile(item.id);
+    } catch {}
+  }
   try { await api.downloads.erase({ id: item.id }); } catch {}
   const filename = item.filename ? item.filename.split(/[\\/]/).pop() : '';
   sendToApp({ url, filename, referer: item.referrer, kind: 'file' });
@@ -203,7 +212,14 @@ if (api.downloads?.onDeterminingFilename) {
     return true;
   });
 } else if (api.downloads?.onCreated) {
-  api.downloads.onCreated.addListener((item) => { interceptDownload(item); });
+  // Firefox has no onDeterminingFilename: the browser download is already running when we hear about it.
+  // Pause it at once so it does not keep downloading while the app is asked; resume it if the app declines.
+  api.downloads.onCreated.addListener((item) => {
+    const paused = item.state === 'in_progress' ? Promise.resolve(api.downloads.pause(item.id)).then(() => true, () => false) : Promise.resolve(false);
+    interceptDownload(item).then(async (took) => {
+      if (!took && (await paused)) { try { await api.downloads.resume(item.id); } catch {} }
+    });
+  });
 }
 
 // ---------- Media sniffing ----------
@@ -322,12 +338,20 @@ api.tabs.onRemoved.addListener((tabId) => clearMedia(tabId));
 const menus = api.contextMenus || api.menus;
 function createMenus() {
   if (!menus) return;
-  try {
-    menus.removeAll(() => {
+  let created = false;
+  const create = () => {
+    if (created) return;
+    created = true;
+    try {
       menus.create({ id: 'dm-link', title: t('menuDownloadLink'), contexts: ['link', 'video', 'audio', 'image'] });
       menus.create({ id: 'dm-page-video', title: t('menuPageVideo'), contexts: ['page', 'video', 'frame', 'action'] });
-    });
-  } catch {}
+    } catch {}
+  };
+  // Chrome/Safari take a callback; Firefox's browser.menus returns a promise.
+  try {
+    const r = IS_FIREFOX ? menus.removeAll() : menus.removeAll(create);
+    if (r && typeof r.then === 'function') r.then(create, create);
+  } catch { create(); }
 }
 api.runtime.onInstalled.addListener(() => { createMenus(); ping(); });
 api.runtime.onStartup?.addListener(() => { createMenus(); ping(); });

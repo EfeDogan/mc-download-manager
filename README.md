@@ -6,7 +6,7 @@
 
 <p align="center">
   A fast, open-source download manager for macOS.<br>
-  Captures Safari and Chrome downloads, accelerates them with up to 16 parallel connections and downloads videos from web pages.
+  Captures Safari, Chrome and Firefox downloads, accelerates them with up to 16 parallel connections and downloads videos from web pages.
 </p>
 
 <p align="center">
@@ -20,7 +20,7 @@
 
 ---
 
-Everything ships in a single `.app`: the Safari extension, the Chrome extension, `yt-dlp` and `ffmpeg` are bundled.
+Everything ships in a single `.app`: the Safari extension, the Chrome and Firefox extensions, `yt-dlp` and `ffmpeg` are bundled.
 Open the DMG, drag the app to *Applications*, done. The interface is in **English** and **Turkish** (follows the system language).
 
 ## Features
@@ -28,7 +28,7 @@ Open the DMG, drag the app to *Applications*, done. The interface is in **Englis
 - **Multi-connection downloads** — files are split into HTTP `Range` requests (8 connections by default, 1–16 configurable).
   Falls back to a single stream when the server does not support ranges; adapts the connection count on `429`/`503` throttling.
 - **Pause / resume** — segment state is persisted on disk, so downloads continue where they left off even after a restart.
-- **Browser integration** — one shared WebExtension for Safari, Google Chrome and Brave. A step-by-step setup wizard handles each browser
+- **Browser integration** — one shared WebExtension for Safari, Google Chrome, Brave and Firefox. A step-by-step setup wizard handles each browser
   one at a time (extension files are placed in `~/Downloads/MC Download Manager/Browser Plugins/`).
   The browser download is cancelled and handed to the app together with cookies, `Referer` and `User-Agent`; captured file types are configurable.
 - **Video downloads** — `<video>`, `.m3u8` and `.mpd` streams on the page are detected; "Download video from this page" uses the bundled
@@ -62,6 +62,8 @@ Update with `brew upgrade --cask mc-download-manager`. Then continue with the br
    - For ad-hoc signed builds Safari also requires *Develop ▸ Allow Unsigned Extensions* (not needed for Developer ID signed builds).
 3. **Chrome:** open `chrome://extensions`, turn on *Developer mode*, choose *Load unpacked* and select the folder shown in the app under
    *Settings ▸ Browser ▸ Show Folder* (`ChromeExtension` inside the app bundle).
+4. **Firefox:** *Settings ▸ Browser Extensions ▸ Open Setup Wizard… ▸ Add to Firefox*. The add-on is signed by Mozilla and bundled
+   with the app; Firefox asks for confirmation once and keeps it installed (Firefox 140 or later).
 
 The app runs a tiny HTTP bridge on `127.0.0.1:48213` that only accepts requests from browser extensions (`Origin` check).
 
@@ -100,6 +102,20 @@ scripts/pack-extension.sh      # → build/mc-download-manager-chrome-<version>.
 
 Upload the zip in the [Chrome Web Store developer console](https://chrome.google.com/webstore/devconsole), then set
 `BrowserIntegration.chromeWebStoreURL` to the store page; "Install" will open it directly.
+
+### Signing the Firefox add-on
+
+Release Firefox only installs add-ons signed by Mozilla. `scripts/build.sh` runs `scripts/pack-firefox.sh`, which builds the
+Firefox variant of the manifest (`background.scripts`, `browser_specific_settings.gecko`) and, when
+[AMO API credentials](https://addons.mozilla.org/developers/addon/api/key/) are available, signs it as an unlisted add-on
+(once per version) and bundles it as `FirefoxExtension.xpi`. Store the credentials in the login keychain:
+
+```bash
+security add-generic-password -s mc-download-manager-amo -a issuer -w 'user:…'
+security add-generic-password -s mc-download-manager-amo -a secret -w '…'
+```
+
+Without credentials the unsigned add-on is bundled; Firefox can then only load it temporarily via `about:debugging`.
 
 ## Project layout
 

@@ -6,7 +6,7 @@ import Network
 final class ServerController: ObservableObject {
     @Published var statusText = String(localized: "Not started")
     @Published var running = false
-    /// Last time each browser's extension talked to the bridge (keys: safari, chrome, brave, other).
+    /// Last time each browser's extension talked to the bridge (keys: safari, chrome, brave, firefox, other).
     @Published var extensionConnections: [String: Date] = [:]
 
     func isExtensionConnected(_ browser: String, within seconds: TimeInterval = 120) -> Bool {
@@ -19,8 +19,9 @@ final class ServerController: ObservableObject {
         if let origin = req.headers["origin"] {
             if origin.hasPrefix("safari-web-extension://") { browser = "safari" }
             else if origin.hasPrefix("chrome-extension://") { browser = "chrome" }
+            else if origin.hasPrefix("moz-extension://") { browser = "firefox" }
         }
-        if let h = req.headers["x-mcdm-extension"]?.lowercased(), ["safari", "chrome", "brave", "edge"].contains(h) { browser = h }
+        if let h = req.headers["x-mcdm-extension"]?.lowercased(), ["safari", "chrome", "brave", "edge", "firefox"].contains(h) { browser = h }
         if let q = req.path.split(separator: "?", maxSplits: 1).last, req.path.contains("?") {
             for pair in q.split(separator: "&") {
                 let kv = pair.split(separator: "=", maxSplits: 1)
@@ -35,7 +36,7 @@ final class ServerController: ObservableObject {
     private let settings: AppSettings
     private var cancellable: AnyCancellable?
 
-    static let version = "1.1.1"
+    static let version = "1.2.0"
 
     init(store: DownloadStore, settings: AppSettings) {
         self.store = store

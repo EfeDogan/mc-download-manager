@@ -6,10 +6,14 @@ const t = (k, subs) => { try { return api.i18n.getMessage(k, subs) || k; } catch
 document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = t(el.dataset.i18n); });
 document.documentElement.lang = (() => { try { return api.i18n.getUILanguage(); } catch { return 'en'; } })();
 
+// Firefox's browser.runtime.sendMessage only returns a promise (a callback argument is rejected).
+const IS_FIREFOX = typeof browser !== 'undefined' && String(browser.runtime.getURL('')).startsWith('moz-extension:');
+
 function send(msg) {
   return new Promise((resolve) => {
     try {
-      api.runtime.sendMessage(msg, (r) => resolve(api.runtime.lastError ? null : r));
+      if (IS_FIREFOX) browser.runtime.sendMessage(msg).then(resolve, () => resolve(null));
+      else api.runtime.sendMessage(msg, (r) => resolve(api.runtime.lastError ? null : r));
     } catch { resolve(null); }
   });
 }

@@ -1,7 +1,7 @@
 import SwiftUI
 import AppKit
 
-/// Guided, one-browser-at-a-time setup of the browser extensions (Safari, Chrome, Brave).
+/// Guided, one-browser-at-a-time setup of the browser extensions (Safari, Chrome, Brave, Firefox).
 struct ExtensionSetupWizard: View {
     @EnvironmentObject var server: ServerController
     let browsers: [BrowserIntegration.Kind]
@@ -15,7 +15,13 @@ struct ExtensionSetupWizard: View {
     @State private var copied = false
 
     private var browser: BrowserIntegration.Kind { browsers[browserIndex] }
-    private var stepCount: Int { browser == .safari ? 3 : 4 }
+    private var stepCount: Int {
+        switch browser {
+        case .safari: return 3
+        case .firefox: return 2
+        default: return 4
+        }
+    }
     private var isLastStep: Bool { step >= stepCount - 1 }
     private var isLastBrowser: Bool { browserIndex >= browsers.count - 1 }
     private var connected: Bool { server.isExtensionConnected(browser.rawValue) }
@@ -26,7 +32,11 @@ struct ExtensionSetupWizard: View {
             Divider()
             ScrollView {
                 VStack(alignment: .leading, spacing: 14) {
-                    if browser == .safari { safariStep } else { chromiumStep }
+                    switch browser {
+                    case .safari: safariStep
+                    case .firefox: firefoxStep
+                    default: chromiumStep
+                    }
                     if let error { Text(error).font(.caption).foregroundStyle(.red) }
                 }
                 .padding(22)
@@ -171,6 +181,45 @@ struct ExtensionSetupWizard: View {
         default:
             stepTitle("\(browser.name) is ready")
             Text("Pin MC Download Manager to the toolbar (puzzle icon ▸ pin). Its popup should show “Connected”. Downloads of the captured file types are now handed to the app.")
+            statusRow(ok: connected, okText: "Extension has connected to the app", pendingText: "Waiting for the extension to connect (it connects right after loading)")
+        }
+    }
+
+    // MARK: Firefox
+
+    @ViewBuilder
+    private var firefoxStep: some View {
+        switch step {
+        case 0:
+            if BrowserIntegration.signedFirefoxAddon != nil {
+                stepTitle("Add the extension to Firefox")
+                Text("The Firefox add-on is included in the app and signed by Mozilla. Click the button below; Firefox opens and asks “Add MC Download Manager?”. Click “Add”.")
+                Button { BrowserIntegration.installFirefoxAddon() } label: {
+                    Label("Add to Firefox", systemImage: "puzzlepiece.extension")
+                }
+                Text("To capture downloads in private windows too, tick “Allow this extension to run in Private Windows” in the confirmation that follows.")
+                    .font(.caption).foregroundStyle(.secondary)
+            } else if BrowserIntegration.unsignedFirefoxAddon != nil {
+                stepTitle("Load the extension temporarily")
+                Text("This build contains an unsigned Firefox add-on. Firefox only loads it temporarily: it is removed when Firefox quits. On the page that opens, click “Load Temporary Add-on…” and select the file below.")
+                HStack {
+                    Button {
+                        do { prepared[browser] = try BrowserIntegration.prepareTemporaryFirefoxAddon(); error = nil }
+                        catch { self.error = error.localizedDescription }
+                        BrowserIntegration.openFirefoxDebugging()
+                    } label: { Label("Open about:debugging", systemImage: "globe") }
+                    if let file = prepared[browser] {
+                        Button("Show in Finder") { BrowserIntegration.revealInFinder(file) }
+                    }
+                }
+                if let file = prepared[browser] { pathBox(file.path) }
+            } else {
+                stepTitle("Firefox add-on not included")
+                Text("This build of the app does not contain the Firefox add-on. Build it with scripts/pack-firefox.sh, or install the release version of the app.")
+            }
+        default:
+            stepTitle("Firefox is ready")
+            Text("Pin MC Download Manager to the toolbar (puzzle icon ▸ gear ▸ Pin to Toolbar). Its popup should show “Connected”. Downloads of the captured file types are now handed to the app.")
             statusRow(ok: connected, okText: "Extension has connected to the app", pendingText: "Waiting for the extension to connect (it connects right after loading)")
         }
     }

@@ -61,6 +61,17 @@ xcodebuild -project MCDownloadManager.xcodeproj -scheme MCDownloadManager -confi
 APP="$EXPORT/$APP_NAME.app"
 [[ -d "$APP" ]] || { echo "✗ App was not produced"; exit 1; }
 
+echo "▶ Firefox add-on"
+scripts/pack-firefox.sh
+EXT_VERSION="$(python3 -c "import json;print(json.load(open('Extension/manifest.json'))['version'])")"
+FF_SIGNED="$BUILD/mc-download-manager-firefox-$EXT_VERSION-signed.xpi"
+if [[ -f "$FF_SIGNED" ]]; then
+  cp "$FF_SIGNED" "$APP/Contents/Resources/FirefoxExtension.xpi"
+else
+  echo "  ⚠︎ bundling the unsigned add-on (Firefox loads it only temporarily)"
+  cp "$BUILD/mc-download-manager-firefox-$EXT_VERSION.xpi" "$APP/Contents/Resources/FirefoxExtension-unsigned.xpi"
+fi
+
 echo "▶ Code signing ($IDENTITY)"
 # Notarization requires a secure timestamp; ad-hoc signatures cannot have one.
 if [[ "$IDENTITY" == "-" ]]; then TS="--timestamp=none"; else TS="--timestamp"; fi
@@ -109,6 +120,7 @@ MC Download Manager $VERSION
 3) Safari: Settings ▸ Extensions ▸ enable MC Download Manager.
    Chrome: chrome://extensions ▸ Developer mode ▸ "Load unpacked" ▸ pick the folder shown in
            the app under Settings ▸ Browser ▸ "Show Folder".
+   Firefox: Settings ▸ Browser Extensions ▸ "Open Setup Wizard…" ▸ "Add to Firefox".
 
 --- Türkçe ---
 1) "MC Download Manager.app" simgesini Applications klasörüne sürükleyin.
@@ -116,6 +128,7 @@ MC Download Manager $VERSION
 3) Safari: Ayarlar ▸ Uzantılar ▸ MC Download Manager'ı etkinleştirin.
    Chrome: chrome://extensions ▸ Geliştirici modu ▸ "Paketlenmemiş öğe yükle" ▸
            uygulama içindeki Ayarlar ▸ Tarayıcı ▸ "Klasörü Göster" ile açılan klasörü seçin.
+   Firefox: Ayarlar ▸ Tarayıcı Eklentileri ▸ "Kurulum Sihirbazını Aç…" ▸ "Firefox'a Ekle".
 TXT
 hdiutil create -volname "$APP_NAME" -srcfolder "$STAGE" -ov -format UDZO -quiet "$DMG"
 rm -rf "$STAGE"

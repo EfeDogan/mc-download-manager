@@ -3,14 +3,14 @@ import Foundation
 import Security
 import SafariServices
 
-/// Browser extension helpers. Supported browsers for the guided setup: Safari, Google Chrome, Brave.
+/// Browser extension helpers. Supported browsers for the guided setup: Safari, Google Chrome, Brave, Firefox.
 enum BrowserIntegration {
     static let safariExtensionID = "com.mesutcevik.mcdownloadmanager.safari"
     /// Set this once the extension is published on the Chrome Web Store; the wizard then links to it.
     static let chromeWebStoreURL: URL? = nil
 
     enum Kind: String, CaseIterable, Identifiable {
-        case safari, chrome, brave
+        case safari, chrome, brave, firefox
         var id: String { rawValue }
 
         var name: String {
@@ -18,6 +18,7 @@ enum BrowserIntegration {
             case .safari: return "Safari"
             case .chrome: return "Google Chrome"
             case .brave: return "Brave"
+            case .firefox: return "Firefox"
             }
         }
         var bundleID: String {
@@ -25,6 +26,7 @@ enum BrowserIntegration {
             case .safari: return "com.apple.Safari"
             case .chrome: return "com.google.Chrome"
             case .brave: return "com.brave.Browser"
+            case .firefox: return "org.mozilla.firefox"
             }
         }
         var extensionsPageURL: String {
@@ -32,9 +34,10 @@ enum BrowserIntegration {
             case .safari: return ""
             case .chrome: return "chrome://extensions"
             case .brave: return "brave://extensions"
+            case .firefox: return "about:addons"
             }
         }
-        var isChromium: Bool { self != .safari }
+        var isChromium: Bool { self == .chrome || self == .brave }
         var appURL: URL? { NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) }
         var isInstalled: Bool { appURL != nil }
         var icon: NSImage? { appURL.map { NSWorkspace.shared.icon(forFile: $0.path) } }
@@ -135,12 +138,57 @@ enum BrowserIntegration {
 
     /// Opens the browser's extensions page (same mechanism as `open -a <Browser> chrome://extensions`).
     static func openExtensionsPage(in kind: Kind) {
-        guard kind.isChromium, let appURL = kind.appURL, let url = URL(string: kind.extensionsPageURL) else { return }
+        guard kind != .safari else { return }
+        open(kind.extensionsPageURL, in: kind)
+    }
+
+    private static func open(_ address: String, in kind: Kind) {
+        guard let appURL = kind.appURL, let url = URL(string: address) else { return }
         let cfg = NSWorkspace.OpenConfiguration()
         cfg.activates = true
         NSWorkspace.shared.open([url], withApplicationAt: appURL, configuration: cfg) { _, error in
-            if error != nil { queue.async { run("/usr/bin/open", ["-a", appURL.path, kind.extensionsPageURL]) } }
+            if error != nil { queue.async { run("/usr/bin/open", ["-a", appURL.path, address]) } }
         }
+    }
+
+    // MARK: Firefox
+
+    /// Add-on signed by Mozilla (unlisted channel), bundled by scripts/build.sh. Release Firefox
+    /// installs it permanently when the file is opened: Firefox shows its own “Add …?” prompt.
+    static var signedFirefoxAddon: URL? { bundledResource("FirefoxExtension.xpi") }
+    /// Unsigned build, only loadable temporarily via about:debugging (removed when Firefox quits).
+    static var unsignedFirefoxAddon: URL? { bundledResource("FirefoxExtension-unsigned.xpi") }
+
+    private static func bundledResource(_ name: String) -> URL? {
+        let url = Bundle.main.bundleURL.appendingPathComponent("Contents/Resources/\(name)")
+        return FileManager.default.fileExists(atPath: url.path) ? url : nil
+    }
+
+    /// Hands the signed add-on to Firefox, which asks the user to confirm the installation.
+    static func installFirefoxAddon() {
+        guard let xpi = signedFirefoxAddon, let appURL = Kind.firefox.appURL else { return }
+        let cfg = NSWorkspace.OpenConfiguration()
+        cfg.activates = true
+        NSWorkspace.shared.open([xpi], withApplicationAt: appURL, configuration: cfg) { _, error in
+            if error != nil { queue.async { run("/usr/bin/open", ["-a", appURL.path, xpi.path]) } }
+        }
+    }
+
+    /// Copies the unsigned add-on next to the other browser plugins for a temporary load.
+    @discardableResult
+    static func prepareTemporaryFirefoxAddon() throws -> URL {
+        guard let src = unsignedFirefoxAddon else { throw CocoaError(.fileNoSuchFile) }
+        let fm = FileManager.default
+        let dir = pluginFolder(for: .firefox)
+        try fm.createDirectory(at: dir, withIntermediateDirectories: true)
+        let dest = dir.appendingPathComponent("mc-download-manager.xpi")
+        if fm.fileExists(atPath: dest.path) { try fm.removeItem(at: dest) }
+        try fm.copyItem(at: src, to: dest)
+        return dest
+    }
+
+    static func openFirefoxDebugging() {
+        open("about:debugging#/runtime/this-firefox", in: .firefox)
     }
 
     static func revealInFinder(_ url: URL) {

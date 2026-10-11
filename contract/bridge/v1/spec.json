@@ -1,0 +1,68 @@
+{
+  "contract": "mc-download-manager-bridge",
+  "version": 1,
+  "transport": {
+    "scheme": "http",
+    "bindHost": "127.0.0.1",
+    "acceptedHostNames": ["127.0.0.1", "localhost", "[::1]"],
+    "defaultPort": 48213,
+    "maximumRequestBytes": 16000000
+  },
+  "client": {
+    "markerHeader": "X-MCDM-Extension",
+    "markerValues": ["safari", "chrome", "brave", "edge", "firefox"],
+    "allowedOriginPrefixes": [
+      "chrome-extension://",
+      "safari-web-extension://",
+      "moz-extension://"
+    ],
+    "allowMissingOriginWithMarker": true,
+    "rejectOrigins": ["", "null"]
+  },
+  "cors": {
+    "allowHeaders": ["Content-Type", "X-MCDM-Extension"],
+    "allowMethods": ["GET", "POST", "OPTIONS"],
+    "allowPrivateNetwork": true,
+    "allowLocalNetwork": true
+  },
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/ping",
+      "responseRequired": ["ok", "app", "version", "ytdlp", "active", "captureExtensions"]
+    },
+    {
+      "method": "POST",
+      "path": "/download",
+      "requestRequired": ["url"],
+      "requestOptional": [
+        "filename",
+        "referer",
+        "userAgent",
+        "cookieHeader",
+        "cookies",
+        "kind",
+        "headers",
+        "segments"
+      ],
+      "requestEnums": { "kind": ["file", "video"] },
+      "responseRequired": ["ok", "id"]
+    },
+    {
+      "method": "GET",
+      "path": "/downloads",
+      "responseRequired": ["ok", "items"],
+      "itemRequired": ["id", "name", "state", "progress", "speed", "total", "received", "stage"],
+      "itemEnums": {
+        "state": ["queued", "probing", "downloading", "paused", "completed", "failed", "cancelled"]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/action",
+      "requestRequired": ["id", "action"],
+      "requestEnums": { "action": ["pause", "resume", "cancel", "remove"] },
+      "responseRequired": ["ok"]
+    }
+  ]
+}

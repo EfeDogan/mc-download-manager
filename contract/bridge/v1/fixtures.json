@@ -1,0 +1,149 @@
+{
+  "authorizationCases": [
+    {
+      "name": "extension origin and loopback host",
+      "headers": {
+        "origin": "chrome-extension://abcdefghijklmnop",
+        "host": "127.0.0.1:48213",
+        "x-mcdm-extension": "chrome"
+      },
+      "allowed": true
+    },
+    {
+      "name": "Chrome GET without Origin but with marker",
+      "headers": {
+        "host": "localhost:48213",
+        "x-mcdm-extension": "chrome"
+      },
+      "allowed": true
+    },
+    {
+      "name": "Firefox extension origin",
+      "headers": {
+        "origin": "moz-extension://12345678-1234-1234-1234-123456789abc",
+        "host": "127.0.0.1:48213",
+        "x-mcdm-extension": "firefox"
+      },
+      "allowed": true
+    },
+    {
+      "name": "ordinary web origin with forged marker",
+      "headers": {
+        "origin": "https://example.com",
+        "host": "127.0.0.1:48213",
+        "x-mcdm-extension": "chrome"
+      },
+      "allowed": false
+    },
+    {
+      "name": "opaque null origin",
+      "headers": {
+        "origin": "null",
+        "host": "127.0.0.1:48213",
+        "x-mcdm-extension": "firefox"
+      },
+      "allowed": false
+    },
+    {
+      "name": "missing marker and origin",
+      "headers": { "host": "127.0.0.1:48213" },
+      "allowed": false
+    },
+    {
+      "name": "non-loopback Host",
+      "headers": {
+        "origin": "chrome-extension://abcdefghijklmnop",
+        "host": "example.com:48213",
+        "x-mcdm-extension": "chrome"
+      },
+      "allowed": false
+    },
+    {
+      "name": "wrong port",
+      "headers": {
+        "origin": "chrome-extension://abcdefghijklmnop",
+        "host": "127.0.0.1:9999",
+        "x-mcdm-extension": "chrome"
+      },
+      "allowed": false
+    }
+  ],
+  "requests": [
+    {
+      "name": "file download with browser context",
+      "method": "POST",
+      "path": "/download",
+      "body": {
+        "url": "https://downloads.example.test/archive.zip",
+        "filename": "archive.zip",
+        "referer": "https://example.test/files",
+        "userAgent": "Contract Fixture Browser",
+        "cookieHeader": "",
+        "cookies": [],
+        "kind": "file",
+        "segments": 8
+      }
+    },
+    {
+      "name": "video download",
+      "method": "POST",
+      "path": "/download",
+      "body": {
+        "url": "https://video.example.test/watch/42",
+        "filename": "",
+        "referer": "https://video.example.test/watch/42",
+        "kind": "video"
+      }
+    },
+    {
+      "name": "pause action",
+      "method": "POST",
+      "path": "/action",
+      "body": {
+        "id": "11111111-1111-4111-8111-111111111111",
+        "action": "pause"
+      }
+    }
+  ],
+  "responses": [
+    {
+      "name": "ping response",
+      "method": "GET",
+      "path": "/ping",
+      "body": {
+        "ok": true,
+        "app": "MCDownloadManager",
+        "version": "1.2.0",
+        "ytdlp": true,
+        "active": 0,
+        "captureExtensions": ["zip", "pdf", "mp4"]
+      }
+    },
+    {
+      "name": "downloads response",
+      "method": "GET",
+      "path": "/downloads",
+      "body": {
+        "ok": true,
+        "items": [
+          {
+            "id": "11111111-1111-4111-8111-111111111111",
+            "name": "archive.zip",
+            "state": "downloading",
+            "progress": 0.5,
+            "speed": 1048576,
+            "total": 2097152,
+            "received": 1048576,
+            "stage": ""
+          }
+        ]
+      }
+    },
+    {
+      "name": "action response",
+      "method": "POST",
+      "path": "/action",
+      "body": { "ok": true }
+    }
+  ]
+}

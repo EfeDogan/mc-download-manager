@@ -1,0 +1,13 @@
+{
+  "name": "mc-download-manager-repository",
+  "private": true,
+  "version": "1.2.0",
+  "description": "Repository-level compatibility checks for MC Download Manager",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "test:contract": "node --test tests/bridge-contract.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

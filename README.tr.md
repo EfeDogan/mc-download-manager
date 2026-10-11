@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="README.md">🇬🇧 English</a> · <a href="https://github.com/mstcvk/mc-download-manager/releases">Sürümler</a> · <a href="#kurulum">Homebrew</a>
+  <a href="README.md">🇬🇧 English</a> · <a href="https://github.com/EfeDogan/mc-download-manager/releases">Linux/Windows'u indir</a> · <a href="#kurulum">Kurulum</a>
 </p>
 
 <p align="center">
@@ -54,37 +54,43 @@ DMG'yi açıp uygulamayı *Applications* klasörüne sürüklemek yeterlidir. ma
 
 ### Linux (deneysel)
 
-Linux paketleri [çapraz platform iş akışı](.github/workflows/cross-platform-core.yml)
-tarafından üretilir. Başarılı bir GitHub Actions çalıştırmasındaki
-`linux-installers` dosyasını indirip arşivden çıkarın. GitHub, iş akışı
-dosyalarını indirmek için oturum açmanızı isteyebilir.
+1. [Linux/Windows indirme sayfasını](https://github.com/EfeDogan/mc-download-manager/releases)
+   açın ve en üstteki **Cross-platform preview** sürümünün altındaki
+   **Assets** bölümünü genişletin.
+2. Ubuntu, Debian veya Linux Mint kullanıyorsanız adı `amd64.deb` ile biten
+   dosyayı indirin. Dosyaya çift tıklayıp yazılım yükleyiciyle kurun. Terminalden
+   kurmak isterseniz:
 
-Paketlerden birini seçin:
+   ```bash
+   sudo apt install ./"MC Download Manager_"*.deb
+   ```
 
-- **AppImage** — taşınabilirdir, kurulum gerektirmez:
+3. Kurulum yapmadan çalıştırmak veya başka bir dağıtım denemek için adı
+   `amd64.AppImage` ile biten dosyayı indirin; ardından:
 
-  ```bash
-  chmod +x "MC Download Manager_"*.AppImage
-  ./"MC Download Manager_"*.AppImage
-  ```
-
-- **Debian/Ubuntu paketi** — uygulama başlatıcısını ve simgesini sisteme ekler:
-
-  ```bash
-  sudo apt install ./"MC Download Manager_"*.deb
-  ```
+   ```bash
+   chmod +x "MC Download Manager_"*.AppImage
+   ./"MC Download Manager_"*.AppImage
+   ```
 
 AppImage ve tarayıcı eklentisi akışı Ubuntu üzerinde elle denenmiştir. Diğer
-Linux dağıtımları ve masaüstü ortamları için daha geniş test gereklidir. Hazır
-iş akışı dosyası yoksa [kaynaktan çapraz platform derleme](CrossPlatform/README.md#build-from-source)
-adımlarını kullanın.
+Linux dağıtımları ve masaüstü ortamları için daha geniş test gereklidir.
 
 ### Windows (deneysel)
 
-Başarılı bir [çapraz platform iş akışı](.github/workflows/cross-platform-core.yml)
-çalıştırmasındaki `windows-installers` dosyasını indirip arşivden çıkarın;
-ardından NSIS `*-setup.exe` kurucusunu veya `.msi` paketini çalıştırın. Paketler
-henüz kod imzalı olmadığı için Windows SmartScreen ilk açılışta uyarı verebilir.
+1. [Windows indirme sayfasını](https://github.com/EfeDogan/mc-download-manager/releases)
+   açın.
+2. En üstteki **Cross-platform preview** sürümünün altındaki **Assets** bölümünü
+   genişletin. **Source code** dosyalarını değil, adı `x64-setup.exe` ile biten
+   Windows kurucusunu indirin. `.msi` dosyası alternatif kurucudur; normal
+   kullanıcı için `setup.exe` önerilir.
+3. İndirilen `setup.exe` dosyasına çift tıklayın ve kurulum adımlarını izleyin.
+4. Paket henüz kod imzalı değildir. SmartScreen **Windows bilgisayarınızı
+   korudu** uyarısı gösterirse yalnızca dosyayı yukarıdaki Release sayfasından
+   indirdiğinizden eminseniz **Ek bilgi → Yine de çalıştır**ı seçin.
+5. Kurulum bitince Başlat menüsünden **MC Download Manager**'ı açın. Sağ üstte
+   **Bridge online** göründüğünde uygulama tarayıcı eklentilerini kabul etmeye
+   hazırdır.
 
 Windows paketleri CI üzerinde derlenmektedir ancak gerçek bir Windows
 kurulumunda henüz doğrulanmamıştır. Güncel sınırlamalar ve kaynaktan derleme

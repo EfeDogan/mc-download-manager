@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="README.tr.md">🇹🇷 Türkçe</a> · <a href="https://github.com/mstcvk/mc-download-manager/releases">Releases</a> · <a href="#installation">Homebrew</a> · <a href="#building-from-source">Build</a>
+  <a href="README.tr.md">🇹🇷 Türkçe</a> · <a href="https://github.com/EfeDogan/mc-download-manager/releases">Download Linux/Windows</a> · <a href="#installation">Install</a> · <a href="#building-from-source">Build</a>
 </p>
 
 <p align="center">
@@ -54,36 +54,41 @@ Open the DMG, drag the app to *Applications*, done. The macOS interface is in **
 
 ### Linux (experimental)
 
-Linux packages are produced by the [cross-platform workflow](.github/workflows/cross-platform-core.yml). Download the `linux-installers`
-artifact from a successful GitHub Actions run and extract it. GitHub may require
-you to sign in before downloading workflow artifacts.
+1. Open the [Linux/Windows download page](https://github.com/EfeDogan/mc-download-manager/releases)
+   and expand **Assets** under the newest **Cross-platform preview** release.
+2. On Ubuntu, Debian, or Linux Mint, download the file ending in `amd64.deb`.
+   Double-click it to use the graphical software installer, or install it from
+   a terminal:
 
-Choose one package:
+   ```bash
+   sudo apt install ./"MC Download Manager_"*.deb
+   ```
 
-- **AppImage** — portable; no installation is required:
+3. To run without installing, or to try another distribution, download the file
+   ending in `amd64.AppImage`, then run:
 
-  ```bash
-  chmod +x "MC Download Manager_"*.AppImage
-  ./"MC Download Manager_"*.AppImage
-  ```
-
-- **Debian/Ubuntu package** — integrates the launcher and application icon:
-
-  ```bash
-  sudo apt install ./"MC Download Manager_"*.deb
-  ```
+   ```bash
+   chmod +x "MC Download Manager_"*.AppImage
+   ./"MC Download Manager_"*.AppImage
+   ```
 
 The AppImage and browser-extension workflow have been manually exercised on
 Ubuntu. Other Linux distributions and desktop environments still need broader
-testing. If no workflow artifact is available, follow the
-[cross-platform source-build instructions](CrossPlatform/README.md#build-from-source).
+testing.
 
 ### Windows (experimental)
 
-Download and extract the `windows-installers` artifact from a successful
-[cross-platform workflow](.github/workflows/cross-platform-core.yml) run, then
-launch either the NSIS `*-setup.exe` installer or the `.msi` package. These
-packages are not code-signed yet, so Windows SmartScreen may warn before launch.
+1. Open the [Windows download page](https://github.com/EfeDogan/mc-download-manager/releases).
+2. Expand **Assets** under the newest **Cross-platform preview** release. Do not
+   download the **Source code** archives. Download the Windows installer whose
+   name ends in `x64-setup.exe`. The `.msi` is an alternative; `setup.exe` is
+   recommended for most users.
+3. Double-click the downloaded `setup.exe` and follow the installer.
+4. The package is not code-signed yet. If SmartScreen shows **Windows protected
+   your PC**, choose **More info → Run anyway** only if you downloaded the file
+   from the Release page linked above.
+5. Open **MC Download Manager** from the Start menu. When the upper-right status
+   says **Bridge online**, it is ready to accept browser-extension requests.
 
 Windows packages compile in CI, but have not yet been verified on a real Windows
 installation. See [CrossPlatform/README.md](CrossPlatform/README.md) for the

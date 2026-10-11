@@ -14,11 +14,18 @@ it while the bridge continues to run from the system tray.
 
 ## Install a packaged build
 
-The `cross-platform-core.yml` GitHub Actions workflow produces two downloadable
-artifacts:
+End users should download installers from the fork's
+[Releases page](https://github.com/EfeDogan/mc-download-manager/releases), not
+from repository paths or build logs. Expand **Assets** under the newest
+**Cross-platform preview** release:
 
-- `linux-installers`: a portable AppImage and a Debian/Ubuntu `.deb` package;
-- `windows-installers`: an NSIS `*-setup.exe` installer and an `.msi` package.
+- Windows: choose the file ending in `x64-setup.exe`;
+- Ubuntu/Debian/Linux Mint: choose the file ending in `amd64.deb`;
+- portable Linux: choose the file ending in `amd64.AppImage`.
+
+Paths such as `CrossPlatform/target/release/bundle/nsis/*-setup.exe` in the
+workflow are internal build paths for GitHub Actions. Users do not create or
+navigate to those paths.
 
 The packages are currently unsigned experimental builds. Linux AppImage,
 Chromium, and Firefox flows have been manually exercised on Ubuntu. Windows
@@ -34,8 +41,9 @@ chmod +x "MC Download Manager_"*.AppImage
 sudo apt install ./"MC Download Manager_"*.deb
 ```
 
-On Windows, extract the workflow artifact and start either `*-setup.exe` or the
-`.msi`. SmartScreen may warn because the packages are not code-signed yet.
+On Windows, download and start the Release asset ending in `x64-setup.exe`.
+The `.msi` is an alternative installer. SmartScreen may warn because the
+packages are not code-signed yet.
 
 ## Build from source
 

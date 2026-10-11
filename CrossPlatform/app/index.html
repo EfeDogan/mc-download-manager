@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="color-scheme" content="dark" />
+    <meta name="color-scheme" content="light dark" />
     <meta name="description" content="A fast, cross-platform download manager." />
+    <link rel="icon" href="/logo.png" />
     <link rel="stylesheet" href="/src/styles.css" />
     <title>MC Download Manager</title>
     <script type="module" src="/src/main.ts" defer></script>
@@ -13,7 +14,7 @@
     <div class="app-shell">
       <header class="topbar">
         <div class="brand">
-          <span class="brand-mark" aria-hidden="true">M</span>
+          <img class="brand-mark" src="/logo.png" alt="" width="42" height="42" />
           <div>
             <h1>MC Download Manager</h1>
             <p id="runtime-copy">Starting local bridge…</p>
@@ -36,8 +37,21 @@
             </div>
             <button id="settings-close" class="secondary-button" type="button">Close</button>
           </div>
+          <fieldset class="mode-fieldset">
+            <legend>Appearance</legend>
+            <div class="mode-options">
+              <label class="mode-option">
+                <input type="radio" name="color-mode" value="light" />
+                <span>Light</span>
+              </label>
+              <label class="mode-option">
+                <input type="radio" name="color-mode" value="dark" />
+                <span>Dark</span>
+              </label>
+            </div>
+          </fieldset>
           <fieldset class="theme-fieldset">
-            <legend>Theme</legend>
+            <legend>Palette</legend>
             <p class="settings-copy">Choose a quiet palette for the desktop app. Your selection is saved automatically.</p>
             <div class="theme-grid">
               <label class="theme-option ink-wash-option">
@@ -103,7 +117,11 @@
               <p class="eyebrow">Queue</p>
               <h2 id="downloads-title">Downloads</h2>
             </div>
-            <span id="download-count" class="count">0 items</span>
+            <div class="downloads-tools">
+              <span id="download-count" class="count">0 items</span>
+              <button id="open-download-folder" class="secondary-button" type="button" disabled>Open download folder</button>
+              <span id="folder-result" class="visually-hidden" role="status"></span>
+            </div>
           </div>
           <div id="download-list" class="download-list" aria-live="polite"></div>
           <div id="empty-state" class="empty-state">

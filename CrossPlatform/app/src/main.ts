@@ -12,6 +12,7 @@ type DownloadState =
 type DownloadAction = "pause" | "resume" | "cancel" | "remove";
 type DownloadKind = "file" | "video";
 type ThemeName = "ink-wash" | "lush-forest" | "stormy-morning";
+type ColorMode = "light" | "dark";
 
 interface DownloadSummary {
   id: string;
@@ -58,12 +59,20 @@ const settingsButton = document.querySelector<HTMLButtonElement>("#settings-butt
 const settingsDialog = document.querySelector<HTMLDialogElement>("#settings-dialog")!;
 const settingsClose = document.querySelector<HTMLButtonElement>("#settings-close")!;
 const themeInputs = Array.from(document.querySelectorAll<HTMLInputElement>('input[name="theme"]'));
+const modeInputs = Array.from(document.querySelectorAll<HTMLInputElement>('input[name="color-mode"]'));
+const openDownloadFolderButton = document.querySelector<HTMLButtonElement>("#open-download-folder")!;
+const folderResult = document.querySelector<HTMLElement>("#folder-result")!;
 let kindWasChosenManually = false;
 
 const themeLabels: Record<ThemeName, string> = {
   "ink-wash": "Ink wash",
   "lush-forest": "Lush forest",
   "stormy-morning": "Stormy morning",
+};
+
+const modeLabels: Record<ColorMode, string> = {
+  light: "Light",
+  dark: "Dark",
 };
 
 const isTauriRuntime = "__TAURI_INTERNALS__" in window;
@@ -83,6 +92,7 @@ async function appInvoke<T>(command: string, args?: Record<string, unknown>): Pr
   }
   if (command === "list_downloads") return [] as T;
   if (command === "download_action") return undefined as T;
+  if (command === "open_download_directory") return undefined as T;
 
   throw new Error("This action is available in the desktop app.");
 }
@@ -95,14 +105,27 @@ function storedTheme(): ThemeName {
   return "ink-wash";
 }
 
-function applyTheme(theme: ThemeName): void {
-  document.documentElement.dataset.theme = theme;
-  settingsButton.textContent = `Settings · ${themeLabels[theme]}`;
-  for (const input of themeInputs) input.checked = input.value === theme;
-  try { window.localStorage.setItem("mcdm-theme", theme); } catch {}
+function storedMode(): ColorMode {
+  try {
+    const value = window.localStorage.getItem("mcdm-color-mode");
+    if (value && Object.prototype.hasOwnProperty.call(modeLabels, value)) return value as ColorMode;
+  } catch {}
+  return "light";
 }
 
-applyTheme(storedTheme());
+function applyAppearance(theme: ThemeName, mode: ColorMode): void {
+  document.documentElement.dataset.theme = theme;
+  document.documentElement.dataset.mode = mode;
+  settingsButton.textContent = `Settings · ${themeLabels[theme]} · ${modeLabels[mode]}`;
+  for (const input of themeInputs) input.checked = input.value === theme;
+  for (const input of modeInputs) input.checked = input.value === mode;
+  try {
+    window.localStorage.setItem("mcdm-theme", theme);
+    window.localStorage.setItem("mcdm-color-mode", mode);
+  } catch {}
+}
+
+applyAppearance(storedTheme(), storedMode());
 
 const videoHosts = [
   "youtube.com", "youtu.be", "vimeo.com", "dailymotion.com", "twitter.com", "x.com",
@@ -225,6 +248,7 @@ async function refreshRuntime(): Promise<void> {
       ? `Listening on port ${info.bridgePort} · ${info.videoAvailable ? "yt-dlp ready" : "yt-dlp missing"}`
       : "Browser bridge is unavailable";
     directory.textContent = `Saving to ${info.downloadDirectory}`;
+    openDownloadFolderButton.disabled = false;
   } catch (error) {
     status.textContent = "Unavailable";
     status.className = "status-pill error";
@@ -299,8 +323,25 @@ settingsDialog.addEventListener("click", (event) => {
   if (event.target === settingsDialog) settingsDialog.close();
 });
 for (const input of themeInputs) {
-  input.addEventListener("change", () => applyTheme(input.value as ThemeName));
+  input.addEventListener("change", () => applyAppearance(input.value as ThemeName, storedMode()));
 }
+for (const input of modeInputs) {
+  input.addEventListener("change", () => applyAppearance(storedTheme(), input.value as ColorMode));
+}
+
+openDownloadFolderButton.addEventListener("click", async () => {
+  openDownloadFolderButton.disabled = true;
+  folderResult.textContent = "";
+  try {
+    await appInvoke("open_download_directory");
+    folderResult.textContent = "Download folder opened.";
+  } catch (error) {
+    folderResult.textContent = `Could not open the download folder: ${String(error)}`;
+    formError.textContent = folderResult.textContent;
+  } finally {
+    openDownloadFolderButton.disabled = false;
+  }
+});
 
 void refreshRuntime();
 void refreshDownloads();

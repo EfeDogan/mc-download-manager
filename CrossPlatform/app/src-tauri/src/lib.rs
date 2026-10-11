@@ -2,6 +2,7 @@ use std::{
     collections::HashMap,
     fs,
     path::{Path, PathBuf},
+    process::Command,
     sync::{Arc, RwLock},
 };
 
@@ -56,6 +57,32 @@ async fn runtime_info(state: State<'_, AppState>) -> Result<RuntimeInfo, String>
 #[tauri::command]
 async fn list_downloads(state: State<'_, AppState>) -> Result<Vec<DownloadSummary>, String> {
     Ok(state.manager.list().await)
+}
+
+#[cfg(target_os = "windows")]
+fn directory_opener() -> &'static str {
+    "explorer.exe"
+}
+
+#[cfg(target_os = "macos")]
+fn directory_opener() -> &'static str {
+    "open"
+}
+
+#[cfg(all(unix, not(target_os = "macos")))]
+fn directory_opener() -> &'static str {
+    "xdg-open"
+}
+
+#[tauri::command]
+fn open_download_directory(state: State<'_, AppState>) -> Result<(), String> {
+    fs::create_dir_all(&state.download_directory)
+        .map_err(|error| format!("could not create the download directory: {error}"))?;
+    Command::new(directory_opener())
+        .arg(&state.download_directory)
+        .spawn()
+        .map(|_| ())
+        .map_err(|error| format!("could not open the download directory: {error}"))
 }
 
 #[tauri::command]
@@ -250,6 +277,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             runtime_info,
             list_downloads,
+            open_download_directory,
             add_download,
             download_action,
             install_browser_extension,

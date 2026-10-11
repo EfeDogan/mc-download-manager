@@ -27,8 +27,5 @@ jobs:
         with:
           name: MC-Download-Manager-dmg
           path: build/*.dmg
-      - name: Release
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: build/*.dmg
+      # Releases are published from a local Developer ID-signed, notarized build (scripts/build.sh);
+      # the CI DMG is ad-hoc signed and kept only as a workflow artifact.

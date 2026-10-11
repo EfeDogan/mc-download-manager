@@ -13,6 +13,7 @@ type DownloadAction = "pause" | "resume" | "cancel" | "remove";
 type DownloadKind = "file" | "video";
 type ThemeName = "ink-wash" | "lush-forest" | "stormy-morning";
 type ColorMode = "light" | "dark";
+type VideoQuality = "best" | "2160p" | "1440p" | "1080p" | "720p" | "480p" | "360p";
 
 interface DownloadSummary {
   id: string;
@@ -60,6 +61,8 @@ const settingsDialog = document.querySelector<HTMLDialogElement>("#settings-dial
 const settingsClose = document.querySelector<HTMLButtonElement>("#settings-close")!;
 const themeInputs = Array.from(document.querySelectorAll<HTMLInputElement>('input[name="theme"]'));
 const modeInputs = Array.from(document.querySelectorAll<HTMLInputElement>('input[name="color-mode"]'));
+const videoQualityInput = document.querySelector<HTMLSelectElement>("#video-quality-input")!;
+const videoQualityResult = document.querySelector<HTMLElement>("#video-quality-result")!;
 const openDownloadFolderButton = document.querySelector<HTMLButtonElement>("#open-download-folder")!;
 const folderResult = document.querySelector<HTMLElement>("#folder-result")!;
 let kindWasChosenManually = false;
@@ -73,6 +76,16 @@ const themeLabels: Record<ThemeName, string> = {
 const modeLabels: Record<ColorMode, string> = {
   light: "Light",
   dark: "Dark",
+};
+
+const videoQualityLabels: Record<VideoQuality, string> = {
+  best: "Best available",
+  "2160p": "2160p (4K)",
+  "1440p": "1440p (2K)",
+  "1080p": "1080p",
+  "720p": "720p",
+  "480p": "480p",
+  "360p": "360p",
 };
 
 const isTauriRuntime = "__TAURI_INTERNALS__" in window;
@@ -93,6 +106,7 @@ async function appInvoke<T>(command: string, args?: Record<string, unknown>): Pr
   if (command === "list_downloads") return [] as T;
   if (command === "download_action") return undefined as T;
   if (command === "open_download_directory") return undefined as T;
+  if (command === "set_video_quality") return undefined as T;
 
   throw new Error("This action is available in the desktop app.");
 }
@@ -113,6 +127,31 @@ function storedMode(): ColorMode {
   return "light";
 }
 
+function storedVideoQuality(): VideoQuality {
+  try {
+    const value = window.localStorage.getItem("mcdm-video-quality");
+    if (value && Object.prototype.hasOwnProperty.call(videoQualityLabels, value)) {
+      return value as VideoQuality;
+    }
+  } catch {}
+  return "1080p";
+}
+
+async function applyVideoQuality(quality: VideoQuality, announce = true): Promise<void> {
+  videoQualityInput.value = quality;
+  try {
+    window.localStorage.setItem("mcdm-video-quality", quality);
+  } catch {}
+  try {
+    await appInvoke("set_video_quality", { videoQuality: quality });
+    videoQualityResult.textContent = announce
+      ? `Video downloads will use ${videoQualityLabels[quality]}.`
+      : "";
+  } catch (error) {
+    videoQualityResult.textContent = `Could not save video quality: ${String(error)}`;
+  }
+}
+
 function applyAppearance(theme: ThemeName, mode: ColorMode): void {
   document.documentElement.dataset.theme = theme;
   document.documentElement.dataset.mode = mode;
@@ -126,6 +165,7 @@ function applyAppearance(theme: ThemeName, mode: ColorMode): void {
 }
 
 applyAppearance(storedTheme(), storedMode());
+void applyVideoQuality(storedVideoQuality(), false);
 
 const videoHosts = [
   "youtube.com", "youtu.be", "vimeo.com", "dailymotion.com", "twitter.com", "x.com",
@@ -265,6 +305,7 @@ form.addEventListener("submit", async (event) => {
       url: urlInput.value.trim(),
       filename: filenameInput.value.trim() || null,
       kind: kindInput.value as DownloadKind,
+      videoQuality: storedVideoQuality(),
     });
     urlInput.value = "";
     filenameInput.value = "";
@@ -328,6 +369,9 @@ for (const input of themeInputs) {
 for (const input of modeInputs) {
   input.addEventListener("change", () => applyAppearance(storedTheme(), input.value as ColorMode));
 }
+videoQualityInput.addEventListener("change", () => {
+  void applyVideoQuality(videoQualityInput.value as VideoQuality);
+});
 
 openDownloadFolderButton.addEventListener("click", async () => {
   openDownloadFolderButton.disabled = true;

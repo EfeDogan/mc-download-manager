@@ -10,6 +10,39 @@ pub enum DownloadKind {
     Video,
 }
 
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub enum VideoQuality {
+    #[serde(rename = "best")]
+    Best,
+    #[serde(rename = "2160p")]
+    P2160,
+    #[serde(rename = "1440p")]
+    P1440,
+    #[default]
+    #[serde(rename = "1080p")]
+    P1080,
+    #[serde(rename = "720p")]
+    P720,
+    #[serde(rename = "480p")]
+    P480,
+    #[serde(rename = "360p")]
+    P360,
+}
+
+impl VideoQuality {
+    pub fn max_height(self) -> Option<u16> {
+        match self {
+            Self::Best => None,
+            Self::P2160 => Some(2160),
+            Self::P1440 => Some(1440),
+            Self::P1080 => Some(1080),
+            Self::P720 => Some(720),
+            Self::P480 => Some(480),
+            Self::P360 => Some(360),
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum DownloadState {
@@ -44,6 +77,8 @@ pub struct DownloadRequest {
     pub cookies: Vec<serde_json::Value>,
     #[serde(default)]
     pub kind: DownloadKind,
+    #[serde(default)]
+    pub video_quality: Option<VideoQuality>,
     #[serde(default)]
     pub headers: HashMap<String, String>,
     pub segments: Option<u16>,

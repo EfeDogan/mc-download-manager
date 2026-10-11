@@ -42,10 +42,14 @@
         "cookieHeader",
         "cookies",
         "kind",
+        "videoQuality",
         "headers",
         "segments"
       ],
-      "requestEnums": { "kind": ["file", "video"] },
+      "requestEnums": {
+        "kind": ["file", "video"],
+        "videoQuality": ["best", "2160p", "1440p", "1080p", "720p", "480p", "360p"]
+      },
       "responseRequired": ["ok", "id"]
     },
     {

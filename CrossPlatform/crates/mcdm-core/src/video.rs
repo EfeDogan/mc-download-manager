@@ -9,7 +9,7 @@ use tokio::{
 use tokio_util::sync::CancellationToken;
 use uuid::Uuid;
 
-use crate::model::DownloadRequest;
+use crate::model::{DownloadRequest, VideoQuality};
 
 #[derive(Debug)]
 pub enum VideoEvent {
@@ -137,7 +137,11 @@ async fn download_once(
         .arg("-o")
         .arg("%(title).150B [%(id)s].%(ext)s")
         .arg("-f")
-        .arg(format_selector(ffmpeg.is_some(), strategy))
+        .arg(format_selector(
+            ffmpeg.is_some(),
+            strategy,
+            request.video_quality.unwrap_or_default(),
+        ))
         .arg("--progress-template")
         .arg("download:MCDM_PROGRESS:%(progress.downloaded_bytes)s|%(progress.total_bytes)s|%(progress.total_bytes_estimate)s|%(progress.speed)s")
         .arg("--print")
@@ -189,15 +193,34 @@ async fn download_once(
     result
 }
 
-fn format_selector(ffmpeg_available: bool, strategy: VideoStrategy) -> &'static str {
+fn format_selector(
+    ffmpeg_available: bool,
+    strategy: VideoStrategy,
+    quality: VideoQuality,
+) -> String {
+    let Some(height) = quality.max_height() else {
+        return if !ffmpeg_available {
+            "b".to_owned()
+        } else {
+            match strategy {
+                VideoStrategy::Default => "bv*+ba/b".to_owned(),
+                VideoStrategy::YoutubeHls => {
+                    "bv*[protocol^=m3u8]+ba[protocol^=m3u8]/bv*+ba/b".to_owned()
+                }
+            }
+        };
+    };
+
     if !ffmpeg_available {
-        return "b[height<=1080]/b";
+        return format!("b[height<={height}]/b");
     }
     match strategy {
-        VideoStrategy::Default => "bv*[height<=1080]+ba/b[height<=1080]/b",
-        VideoStrategy::YoutubeHls => {
-            "bv*[protocol^=m3u8][height<=1080]+ba[protocol^=m3u8]/bv*[height<=1080]+ba/b[height<=1080]/b"
+        VideoStrategy::Default => {
+            format!("bv*[height<={height}]+ba/b[height<={height}]/b")
         }
+        VideoStrategy::YoutubeHls => format!(
+            "bv*[protocol^=m3u8][height<={height}]+ba[protocol^=m3u8]/bv*[height<={height}]+ba/b[height<={height}]/b"
+        ),
     }
 }
 
@@ -448,6 +471,7 @@ mod tests {
         VideoError, VideoEvent, VideoStrategy, format_selector, is_forbidden, is_youtube_url,
         parse_progress, should_retry_with_browser_session, stage_for, write_cookie_file,
     };
+    use crate::model::VideoQuality;
 
     #[test]
     fn parses_ytdlp_progress_template() {
@@ -506,12 +530,20 @@ mod tests {
             "ERROR: HTTP Error 404: Not Found".to_owned()
         ))));
         assert_eq!(
-            format_selector(true, VideoStrategy::YoutubeHls),
+            format_selector(true, VideoStrategy::YoutubeHls, VideoQuality::P1080),
             "bv*[protocol^=m3u8][height<=1080]+ba[protocol^=m3u8]/bv*[height<=1080]+ba/b[height<=1080]/b"
         );
         assert_eq!(
-            format_selector(false, VideoStrategy::YoutubeHls),
+            format_selector(false, VideoStrategy::YoutubeHls, VideoQuality::P1080),
             "b[height<=1080]/b"
+        );
+        assert_eq!(
+            format_selector(true, VideoStrategy::Default, VideoQuality::P720),
+            "bv*[height<=720]+ba/b[height<=720]/b"
+        );
+        assert_eq!(
+            format_selector(true, VideoStrategy::Default, VideoQuality::Best),
+            "bv*+ba/b"
         );
     }
 
@@ -551,6 +583,7 @@ mod tests {
                 "secure": true
             })],
             kind: DownloadKind::Video,
+            video_quality: Some(VideoQuality::P720),
             headers: HashMap::new(),
             segments: None,
         };

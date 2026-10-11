@@ -1,4 +1,8 @@
-use std::{net::SocketAddr, path::PathBuf};
+use std::{
+    net::SocketAddr,
+    path::PathBuf,
+    sync::{Arc, RwLock},
+};
 
 use axum::{
     Json, Router,
@@ -15,7 +19,7 @@ use uuid::Uuid;
 
 use crate::{
     download::DownloadManager,
-    model::{DownloadAction, DownloadRequest},
+    model::{DownloadAction, DownloadRequest, VideoQuality},
 };
 
 const ORIGIN_PREFIXES: &[&str] = &[
@@ -46,6 +50,7 @@ impl Default for BridgeConfig {
 struct BridgeState {
     manager: DownloadManager,
     port: u16,
+    video_quality: Arc<RwLock<VideoQuality>>,
 }
 
 #[derive(Deserialize)]
@@ -55,8 +60,21 @@ struct ActionRequest {
 }
 
 pub async fn serve(listener: TcpListener, manager: DownloadManager) -> std::io::Result<()> {
+    serve_with_quality(
+        listener,
+        manager,
+        Arc::new(RwLock::new(VideoQuality::default())),
+    )
+    .await
+}
+
+pub async fn serve_with_quality(
+    listener: TcpListener,
+    manager: DownloadManager,
+    video_quality: Arc<RwLock<VideoQuality>>,
+) -> std::io::Result<()> {
     let port = listener.local_addr()?.port();
-    axum::serve(listener, router(manager, port)).await
+    axum::serve(listener, router_with_quality(manager, port, video_quality)).await
 }
 
 pub async fn run(config: BridgeConfig) -> Result<(), Box<dyn std::error::Error>> {
@@ -68,7 +86,23 @@ pub async fn run(config: BridgeConfig) -> Result<(), Box<dyn std::error::Error>>
 }
 
 pub fn router(manager: DownloadManager, port: u16) -> Router {
-    let state = BridgeState { manager, port };
+    router_with_quality(
+        manager,
+        port,
+        Arc::new(RwLock::new(VideoQuality::default())),
+    )
+}
+
+fn router_with_quality(
+    manager: DownloadManager,
+    port: u16,
+    video_quality: Arc<RwLock<VideoQuality>>,
+) -> Router {
+    let state = BridgeState {
+        manager,
+        port,
+        video_quality,
+    };
     Router::new()
         .route("/ping", get(ping).options(preflight))
         .route("/download", post(download).options(preflight))
@@ -191,12 +225,19 @@ async fn downloads(State(state): State<BridgeState>) -> Json<Value> {
 
 async fn download(
     State(state): State<BridgeState>,
-    Json(request): Json<DownloadRequest>,
+    Json(mut request): Json<DownloadRequest>,
 ) -> Response {
+    if request.video_quality.is_none() {
+        request.video_quality = Some(configured_video_quality(&state.video_quality));
+    }
     match state.manager.add(request).await {
         Ok(id) => Json(json!({ "ok": true, "id": id.to_string() })).into_response(),
         Err(error) => json_error(StatusCode::BAD_REQUEST, &error.to_string()),
     }
+}
+
+fn configured_video_quality(selected: &RwLock<VideoQuality>) -> VideoQuality {
+    selected.read().map(|quality| *quality).unwrap_or_default()
 }
 
 async fn action(State(state): State<BridgeState>, Json(request): Json<ActionRequest>) -> Response {
@@ -229,7 +270,11 @@ fn default_capture_extensions() -> &'static [&'static str] {
 mod tests {
     use axum::http::{HeaderMap, HeaderValue, header};
 
-    use super::{extension_request, host_allowed, origin_allowed};
+    use std::sync::RwLock;
+
+    use crate::model::VideoQuality;
+
+    use super::{configured_video_quality, extension_request, host_allowed, origin_allowed};
 
     #[test]
     fn accepts_only_extension_origins() {
@@ -258,5 +303,11 @@ mod tests {
         headers.insert(header::HOST, HeaderValue::from_static("127.0.0.1:48213"));
         assert!(host_allowed(&headers, 48213));
         assert!(!host_allowed(&headers, 9999));
+    }
+
+    #[test]
+    fn bridge_uses_the_quality_selected_in_desktop_settings() {
+        let selected = RwLock::new(VideoQuality::P720);
+        assert_eq!(configured_video_quality(&selected), VideoQuality::P720);
     }
 }

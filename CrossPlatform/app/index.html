@@ -50,6 +50,23 @@
               </label>
             </div>
           </fieldset>
+          <fieldset class="quality-fieldset">
+            <legend>Video quality</legend>
+            <p class="settings-copy">Used for video downloads started here or from a browser extension. yt-dlp chooses the best available format up to this resolution when possible.</p>
+            <label class="field settings-select-field" for="video-quality-input">
+              <span>Maximum resolution</span>
+              <select id="video-quality-input">
+                <option value="best">Best available</option>
+                <option value="2160p">2160p (4K)</option>
+                <option value="1440p">1440p (2K)</option>
+                <option value="1080p">1080p (default)</option>
+                <option value="720p">720p</option>
+                <option value="480p">480p</option>
+                <option value="360p">360p</option>
+              </select>
+            </label>
+            <p id="video-quality-result" class="settings-result" role="status"></p>
+          </fieldset>
           <fieldset class="theme-fieldset">
             <legend>Palette</legend>
             <p class="settings-copy">Choose a quiet palette for the desktop app. Your selection is saved automatically.</p>

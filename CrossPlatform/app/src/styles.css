@@ -267,8 +267,8 @@ dialog {
 dialog::backdrop { background: rgba(25, 29, 27, 0.55); }
 .settings-panel { padding: 24px; }
 .settings-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
-.theme-fieldset, .mode-fieldset { min-width: 0; margin: 20px 0 0; padding: 0; border: 0; }
-.theme-fieldset legend, .mode-fieldset legend { padding: 0; color: var(--text); font-size: 13px; font-weight: 700; }
+.theme-fieldset, .mode-fieldset, .quality-fieldset { min-width: 0; margin: 20px 0 0; padding: 0; border: 0; }
+.theme-fieldset legend, .mode-fieldset legend, .quality-fieldset legend { padding: 0; color: var(--text); font-size: 13px; font-weight: 700; }
 .mode-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
 .mode-option { position: relative; cursor: pointer; }
 .mode-option > input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
@@ -280,6 +280,8 @@ dialog::backdrop { background: rgba(25, 29, 27, 0.55); }
 .mode-option > input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: 2px; }
 .mode-option > input:checked + span { color: var(--accent-contrast); background: var(--surface-strong); border-color: var(--surface-strong); }
 .settings-copy { margin: 4px 0 14px; color: var(--muted); font-size: 12px; }
+.settings-select-field { max-width: 260px; }
+.settings-result { min-height: 16px; margin: 7px 0 0; color: var(--muted); font-size: 11px; }
 .theme-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .theme-option { position: relative; cursor: pointer; }
 .theme-option > input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }

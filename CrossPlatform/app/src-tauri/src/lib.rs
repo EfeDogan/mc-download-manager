@@ -8,7 +8,7 @@ use std::{
 
 use mcdm_core::{
     BridgeConfig, DownloadAction, DownloadKind, DownloadManager, DownloadRequest, DownloadSummary,
-    discover_video_tool, serve,
+    VideoQuality, discover_video_tool, serve_with_quality,
 };
 use serde::Serialize;
 use serde_json::{Value, json};
@@ -27,6 +27,7 @@ struct AppState {
     manager: DownloadManager,
     bridge_port: u16,
     bridge_status: Arc<RwLock<String>>,
+    video_quality: Arc<RwLock<VideoQuality>>,
     download_directory: PathBuf,
 }
 
@@ -91,6 +92,7 @@ async fn add_download(
     url: String,
     filename: Option<String>,
     kind: DownloadKind,
+    video_quality: Option<VideoQuality>,
 ) -> Result<String, String> {
     let request = DownloadRequest {
         url,
@@ -100,6 +102,7 @@ async fn add_download(
         cookie_header: String::new(),
         cookies: Vec::new(),
         kind,
+        video_quality,
         headers: HashMap::new(),
         segments: None,
     };
@@ -109,6 +112,19 @@ async fn add_download(
         .await
         .map(|id| id.to_string())
         .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+fn set_video_quality(
+    state: State<'_, AppState>,
+    video_quality: VideoQuality,
+) -> Result<(), String> {
+    let mut selected = state
+        .video_quality
+        .write()
+        .map_err(|_| "video quality lock is unavailable".to_owned())?;
+    *selected = video_quality;
+    Ok(())
 }
 
 #[tauri::command]
@@ -221,11 +237,13 @@ pub fn run() {
             let manager =
                 DownloadManager::with_video_tool(config.download_directory.clone(), video_tool)?;
             let bridge_status = Arc::new(RwLock::new(BRIDGE_STARTING.to_owned()));
+            let video_quality = Arc::new(RwLock::new(VideoQuality::default()));
 
             app.manage(AppState {
                 manager: manager.clone(),
                 bridge_port: config.port,
                 bridge_status: bridge_status.clone(),
+                video_quality: video_quality.clone(),
                 download_directory: config.download_directory.clone(),
             });
 
@@ -256,7 +274,9 @@ pub fn run() {
                 match TcpListener::bind(&address).await {
                     Ok(listener) => {
                         update_bridge_status(&bridge_status, "running");
-                        if let Err(error) = serve(listener, manager).await {
+                        if let Err(error) =
+                            serve_with_quality(listener, manager, video_quality).await
+                        {
                             update_bridge_status(&bridge_status, format!("error: {error}"));
                         }
                     }
@@ -279,6 +299,7 @@ pub fn run() {
             list_downloads,
             open_download_directory,
             add_download,
+            set_video_quality,
             download_action,
             install_browser_extension,
             install_firefox_extension

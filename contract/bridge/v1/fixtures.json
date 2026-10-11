@@ -92,7 +92,8 @@
         "url": "https://video.example.test/watch/42",
         "filename": "",
         "referer": "https://video.example.test/watch/42",
-        "kind": "video"
+        "kind": "video",
+        "videoQuality": "720p"
       }
     },
     {

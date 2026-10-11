@@ -27,6 +27,12 @@ final class DownloadStore: ObservableObject {
     private var videoProcesses: [UUID: Process] = [:]
     /// yt-dlp downloads several files (video, audio): bytes completed in earlier phases + approx total.
     private var videoPhase: [UUID: (base: Int64, lastDownloaded: Int64, approxTotal: Int64)] = [:]
+    /// YouTube downloads waiting for the deno install prompt / install to finish.
+    private var denoWaiters: [UUID] = []
+    private var denoPrompting = false
+    private var denoDeclinedThisLaunch = false
+    /// Video downloads that are retried without cookies after YouTube rejected the signed-in client.
+    private var cookielessVideos: Set<UUID> = []
     private var samples: [UUID: (bytes: Int64, time: Date)] = [:]
     private var timer: Timer?
     private var saveWork: DispatchWorkItem?
@@ -253,12 +259,27 @@ final class DownloadStore: ObservableObject {
             pumpQueue()
             return
         }
-        update(id) { $0.state = .downloading; $0.errorMessage = nil; $0.log = ""; $0.receivedBytes = 0; $0.speed = 0; $0.totalBytes = -1; $0.stage = String(localized: "Fetching video information…") }
+        if VideoDownloader.isYouTube(item.url), VideoDownloader.locateDeno() == nil,
+           !settings.denoPromptSuppressed, !denoDeclinedThisLaunch {
+            update(id) { $0.state = .downloading; $0.errorMessage = nil; $0.speed = 0; $0.stage = String(localized: "Waiting for the JavaScript runtime (deno)…") }
+            if !denoWaiters.contains(id) { denoWaiters.append(id) }
+            if !denoPrompting {
+                denoPrompting = true
+                DispatchQueue.main.async { [weak self] in self?.promptForDeno() }
+            }
+            return
+        }
+        let useCookies = !cookielessVideos.contains(id)
+        update(id) {
+            $0.state = .downloading; $0.errorMessage = nil; $0.receivedBytes = 0; $0.speed = 0; $0.totalBytes = -1
+            $0.stage = String(localized: "Fetching video information…")
+            if useCookies { $0.log = "" }   // keep the failed attempt's output visible above the retry
+        }
         let outDir = destinationDirectory(for: item)
         try? FileManager.default.createDirectory(at: outDir, withIntermediateDirectories: true)
         let proc = VideoDownloader.run(
             executable: exe, url: item.url, outputDir: outDir, formatArgs: settings.ytdlpFormatArguments,
-            headers: item.headers, cookieFile: item.cookieFile,
+            headers: item.headers, cookieFile: item.cookieFile, useCookies: useCookies,
             onProgress: { [weak self] p in
                 DispatchQueue.main.async {
                     guard let self else { return }
@@ -331,6 +352,15 @@ final class DownloadStore: ObservableObject {
             notifyCompleted(item)
             DetailWindowManager.shared.didComplete(id: id, autoClose: settings.autoCloseDetail)
         case .failure(let e):
+            if !cookielessVideos.contains(id), VideoDownloader.isYouTube(item.url),
+               VideoDownloader.isSignedInClientFailure(e.localizedDescription),
+               VideoDownloader.hasCookies(itemCookies: item.cookieFile, targetHost: item.url.host) {
+                cookielessVideos.insert(id)
+                item.log += String(localized: "→ YouTube rejected the signed-in request; retrying without cookies…") + "\n"
+                items[i] = item
+                startVideo(item)
+                return
+            }
             item.state = .failed
             item.errorMessage = e.localizedDescription
             item.speed = 0
@@ -338,6 +368,49 @@ final class DownloadStore: ObservableObject {
         }
         scheduleSave()
         pumpQueue()
+    }
+
+    /// Asks once whether to install deno, which yt-dlp needs for YouTube, then starts the waiting downloads.
+    private func promptForDeno() {
+        let alert = NSAlert()
+        alert.alertStyle = .informational
+        alert.icon = NSApp.applicationIconImage
+        alert.messageText = String(localized: "Install the JavaScript runtime for YouTube?")
+        alert.informativeText = String(localized: "YouTube now requires yt-dlp to run JavaScript (deno) to unlock video streams. Without it, YouTube downloads may fail with errors such as “The page needs to be reloaded” or “n challenge solving failed”.\n\nMC Download Manager can download deno (\(ToolInstaller.denoDownloadSize)) from its official GitHub releases and keep it in its own Application Support folder.")
+        alert.addButton(withTitle: String(localized: "Install deno"))
+        alert.addButton(withTitle: String(localized: "Not Now")).keyEquivalent = "\u{1b}"
+        alert.showsSuppressionButton = true
+        alert.suppressionButton?.title = String(localized: "Don’t ask again")
+        alert.window.level = .floating
+        NSApp.activate(ignoringOtherApps: true)
+        let response = alert.runModal()
+        if alert.suppressionButton?.state == .on { settings.denoPromptSuppressed = true }
+        guard response == .alertFirstButtonReturn else {
+            denoDeclinedThisLaunch = true
+            resumeDenoWaiters()
+            return
+        }
+        for id in denoWaiters { update(id) { $0.stage = String(localized: "Installing deno…") } }
+        ToolInstaller.shared.installDeno { [weak self] result in
+            guard let self else { return }
+            if case .failure(let e) = result {
+                self.denoDeclinedThisLaunch = true   // don't loop on a failing install; Settings ▸ Video can retry
+                for id in self.denoWaiters {
+                    self.update(id) { $0.log += String(localized: "deno could not be installed: \(e.localizedDescription)") + "\n" }
+                }
+            }
+            self.resumeDenoWaiters()
+        }
+    }
+
+    private func resumeDenoWaiters() {
+        denoPrompting = false
+        let waiting = denoWaiters
+        denoWaiters = []
+        for id in waiting {
+            guard let item = items.first(where: { $0.id == id }), item.state == .downloading else { continue }
+            startVideo(item)
+        }
     }
 
     // MARK: - Kullanıcı eylemleri
@@ -354,6 +427,7 @@ final class DownloadStore: ObservableObject {
     func resume(_ id: UUID) {
         guard let i = index(of: id), [.paused, .failed, .cancelled].contains(items[i].state) else { return }
         update(id) { $0.state = .queued; $0.errorMessage = nil }
+        cookielessVideos.remove(id)
         pumpQueue()
     }
 

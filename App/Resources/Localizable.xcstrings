@@ -2851,6 +2851,186 @@
           }
         }
       }
+    },
+    "%@ installed.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kuruldu."
+          }
+        }
+      }
+    },
+    "Another tool install is in progress.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Başka bir araç kurulumu sürüyor."
+          }
+        }
+      }
+    },
+    "Checksum mismatch; the download was discarded.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sağlama toplamı uyuşmadı; indirilen dosya silindi."
+          }
+        }
+      }
+    },
+    "Could not fetch the checksum for verification.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Doğrulama için sağlama toplamı alınamadı."
+          }
+        }
+      }
+    },
+    "Don’t ask again": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir daha sorma"
+          }
+        }
+      }
+    },
+    "Downloading deno…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "deno indiriliyor…"
+          }
+        }
+      }
+    },
+    "Install deno": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "deno'yu Kur"
+          }
+        }
+      }
+    },
+    "Install the JavaScript runtime for YouTube?": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "YouTube için JavaScript çalışma ortamı kurulsun mu?"
+          }
+        }
+      }
+    },
+    "Installing deno…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "deno kuruluyor…"
+          }
+        }
+      }
+    },
+    "The deno archive could not be unpacked.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "deno arşivi açılamadı."
+          }
+        }
+      }
+    },
+    "The downloaded deno binary could not be executed.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İndirilen deno dosyası çalıştırılamadı."
+          }
+        }
+      }
+    },
+    "Update deno": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "deno'yu Güncelle"
+          }
+        }
+      }
+    },
+    "Waiting for the JavaScript runtime (deno)…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JavaScript çalışma ortamı (deno) bekleniyor…"
+          }
+        }
+      }
+    },
+    "YouTube now requires yt-dlp to run JavaScript (deno) to unlock video streams. Without it, YouTube downloads may fail with errors such as “The page needs to be reloaded” or “n challenge solving failed”.\n\nMC Download Manager can download deno (%@) from its official GitHub releases and keep it in its own Application Support folder.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "YouTube artık video akışlarını açmak için yt-dlp'nin JavaScript (deno) çalıştırmasını gerektiriyor. deno olmadan YouTube indirmeleri “The page needs to be reloaded” veya “n challenge solving failed” gibi hatalarla başarısız olabilir.\n\nMC Download Manager deno'yu (%@) resmi GitHub sürümlerinden indirip kendi Application Support klasöründe tutabilir."
+          }
+        }
+      }
+    },
+    "YouTube requires a JavaScript runtime to unlock video streams. deno is downloaded from its official GitHub releases (checksum verified) into Application Support.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "YouTube, video akışlarını açmak için bir JavaScript çalışma ortamı gerektiriyor. deno resmi GitHub sürümlerinden (sağlama toplamı doğrulanarak) Application Support klasörüne indirilir."
+          }
+        }
+      }
+    },
+    "deno could not be installed: %@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "deno kurulamadı: %@"
+          }
+        }
+      }
+    },
+    "deno not installed (needed for YouTube)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "deno kurulu değil (YouTube için gerekli)"
+          }
+        }
+      }
+    },
+    "→ YouTube rejected the signed-in request; retrying without cookies…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "→ YouTube oturum açılmış isteği reddetti; çerezler olmadan yeniden deneniyor…"
+          }
+        }
+      }
     }
   }
 }

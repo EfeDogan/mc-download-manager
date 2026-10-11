@@ -29,6 +29,8 @@ final class AppSettings: ObservableObject {
     @Published var hideDockIcon: Bool { didSet { defaults.set(hideDockIcon, forKey: "hideDockIcon") } }
     /// One-shot flag: the login item was offered/registered automatically after setup.
     @Published var loginItemAutoRegistered: Bool { didSet { defaults.set(loginItemAutoRegistered, forKey: "loginItemAutoRegistered") } }
+    /// The user chose “Don't ask again” on the deno install prompt for YouTube downloads.
+    @Published var denoPromptSuppressed: Bool { didSet { defaults.set(denoPromptSuppressed, forKey: "denoPromptSuppressed") } }
 
     /// All file extensions (lowercase, no dot) the app should capture.
     var captureExtensions: [String] { CaptureTypes.extensions(groupIDs: captureGroupIDs, custom: customExtensions) }
@@ -60,6 +62,7 @@ final class AppSettings: ObservableObject {
         startInMenuBar = defaults.object(forKey: "startInMenuBar") as? Bool ?? true
         hideDockIcon = defaults.object(forKey: "hideDockIcon") as? Bool ?? true
         loginItemAutoRegistered = defaults.object(forKey: "loginItemAutoRegistered") as? Bool ?? false
+        denoPromptSuppressed = defaults.object(forKey: "denoPromptSuppressed") as? Bool ?? false
     }
 
     /// yt-dlp arguments for the chosen format/quality.

@@ -264,6 +264,23 @@ struct VideoSettings: View {
                     TextField("Custom yt-dlp path (empty = bundled)", text: $settings.ytdlpPath)
                     Button("Choose…") { chooseYtDlp() }
                 }
+                HStack {
+                    if let deno = VideoDownloader.locateDeno() {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(installer.denoVersion ?? "deno")
+                            Text(deno).font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle)
+                        }
+                    } else {
+                        Text("deno not installed (needed for YouTube)").foregroundStyle(.orange)
+                    }
+                    Spacer()
+                    Button(VideoDownloader.locateDeno() == nil ? "Install deno" : "Update deno") {
+                        installer.installDeno { _ in installer.refreshVersion(custom: settings.ytdlpPath) }
+                    }
+                    .disabled(installer.busy)
+                }
+                Text("YouTube requires a JavaScript runtime to unlock video streams. deno is downloaded from its official GitHub releases (checksum verified) into Application Support.")
+                    .font(.caption).foregroundStyle(.secondary)
                 if let ff = VideoDownloader.locateFfmpeg() {
                     Text("ffmpeg: \(ff)").font(.caption).foregroundStyle(.secondary)
                 } else {

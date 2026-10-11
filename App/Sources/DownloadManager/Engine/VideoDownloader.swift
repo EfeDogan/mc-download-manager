@@ -39,6 +39,30 @@ enum VideoDownloader {
         return nil
     }
 
+    /// deno is the JavaScript runtime yt-dlp uses to solve YouTube's n/signature challenges.
+    /// Without it YouTube downloads fail or lose formats (see https://github.com/yt-dlp/yt-dlp/wiki/EJS).
+    static func locateDeno() -> String? {
+        let candidates = [
+            ToolInstaller.userDenoPath,
+            helpersDirectory.appendingPathComponent("deno").path,
+            "/opt/homebrew/bin/deno",
+            "/usr/local/bin/deno",
+            NSHomeDirectory() + "/.deno/bin/deno",
+        ]
+        return candidates.first { FileManager.default.isExecutableFile(atPath: $0) }
+    }
+
+    static func isYouTube(_ url: URL) -> Bool {
+        let host = url.host?.lowercased() ?? ""
+        return ["youtube.com", "youtu.be", "youtube-nocookie.com"].contains { host == $0 || host.hasSuffix("." + $0) }
+    }
+
+    /// YouTube rejects the signed-in clients yt-dlp picks when cookies are passed
+    /// ("The page needs to be reloaded", yt-dlp#17389); the same video usually works without cookies.
+    static func isSignedInClientFailure(_ message: String) -> Bool {
+        message.localizedCaseInsensitiveContains("page needs to be reloaded")
+    }
+
     static func environment() -> [String: String] {
         var env = ProcessInfo.processInfo.environment
         let extra = [helpersDirectory.path, "/opt/homebrew/bin", "/usr/local/bin", NSHomeDirectory() + "/.local/bin"]
@@ -50,6 +74,12 @@ enum VideoDownloader {
     /// Combines the per-download cookie file (from the browser extension) with the shared
     /// site-login cookie file into one temporary Netscape file. The site-login jar is only
     /// attached when the target host belongs to one of the domains the user signed in to.
+    static func hasCookies(itemCookies: String?, targetHost: String?) -> Bool {
+        if let c = itemCookies, FileManager.default.fileExists(atPath: c) { return true }
+        let host = targetHost?.lowercased() ?? ""
+        return SiteLoginManager.shared.domains.contains { host == $0 || host.hasSuffix("." + $0) }
+    }
+
     static func mergedCookieFile(itemCookies: String?, targetHost: String?) -> String? {
         let item = itemCookies.flatMap { FileManager.default.fileExists(atPath: $0) ? $0 : nil }
         let host = targetHost?.lowercased() ?? ""
@@ -112,6 +142,7 @@ enum VideoDownloader {
                     formatArgs: [String],
                     headers: [String: String],
                     cookieFile: String?,
+                    useCookies: Bool = true,
                     onProgress: @escaping (Progress) -> Void,
                     onLine: @escaping (String) -> Void,
                     onFinish: @escaping (Result<String?, Error>) -> Void) -> Process {
@@ -131,7 +162,8 @@ enum VideoDownloader {
         if let ff = locateFfmpeg() { args += ["--ffmpeg-location", ff] }
         if let ua = headers["User-Agent"], !ua.isEmpty { args += ["--user-agent", ua] }
         if let ref = headers["Referer"], !ref.isEmpty { args += ["--referer", ref] }
-        if let cf = mergedCookieFile(itemCookies: cookieFile, targetHost: url.host) { args += ["--cookies", cf] }
+        if useCookies, let cf = mergedCookieFile(itemCookies: cookieFile, targetHost: url.host) { args += ["--cookies", cf] }
+        if let deno = locateDeno() { args += ["--js-runtimes", "deno:" + deno] }
         args.append(url.absoluteString)
         p.arguments = args
         p.environment = environment()

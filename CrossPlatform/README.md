@@ -19,7 +19,7 @@ End users should download installers from the fork's
 from repository paths or build logs. Expand **Assets** under the newest
 **Cross-platform preview** release:
 
-- Windows: choose the file ending in `x64-setup.exe`;
+- Windows: choose `MC Download Manager_0.1.0_x64-setup.exe`;
 - Ubuntu/Debian/Linux Mint: choose the file ending in `amd64.deb`;
 - portable Linux: choose the file ending in `amd64.AppImage`.
 

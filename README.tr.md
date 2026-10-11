@@ -81,8 +81,9 @@ Linux dağıtımları ve masaüstü ortamları için daha geniş test gereklidir
 1. [Windows indirme sayfasını](https://github.com/EfeDogan/mc-download-manager/releases)
    açın.
 2. En üstteki **Cross-platform preview** sürümünün altındaki **Assets** bölümünü
-   genişletin. **Source code** dosyalarını değil, adı `x64-setup.exe` ile biten
-   Windows kurucusunu indirin. `.msi` dosyası alternatif kurucudur; normal
+   genişletin. **Source code** dosyalarını değil,
+   **`MC Download Manager_0.1.0_x64-setup.exe`** dosyasını indirin.
+   `MC Download Manager_0.1.0_x64_en-US.msi` alternatif kurucudur; normal
    kullanıcı için `setup.exe` önerilir.
 3. İndirilen `setup.exe` dosyasına çift tıklayın ve kurulum adımlarını izleyin.
 4. Paket henüz kod imzalı değildir. SmartScreen **Windows bilgisayarınızı

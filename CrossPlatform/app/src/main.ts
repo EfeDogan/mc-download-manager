@@ -223,7 +223,7 @@ extensionButton.addEventListener("click", async () => {
   extensionResult.textContent = "";
   try {
     const path = await invoke<string>("install_browser_extension");
-    extensionResult.textContent = `Extension copied to ${path}. Open chrome://extensions, enable Developer mode, then choose Load unpacked.`;
+    extensionResult.textContent = `Chromium extension updated at ${path}. If it is already loaded, open chrome://extensions and click Reload on MC Download Manager. Otherwise enable Developer mode and choose Load unpacked.`;
   } catch (error) {
     extensionResult.textContent = String(error);
   } finally {

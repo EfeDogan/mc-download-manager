@@ -92,7 +92,8 @@ Deneysel çapraz platform uygulaması [`CrossPlatform/`](CrossPlatform/README.md
 altındadır. Şu anda Tauri masaüstü penceresi ve sistem tepsisi, tarayıcı
 eklentisi köprüsü, doğrudan HTTP(S) indirmeleri, uygulamayla paketlenen
 `yt-dlp` üzerinden sayfa videosu indirme, ilerleme ve
-duraklat/sürdür/iptal et/kaldır işlevleri çalışmaktadır. CI, Linux ve Windows
+duraklat/sürdür/iptal et/kaldır işlevleri ile Chromium ve geçici Firefox
+eklenti kurulumu çalışmaktadır. CI, Linux ve Windows
 kurulum paketlerini üretir; macOS uygulamasındaki çok parçalı indirme, kalıcılık,
 tam video ayarları, pano ve otomatik başlatma özellikleri henüz tamamlanmamıştır.
 

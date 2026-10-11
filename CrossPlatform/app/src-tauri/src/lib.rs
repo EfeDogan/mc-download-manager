@@ -10,6 +10,7 @@ use mcdm_core::{
     discover_video_tool, serve,
 };
 use serde::Serialize;
+use serde_json::{Value, json};
 use tauri::{
     AppHandle, Manager, State,
     menu::{Menu, MenuItem},
@@ -96,6 +97,48 @@ fn install_browser_extension(app: AppHandle, state: State<'_, AppState>) -> Resu
     copy_directory(&source, &destination)
         .map_err(|error| format!("could not copy browser extension: {error}"))?;
     Ok(destination.display().to_string())
+}
+
+#[tauri::command]
+fn install_firefox_extension(app: AppHandle, state: State<'_, AppState>) -> Result<String, String> {
+    let source = app
+        .path()
+        .resolve("browser-extension", BaseDirectory::Resource)
+        .map_err(|error| format!("could not locate bundled extension: {error}"))?;
+    let destination = state
+        .download_directory
+        .join("Browser Plugins")
+        .join("FirefoxExtension");
+    let manifest = prepare_firefox_extension(&source, &destination)?;
+    Ok(manifest.display().to_string())
+}
+
+fn prepare_firefox_extension(source: &Path, destination: &Path) -> Result<PathBuf, String> {
+    copy_directory(source, destination)
+        .map_err(|error| format!("could not copy Firefox extension: {error}"))?;
+    let manifest_path = destination.join("manifest.json");
+    let manifest_bytes = fs::read(&manifest_path)
+        .map_err(|error| format!("could not read Firefox manifest: {error}"))?;
+    let mut manifest: Value = serde_json::from_slice(&manifest_bytes)
+        .map_err(|error| format!("could not parse Firefox manifest: {error}"))?;
+    manifest["background"] = json!({ "scripts": ["background.js"] });
+    let permissions = manifest
+        .get_mut("permissions")
+        .and_then(Value::as_array_mut)
+        .ok_or_else(|| "Firefox manifest permissions are missing".to_owned())?;
+    permissions.retain(|permission| permission.as_str() != Some("nativeMessaging"));
+    manifest["browser_specific_settings"] = json!({
+        "gecko": {
+            "id": "mc-download-manager@mstcvk.github.io",
+            "strict_min_version": "140.0",
+            "data_collection_permissions": { "required": ["none"] }
+        }
+    });
+    let manifest_bytes = serde_json::to_vec_pretty(&manifest)
+        .map_err(|error| format!("could not serialize Firefox manifest: {error}"))?;
+    fs::write(&manifest_path, manifest_bytes)
+        .map_err(|error| format!("could not write Firefox manifest: {error}"))?;
+    Ok(manifest_path)
 }
 
 fn copy_directory(source: &Path, destination: &Path) -> std::io::Result<()> {
@@ -209,7 +252,8 @@ pub fn run() {
             list_downloads,
             add_download,
             download_action,
-            install_browser_extension
+            install_browser_extension,
+            install_firefox_extension
         ])
         .run(tauri::generate_context!())
         .expect("error while running MC Download Manager");
@@ -221,7 +265,7 @@ mod tests {
 
     use uuid::Uuid;
 
-    use super::copy_directory;
+    use super::{copy_directory, prepare_firefox_extension};
 
     #[test]
     fn copies_nested_browser_extension_files() {
@@ -238,6 +282,44 @@ mod tests {
         assert_eq!(
             fs::read(destination.join("icons/icon.png")).unwrap(),
             b"icon"
+        );
+        fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn prepares_a_firefox_specific_manifest_without_changing_the_source() {
+        let root = env::temp_dir().join(format!("mcdm-firefox-test-{}", Uuid::new_v4()));
+        let source = root.join("source");
+        let destination = root.join("destination");
+        fs::create_dir_all(&source).unwrap();
+        let chromium_manifest = br#"{
+          "manifest_version": 3,
+          "permissions": ["downloads", "nativeMessaging"],
+          "background": {"service_worker": "background.js"}
+        }"#;
+        fs::write(source.join("manifest.json"), chromium_manifest).unwrap();
+        fs::write(source.join("background.js"), b"// fixture").unwrap();
+
+        let manifest_path = prepare_firefox_extension(&source, &destination).unwrap();
+        let manifest: serde_json::Value =
+            serde_json::from_slice(&fs::read(manifest_path).unwrap()).unwrap();
+
+        assert_eq!(manifest["background"]["scripts"][0], "background.js");
+        assert!(manifest["background"].get("service_worker").is_none());
+        assert_eq!(
+            manifest["browser_specific_settings"]["gecko"]["id"],
+            "mc-download-manager@mstcvk.github.io"
+        );
+        assert!(
+            manifest["permissions"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .all(|permission| permission != "nativeMessaging")
+        );
+        assert_eq!(
+            fs::read(source.join("manifest.json")).unwrap(),
+            chromium_manifest
         );
         fs::remove_dir_all(root).unwrap();
     }

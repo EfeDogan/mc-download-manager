@@ -68,6 +68,8 @@ Implemented:
 - HTML page detection that prevents a page URL being reported as a completed file;
 - one shared queue for desktop and browser-extension requests;
 - bundled Chromium extension with an in-app extraction button;
+- Firefox-specific Manifest V3 preparation with a temporary `about:debugging`
+  installation flow;
 - system-tray lifecycle on Linux and Windows;
 - Linux and Windows installer jobs in GitHub Actions.
 
@@ -76,4 +78,19 @@ Not implemented yet:
 - persisted restart recovery and segmented range workers;
 - packaged `ffmpeg`/`deno`, video quality settings, and authenticated-site testing;
 - desktop notifications, clipboard capture, and autostart;
+- Mozilla signing and permanent Firefox add-on distribution for cross-platform releases;
 - signing and release publication for native packages.
+
+## Browser extensions
+
+Use **Chromium extension** in the desktop app for Chrome, Chromium, Brave, or
+Edge. Load the resulting `ChromiumExtension` directory from the browser's
+extensions page with developer mode enabled.
+
+Use **Firefox extension** to create a Firefox-compatible manifest. Open
+`about:debugging#/runtime/this-firefox`, choose **Load Temporary Add-on**, and
+select the displayed `FirefoxExtension/manifest.json`. This development add-on
+is removed when Firefox restarts. Standard Firefox releases require a
+Mozilla-signed XPI for permanent installation; the existing macOS release
+pipeline supports AMO signing, but cross-platform release signing is not yet
+configured.

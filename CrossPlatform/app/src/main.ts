@@ -51,6 +51,7 @@ const kindInput = document.querySelector<HTMLSelectElement>("#kind-input")!;
 const submitButton = document.querySelector<HTMLButtonElement>("#download-button")!;
 const formError = document.querySelector<HTMLElement>("#form-error")!;
 const extensionButton = document.querySelector<HTMLButtonElement>("#extension-button")!;
+const firefoxExtensionButton = document.querySelector<HTMLButtonElement>("#firefox-extension-button")!;
 const extensionResult = document.querySelector<HTMLElement>("#extension-result")!;
 let kindWasChosenManually = false;
 
@@ -227,6 +228,19 @@ extensionButton.addEventListener("click", async () => {
     extensionResult.textContent = String(error);
   } finally {
     extensionButton.disabled = false;
+  }
+});
+
+firefoxExtensionButton.addEventListener("click", async () => {
+  firefoxExtensionButton.disabled = true;
+  extensionResult.textContent = "";
+  try {
+    const manifestPath = await invoke<string>("install_firefox_extension");
+    extensionResult.textContent = `Firefox extension prepared at ${manifestPath}. Open about:debugging#/runtime/this-firefox, choose Load Temporary Add-on, then select this manifest.json. Temporary add-ons are removed when Firefox restarts.`;
+  } catch (error) {
+    extensionResult.textContent = String(error);
+  } finally {
+    firefoxExtensionButton.disabled = false;
   }
 });
 

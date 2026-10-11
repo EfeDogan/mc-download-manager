@@ -78,11 +78,14 @@ testing.
 
 ### Windows (experimental)
 
+> **Direct download:**
+> [MC.Download.Manager_0.1.0_x64-setup.exe](https://github.com/EfeDogan/mc-download-manager/releases/download/cross-platform-v0.1.0-preview.1/MC.Download.Manager_0.1.0_x64-setup.exe)
+
 1. Open the [Windows download page](https://github.com/EfeDogan/mc-download-manager/releases).
 2. Expand **Assets** under the newest **Cross-platform preview** release. Do not
    download the **Source code** archives. Download
-   **`MC Download Manager_0.1.0_x64-setup.exe`**. The
-   `MC Download Manager_0.1.0_x64_en-US.msi` file is an alternative;
+   **`MC.Download.Manager_0.1.0_x64-setup.exe`**. The
+   `MC.Download.Manager_0.1.0_x64_en-US.msi` file is an alternative;
    `setup.exe` is recommended for most users.
 3. Double-click the downloaded `setup.exe` and follow the installer.
 4. The package is not code-signed yet. If SmartScreen shows **Windows protected

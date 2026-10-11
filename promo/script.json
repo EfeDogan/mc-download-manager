@@ -1,0 +1,50 @@
+{
+  "voice": "voice_a75tm2opjybu",
+  "model": "gemini-3.8-flash-tts",
+  "style": {
+    "en": "Read like a young, energetic tech product video host: lively, fluent and upbeat; excited but not over the top, with crisp, clear diction. Natural, neutral American English pronunciation. Short natural pauses between sentences.",
+    "tr": "Genç ve enerjik bir Türk teknoloji videosu sunucusu gibi oku: canlı, akıcı ve tempolu; heyecanlı ama abartısız, anlaşılır diksiyonla. Ürün tanıtım videosu seslendirmesi. Cümleler arasında kısa, doğal duraklamalar yap."
+  },
+  "scenes": [
+    {
+      "id": "hook",
+      "en": "Downloads crawling? Stuck at ninety-nine percent? There's a better way.",
+      "tr": "İndirmeler sürünüyor mu? Yüzde doksan dokuzda mı takıldı? Bunun daha iyi bir yolu var."
+    },
+    {
+      "id": "intro",
+      "en": "Meet MC Download Manager: a fast, free and open-source download manager for macOS.",
+      "tr": "Karşınızda MC Download Manager: macOS için hızlı, ücretsiz ve açık kaynak bir indirme yöneticisi."
+    },
+    {
+      "id": "segments",
+      "en": "It splits every file into up to sixteen parallel connections, so downloads finish much faster. And if a server starts throttling, it adapts automatically.",
+      "tr": "Her dosyayı on altıya kadar paralel bağlantıya bölüyor, böylece indirmeler çok daha hızlı bitiyor. Sunucu yavaşlatırsa, kendini otomatik olarak ayarlıyor."
+    },
+    {
+      "id": "resume",
+      "en": "Pause anytime. Even after a restart, downloads pick up exactly where they left off.",
+      "tr": "İstediğiniz an duraklatın. Bilgisayarı yeniden başlatsanız bile indirme kaldığı yerden devam eder."
+    },
+    {
+      "id": "browsers",
+      "en": "Safari, Chrome and Brave hand their downloads straight to the app, cookies included, so even sign-in protected files just work.",
+      "tr": "Safari, Chrome ve Brave, indirmeleri çerezleriyle birlikte doğrudan uygulamaya aktarır. Giriş gerektiren dosyalar bile sorunsuz iner."
+    },
+    {
+      "id": "video",
+      "en": "Found a video? One click, and the built-in video tools save it as a Full HD MP4.",
+      "tr": "Bir video mu buldunuz? Tek tıkla, yerleşik video araçları onu Full HD MP4 olarak kaydeder."
+    },
+    {
+      "id": "extras",
+      "en": "Copy a link and it offers to download it. Files are sorted into categories, and the app quietly lives in your menu bar.",
+      "tr": "Bir bağlantı kopyalayın, indirmeyi hemen önersin. Dosyalar kategorilere ayrılır, uygulama da menü çubuğunda sessizce çalışır."
+    },
+    {
+      "id": "outro",
+      "en": "One DMG. Drag it to Applications, and you're done. Available in English and Turkish. Get it free on GitHub.",
+      "tr": "Tek bir DMG. Uygulamalar klasörüne sürükleyin, hepsi bu. Türkçe ve İngilizce. GitHub'dan ücretsiz indirin."
+    }
+  ]
+}

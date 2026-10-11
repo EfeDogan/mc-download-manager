@@ -1,0 +1,9 @@
+{
+  "name": "mc-download-manager-promo",
+  "private": true,
+  "description": "Motion-graphics promo video for MC Download Manager (rendered with headless Chrome + ffmpeg)",
+  "type": "module",
+  "dependencies": {
+    "puppeteer-core": "^23.11.1"
+  }
+}

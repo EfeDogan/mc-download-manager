@@ -32,7 +32,7 @@ Open the DMG, drag the app to *Applications*, done. The interface is in **Englis
 - **Clipboard** — copy a link and the app asks whether to download it; paste a link into the main window with ⌘V.
 - **UI** — sidebar categories (Images, Music, Video, Apps, Documents, Archives…), sortable table, search,
   an IDM-style per-download window (connection table, segment bar, auto-close option), menu-bar item, notifications.
-- **Runs in the background** — optional launch at login; the browser bridge stays up when the window is closed.
+- **Lives in the menu bar** — opens at login (enabled after the first-run setup), starts without a window and without a Dock icon; the browser bridge stays up so extensions never need you to open the app. Closing the window keeps it running; quit from the menu bar icon.
 
 <p align="center">
   <img src="docs/main.png" width="720" alt="Main window"><br>
@@ -107,6 +107,8 @@ project.yml                          xcodegen project spec
 | `POST /download` | `{url, filename?, referer?, userAgent?, cookieHeader?, cookies?[], kind: "file"\|"video", segments?}` |
 | `GET /downloads` | status of the last 50 downloads |
 | `POST /action` | `{id, action: "pause"\|"resume"\|"cancel"\|"remove"}` |
+
+The bridge only answers requests whose `Origin` is a browser-extension origin (`chrome-extension://`, `safari-web-extension://`, `moz-extension://`) and whose `Host` is the loopback address; requests from ordinary web pages (including `Origin: null`) are rejected, and CORS headers are only sent to extension origins.
 
 ## Contributing
 

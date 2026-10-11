@@ -26,6 +26,7 @@ swiftc -O scripts/make_icons.swift -o "$BUILD/make_icons"
 cp "$BUILD"/icons/ext/*.png Extension/icons/
 mkdir -p App/Assets.xcassets/AppIcon.appiconset
 cp "$BUILD"/icons/AppIcon.iconset/*.png App/Assets.xcassets/AppIcon.appiconset/
+for n in MenuBarIcon MenuBarIconActive; do cp "$BUILD/icons/menubar/$n.png" "$BUILD/icons/menubar/$n@2x.png" "App/Assets.xcassets/$n.imageset/"; done
 
 if command -v xcodegen >/dev/null; then
   echo "▶ Xcode project (xcodegen)"

@@ -32,7 +32,7 @@ DMG'yi açıp uygulamayı *Applications* klasörüne sürüklemek yeterlidir. Ar
 - **Pano** — bir bağlantı kopyaladığınızda uygulama indirmek isteyip istemediğinizi sorar; ana pencereye ⌘V ile bağlantı yapıştırabilirsiniz.
 - **Arayüz** — kenar çubuğunda kategoriler (Resim, Müzik, Video, Uygulama, Belge, Arşiv…), sıralanabilir tablo, arama,
   IDM tarzı dosya özelinde pencere (bağlantı tablosu, parça çubuğu, otomatik kapat seçeneği), menü çubuğu simgesi, bildirimler.
-- **Arka planda çalışır** — isteğe bağlı oturumda başlatma; pencere kapansa bile tarayıcı köprüsü açık kalır.
+- **Menü çubuğunda yaşar** — oturum açıldığında başlar (ilk kurulumdan sonra otomatik etkinleşir), pencere ve Dock simgesi olmadan açılır; tarayıcı köprüsü hep açık olduğundan eklentiler uygulamayı açmanızı beklemez. Pencereyi kapatmak uygulamayı kapatmaz; çıkmak için menü çubuğu simgesini kullanın.
 
 <p align="center">
   <img src="docs/main-tr.png" width="720" alt="Ana pencere"><br>
@@ -89,6 +89,8 @@ Zip'i [Chrome Web Store geliştirici konsoluna](https://chrome.google.com/websto
 | `POST /download` | `{url, filename?, referer?, userAgent?, cookieHeader?, cookies?[], kind: "file"\|"video", segments?}` |
 | `GET /downloads` | son 50 indirmenin durumu |
 | `POST /action` | `{id, action: "pause"\|"resume"\|"cancel"\|"remove"}` |
+
+Köprü yalnızca `Origin` değeri tarayıcı eklentisi kaynağı olan (`chrome-extension://`, `safari-web-extension://`, `moz-extension://`) ve `Host` değeri yerel adres olan isteklere yanıt verir; sıradan web sayfalarından gelen istekler (`Origin: null` dahil) reddedilir, CORS başlıkları yalnızca eklenti kaynaklarına gönderilir.
 
 ## Katkı
 

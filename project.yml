@@ -37,6 +37,8 @@ targets:
         CFBundleDevelopmentRegion: en
         CFBundleLocalizations: [en, tr]
         LSApplicationCategoryType: public.app-category.utilities
+        # Menu bar app: no Dock icon at launch; AppPresence switches to .regular while a window is open.
+        LSUIElement: true
         NSHighResolutionCapable: true
         NSAppTransportSecurity:
           NSAllowsArbitraryLoads: true

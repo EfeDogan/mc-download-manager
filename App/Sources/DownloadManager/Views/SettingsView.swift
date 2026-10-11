@@ -22,7 +22,7 @@ struct SettingsView: View {
 struct GeneralSettings: View {
     @EnvironmentObject var settings: AppSettings
     @ObservedObject private var updater = UpdateChecker.shared
-    @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
+    @State private var launchAtLogin = LoginItem.isEnabled
     @State private var loginError: String?
 
     var body: some View {
@@ -55,9 +55,16 @@ struct GeneralSettings: View {
                 Toggle("Watch the clipboard for links and ask to download them", isOn: $settings.watchClipboard)
                 Text("Only links that point to a captured file type trigger the prompt. You can also paste a link into the main window with ⌘V.")
                     .font(.caption).foregroundStyle(.secondary)
-                Toggle("Launch in the background at login", isOn: $launchAtLogin)
+            }
+            Section("Menu bar") {
+                Toggle("Open at login", isOn: $launchAtLogin)
                     .onChange(of: launchAtLogin) { on in toggleLogin(on) }
                 if let loginError { Text(loginError).font(.caption).foregroundStyle(.red) }
+                Toggle("Start in the menu bar without opening the main window", isOn: $settings.startInMenuBar)
+                Toggle("Hide the Dock icon while the main window is closed", isOn: $settings.hideDockIcon)
+                    .onChange(of: settings.hideDockIcon) { _ in AppPresence.shared.applyDockPreference() }
+                Text("The app keeps running in the menu bar so browser extensions can hand over downloads at any time. Closing the window does not quit; use Quit from the menu bar icon.")
+                    .font(.caption).foregroundStyle(.secondary)
             }
             Section("Updates") {
                 Toggle("Check for updates automatically (GitHub Releases)", isOn: $settings.checkForUpdates)
@@ -92,11 +99,11 @@ struct GeneralSettings: View {
 
     private func toggleLogin(_ on: Bool) {
         do {
-            if on { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }
+            try LoginItem.setEnabled(on)
             loginError = nil
         } catch {
             loginError = error.localizedDescription
-            launchAtLogin = SMAppService.mainApp.status == .enabled
+            launchAtLogin = LoginItem.isEnabled
         }
     }
 }

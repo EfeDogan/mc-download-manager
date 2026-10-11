@@ -17,6 +17,9 @@ struct HTTPResponse {
     }
 }
 
+/// Decides which Origin values receive CORS headers (set by the owner of the server).
+var localServerAllowedOrigin: (String?) -> Bool = { _ in false }
+
 /// 127.0.0.1 üzerinde dinleyen küçük bir HTTP sunucusu. Tarayıcı eklentileri buraya POST atar.
 final class LocalServer {
     typealias Handler = (HTTPRequest, @escaping (HTTPResponse) -> Void) -> Void
@@ -63,7 +66,7 @@ final class LocalServer {
             var buf = buffer
             if let data { buf.append(data) }
             if let req = Self.parse(buf) {
-                self.handler(req) { resp in self.send(resp, on: conn) }
+                self.handler(req) { resp in self.send(resp, origin: req.headers["origin"], on: conn) }
             } else if isComplete || buf.count > 16_000_000 {
                 conn.cancel()
             } else {
@@ -91,18 +94,22 @@ final class LocalServer {
         return HTTPRequest(method: String(reqLine[0]).uppercased(), path: String(reqLine[1]), headers: headers, body: body)
     }
 
-    private func send(_ resp: HTTPResponse, on conn: NWConnection) {
+    private func send(_ resp: HTTPResponse, origin: String?, on conn: NWConnection) {
         let body = (try? JSONSerialization.data(withJSONObject: resp.json)) ?? Data("{}".utf8)
         let reason = resp.status == 200 ? "OK" : "Error"
-        let head = "HTTP/1.1 \(resp.status) \(reason)\r\n"
+        var head = "HTTP/1.1 \(resp.status) \(reason)\r\n"
             + "Content-Type: application/json; charset=utf-8\r\n"
             + "Content-Length: \(body.count)\r\n"
-            + "Access-Control-Allow-Origin: *\r\n"
-            + "Access-Control-Allow-Headers: Content-Type\r\n"
-            + "Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n"
-            + "Access-Control-Allow-Private-Network: true\r\n"
             + "Cache-Control: no-store\r\n"
-            + "Connection: close\r\n\r\n"
+            + "X-Content-Type-Options: nosniff\r\n"
+        // CORS headers only for allowed extension origins; ordinary web pages get none.
+        if let origin, localServerAllowedOrigin(origin) {
+            head += "Access-Control-Allow-Origin: \(origin)\r\n"
+                + "Vary: Origin\r\n"
+                + "Access-Control-Allow-Headers: Content-Type\r\n"
+                + "Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n"
+        }
+        head += "Connection: close\r\n\r\n"
         var out = Data(head.utf8)
         out.append(body)
         conn.send(content: out, completion: .contentProcessed { _ in conn.cancel() })

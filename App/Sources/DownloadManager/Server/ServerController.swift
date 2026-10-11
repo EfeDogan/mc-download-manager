@@ -38,6 +38,7 @@ final class ServerController: ObservableObject {
     init(store: DownloadStore, settings: AppSettings) {
         self.store = store
         self.settings = settings
+        localServerAllowedOrigin = { Self.originAllowed($0) }
         start()
         cancellable = settings.$serverPort
             .dropFirst()
@@ -80,20 +81,27 @@ final class ServerController: ObservableObject {
         }
     }
 
-    private static func originAllowed(_ origin: String?) -> Bool {
-        // Yalnızca tarayıcı eklentileri (ve Origin göndermeyen yerel araçlar, örn. curl).
-        guard let origin, !origin.isEmpty, origin != "null" else { return true }
+    /// Only browser extensions may talk to the bridge. Requests without an Origin, with an
+    /// empty Origin or with the opaque "null" origin (sandboxed iframes, data: pages) are rejected,
+    /// so ordinary web pages cannot drive the app.
+    static func originAllowed(_ origin: String?) -> Bool {
+        guard let origin, !origin.isEmpty, origin != "null" else { return false }
         return origin.hasPrefix("chrome-extension://")
             || origin.hasPrefix("safari-web-extension://")
             || origin.hasPrefix("moz-extension://")
-            || origin.hasPrefix("extension://")
+    }
+
+    private func hostAllowed(_ host: String?) -> Bool {
+        guard let host = host?.lowercased() else { return false }
+        let port = UInt16(clamping: max(1024, min(65535, settings.serverPort)))
+        return host == "127.0.0.1:\(port)" || host == "localhost:\(port)" || host == "[::1]:\(port)"
     }
 
     private func handle(_ req: HTTPRequest) -> HTTPResponse {
-        if req.method == "OPTIONS" { return .json(["ok": true]) }
-        guard Self.originAllowed(req.headers["origin"]) else {
-            return .json(["ok": false, "error": "origin not allowed"], status: 403)
+        guard Self.originAllowed(req.headers["origin"]), hostAllowed(req.headers["host"]) else {
+            return .json(["ok": false, "error": "forbidden"], status: 403)
         }
+        if req.method == "OPTIONS" { return .json(["ok": true]) }
         noteConnection(req)
         let path = req.path.split(separator: "?", maxSplits: 1).first.map(String.init) ?? req.path
 
@@ -119,8 +127,6 @@ final class ServerController: ObservableObject {
                     "total": $0.totalBytes,
                     "received": $0.receivedBytes,
                     "stage": $0.stage,
-                    "error": $0.errorMessage ?? "",
-                    "log": String($0.log.suffix(3000)),
                 ]
             }
             return .json(["ok": true, "items": list])

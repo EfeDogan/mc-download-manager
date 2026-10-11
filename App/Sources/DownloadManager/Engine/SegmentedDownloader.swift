@@ -108,11 +108,23 @@ final class SegmentedDownloader: NSObject, URLSessionDataDelegate {
         mode == .single ? singleReceived : segments.reduce(0) { $0 + $1.received }
     }
 
+    private static let credentialHeaders: Set<String> = ["cookie", "authorization", "proxy-authorization"]
+
+    /// Credentials (Cookie/Authorization) are only sent to the host the download was requested for,
+    /// never to a host reached through a redirect.
+    private func sameOrigin(_ url: URL?) -> Bool {
+        guard let url else { return false }
+        return url.host?.lowercased() == config.url.host?.lowercased() && url.scheme?.lowercased() == config.url.scheme?.lowercased()
+    }
+
     private func makeRequest(range: String?) -> URLRequest {
         var r = URLRequest(url: requestURL)
         r.httpMethod = "GET"
         r.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-        for (k, v) in config.headers { r.setValue(v, forHTTPHeaderField: k) }
+        let allowCredentials = sameOrigin(requestURL)
+        for (k, v) in config.headers where allowCredentials || !Self.credentialHeaders.contains(k.lowercased()) {
+            r.setValue(v, forHTTPHeaderField: k)
+        }
         r.setValue("identity", forHTTPHeaderField: "Accept-Encoding")
         if let range { r.setValue(range, forHTTPHeaderField: "Range") }
         return r
@@ -316,6 +328,15 @@ final class SegmentedDownloader: NSObject, URLSessionDataDelegate {
 
     // MARK: - URLSessionDataDelegate
 
+    func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
+                    newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
+        var req = request
+        if !sameOrigin(req.url) {
+            for h in Self.credentialHeaders { req.setValue(nil, forHTTPHeaderField: h) }
+        }
+        completionHandler(req)
+    }
+
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse,
                     completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
         guard !stopped, !finished else { completionHandler(.cancel); return }
@@ -356,7 +377,8 @@ final class SegmentedDownloader: NSObject, URLSessionDataDelegate {
                 fail(HTTPStatusError(status: http.statusCode))
                 return
             }
-            if singleTotal <= 0, http.expectedContentLength > 0 { singleTotal = http.expectedContentLength }
+            // The real GET may differ from the probe (dynamic responses); trust its Content-Length.
+            singleTotal = http.expectedContentLength > 0 ? http.expectedContentLength : -1
             completionHandler(.allow)
             return
         }

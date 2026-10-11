@@ -91,6 +91,7 @@ struct OnboardingView: View {
 
     private func finish() {
         settings.onboardingDone = true
+        LoginItem.registerByDefaultIfNeeded()
         dismiss()
     }
 }

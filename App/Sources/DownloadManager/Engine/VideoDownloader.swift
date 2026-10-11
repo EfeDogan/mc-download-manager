@@ -48,10 +48,13 @@ enum VideoDownloader {
     }
 
     /// Combines the per-download cookie file (from the browser extension) with the shared
-    /// site-login cookie file into one temporary Netscape file.
-    static func mergedCookieFile(itemCookies: String?) -> String? {
+    /// site-login cookie file into one temporary Netscape file. The site-login jar is only
+    /// attached when the target host belongs to one of the domains the user signed in to.
+    static func mergedCookieFile(itemCookies: String?, targetHost: String?) -> String? {
         let item = itemCookies.flatMap { FileManager.default.fileExists(atPath: $0) ? $0 : nil }
-        let site = SiteLoginManager.cookieFilePath
+        let host = targetHost?.lowercased() ?? ""
+        let siteMatches = SiteLoginManager.shared.domains.contains { host == $0 || host.hasSuffix("." + $0) }
+        let site = siteMatches ? SiteLoginManager.cookieFilePath : nil
         switch (item, site) {
         case (nil, nil): return nil
         case (let a?, nil): return a
@@ -117,7 +120,6 @@ enum VideoDownloader {
         p.executableURL = URL(fileURLWithPath: executable)
         var args = [
             "--newline", "--no-playlist", "--no-colors", "--progress", "--no-simulate", "--no-mtime", "--no-quiet",
-            "--no-check-certificates",
             "-N", "4",
             "-o", outputDir.appendingPathComponent("%(title).150B [%(id)s].%(ext)s").path,
             "--progress-template",
@@ -129,7 +131,7 @@ enum VideoDownloader {
         if let ff = locateFfmpeg() { args += ["--ffmpeg-location", ff] }
         if let ua = headers["User-Agent"], !ua.isEmpty { args += ["--user-agent", ua] }
         if let ref = headers["Referer"], !ref.isEmpty { args += ["--referer", ref] }
-        if let cf = mergedCookieFile(itemCookies: cookieFile) { args += ["--cookies", cf] }
+        if let cf = mergedCookieFile(itemCookies: cookieFile, targetHost: url.host) { args += ["--cookies", cf] }
         args.append(url.absoluteString)
         p.arguments = args
         p.environment = environment()

@@ -198,6 +198,7 @@ final class DownloadStore: ObservableObject {
             do {
                 try FileManager.default.createDirectory(at: destDir, withIntermediateDirectories: true)
                 try FileManager.default.moveItem(at: item.partURL, to: dest)
+                Self.applyQuarantine(to: dest, source: item.url)
                 item.fileName = dest.lastPathComponent
                 item.finalPath = dest.path
                 item.state = .completed
@@ -302,6 +303,7 @@ final class DownloadStore: ObservableObject {
             if let path {
                 item.finalPath = path
                 item.fileName = URL(fileURLWithPath: path).lastPathComponent
+                Self.applyQuarantine(to: URL(fileURLWithPath: path), source: item.url)
                 if let size = (try? FileManager.default.attributesOfItem(atPath: path))?[.size] as? Int64 {
                     item.totalBytes = size
                     item.receivedBytes = size
@@ -488,6 +490,18 @@ final class DownloadStore: ObservableObject {
 
     static let defaultUserAgent =
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15"
+
+    /// Tags a downloaded file like a browser download would, so Gatekeeper/XProtect assess it on first open.
+    static func applyQuarantine(to file: URL, source: URL) {
+        var target = file
+        var values = URLResourceValues()
+        values.quarantineProperties = [
+            kLSQuarantineTypeKey as String: kLSQuarantineTypeWebDownload,
+            kLSQuarantineAgentNameKey as String: "MC Download Manager",
+            kLSQuarantineDataURLKey as String: source.absoluteString,
+        ]
+        try? target.setResourceValues(values)
+    }
 
     // MARK: - Dosya adı yardımcıları
 

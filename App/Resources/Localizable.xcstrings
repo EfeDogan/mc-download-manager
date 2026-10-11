@@ -2791,6 +2791,66 @@
           }
         }
       }
+    },
+    "Menu bar": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menü çubuğu"
+          }
+        }
+      }
+    },
+    "Open at login": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oturum açıldığında başlat"
+          }
+        }
+      }
+    },
+    "Start in the menu bar without opening the main window": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ana pencereyi açmadan menü çubuğunda başla"
+          }
+        }
+      }
+    },
+    "Hide the Dock icon while the main window is closed": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ana pencere kapalıyken Dock simgesini gizle"
+          }
+        }
+      }
+    },
+    "The app keeps running in the menu bar so browser extensions can hand over downloads at any time. Closing the window does not quit; use Quit from the menu bar icon.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uygulama menü çubuğunda çalışmaya devam eder; böylece tarayıcı eklentileri indirmeleri her an aktarabilir. Pencereyi kapatmak uygulamadan çıkmaz; çıkmak için menü çubuğu simgesindeki Çık'ı kullanın."
+          }
+        }
+      }
+    },
+    "Quit MC Download Manager": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MC Download Manager'dan Çık"
+          }
+        }
+      }
     }
   }
 }

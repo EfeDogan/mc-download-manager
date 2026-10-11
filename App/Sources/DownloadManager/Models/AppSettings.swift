@@ -23,6 +23,12 @@ final class AppSettings: ObservableObject {
     @Published var onboardingDone: Bool { didSet { defaults.set(onboardingDone, forKey: "onboardingDone") } }
     @Published var organizeByCategory: Bool { didSet { defaults.set(organizeByCategory, forKey: "organizeByCategory") } }
     @Published var checkForUpdates: Bool { didSet { defaults.set(checkForUpdates, forKey: "checkForUpdates") } }
+    /// Keep the main window closed at launch; the app is reachable from the menu bar icon.
+    @Published var startInMenuBar: Bool { didSet { defaults.set(startInMenuBar, forKey: "startInMenuBar") } }
+    /// Show the Dock icon only while a window is open.
+    @Published var hideDockIcon: Bool { didSet { defaults.set(hideDockIcon, forKey: "hideDockIcon") } }
+    /// One-shot flag: the login item was offered/registered automatically after setup.
+    @Published var loginItemAutoRegistered: Bool { didSet { defaults.set(loginItemAutoRegistered, forKey: "loginItemAutoRegistered") } }
 
     /// All file extensions (lowercase, no dot) the app should capture.
     var captureExtensions: [String] { CaptureTypes.extensions(groupIDs: captureGroupIDs, custom: customExtensions) }
@@ -51,6 +57,9 @@ final class AppSettings: ObservableObject {
         onboardingDone = defaults.object(forKey: "onboardingDone") as? Bool ?? false
         organizeByCategory = defaults.object(forKey: "organizeByCategory") as? Bool ?? true
         checkForUpdates = defaults.object(forKey: "checkForUpdates") as? Bool ?? true
+        startInMenuBar = defaults.object(forKey: "startInMenuBar") as? Bool ?? true
+        hideDockIcon = defaults.object(forKey: "hideDockIcon") as? Bool ?? true
+        loginItemAutoRegistered = defaults.object(forKey: "loginItemAutoRegistered") as? Bool ?? false
     }
 
     /// yt-dlp arguments for the chosen format/quality.

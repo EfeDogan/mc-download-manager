@@ -35,6 +35,12 @@ pub enum VideoError {
     Cookies(#[source] std::io::Error),
 }
 
+#[derive(Clone, Copy)]
+enum VideoStrategy {
+    Default,
+    YoutubeHls,
+}
+
 pub async fn download(
     executable: PathBuf,
     request: DownloadRequest,
@@ -46,20 +52,41 @@ pub async fn download(
     // YouTube account cookies can select clients whose media formats require a PO token.
     // Public videos are more reliable without account cookies; keep them as a fallback for
     // age-restricted, private, or members-only content.
-    if has_browser_session && is_youtube_url(&request.url) {
+    if is_youtube_url(&request.url) {
         let _ = events.send(VideoEvent::Stage(
             "Opening public YouTube stream".to_owned(),
         ));
-        let public_result = download_once(
+        let mut public_result = download_once(
             executable.clone(),
             &request,
             &output_directory,
             &token,
             events.clone(),
             false,
+            VideoStrategy::Default,
         )
         .await;
-        if !should_retry_with_browser_session(&public_result) {
+
+        // YouTube can intermittently reject a signed DASH URL with HTTP 403 even though
+        // extraction succeeded. HLS uses a fresh manifest and is a reliable fallback when
+        // ffmpeg is available to merge the video and audio streams.
+        if is_forbidden(&public_result) && discover_ffmpeg().is_some() {
+            let _ = events.send(VideoEvent::Stage(
+                "Retrying YouTube with HLS stream".to_owned(),
+            ));
+            public_result = download_once(
+                executable.clone(),
+                &request,
+                &output_directory,
+                &token,
+                events.clone(),
+                false,
+                VideoStrategy::YoutubeHls,
+            )
+            .await;
+        }
+
+        if !has_browser_session || !should_retry_with_browser_session(&public_result) {
             return public_result;
         }
         let _ = events.send(VideoEvent::Stage(
@@ -74,6 +101,7 @@ pub async fn download(
         &token,
         events,
         true,
+        VideoStrategy::Default,
     )
     .await
 }
@@ -85,6 +113,7 @@ async fn download_once(
     token: &CancellationToken,
     events: UnboundedSender<VideoEvent>,
     use_browser_session: bool,
+    strategy: VideoStrategy,
 ) -> Result<PathBuf, VideoError> {
     let cookie_file = if use_browser_session {
         write_cookie_file(output_directory, &request.cookies).await?
@@ -108,11 +137,7 @@ async fn download_once(
         .arg("-o")
         .arg("%(title).150B [%(id)s].%(ext)s")
         .arg("-f")
-        .arg(if ffmpeg.is_some() {
-            "bv*[height<=1080]+ba/b[height<=1080]/b"
-        } else {
-            "b[height<=1080]/b"
-        })
+        .arg(format_selector(ffmpeg.is_some(), strategy))
         .arg("--progress-template")
         .arg("download:MCDM_PROGRESS:%(progress.downloaded_bytes)s|%(progress.total_bytes)s|%(progress.total_bytes_estimate)s|%(progress.speed)s")
         .arg("--print")
@@ -164,6 +189,18 @@ async fn download_once(
     result
 }
 
+fn format_selector(ffmpeg_available: bool, strategy: VideoStrategy) -> &'static str {
+    if !ffmpeg_available {
+        return "b[height<=1080]/b";
+    }
+    match strategy {
+        VideoStrategy::Default => "bv*[height<=1080]+ba/b[height<=1080]/b",
+        VideoStrategy::YoutubeHls => {
+            "bv*[protocol^=m3u8][height<=1080]+ba[protocol^=m3u8]/bv*[height<=1080]+ba/b[height<=1080]/b"
+        }
+    }
+}
+
 fn is_youtube_url(value: &str) -> bool {
     let Ok(url) = reqwest::Url::parse(value) else {
         return false;
@@ -193,6 +230,14 @@ fn should_retry_with_browser_session(result: &Result<PathBuf, VideoError>) -> bo
     ]
     .iter()
     .any(|needle| message.contains(needle))
+}
+
+fn is_forbidden(result: &Result<PathBuf, VideoError>) -> bool {
+    let Err(VideoError::Failed(message)) = result else {
+        return false;
+    };
+    let message = message.to_ascii_lowercase();
+    message.contains("http error 403") || message.contains("http 403: forbidden")
 }
 
 fn discover_ffmpeg() -> Option<PathBuf> {
@@ -400,8 +445,8 @@ mod tests {
     use tempfile::tempdir;
 
     use super::{
-        VideoError, VideoEvent, is_youtube_url, parse_progress, should_retry_with_browser_session,
-        stage_for, write_cookie_file,
+        VideoError, VideoEvent, VideoStrategy, format_selector, is_forbidden, is_youtube_url,
+        parse_progress, should_retry_with_browser_session, stage_for, write_cookie_file,
     };
 
     #[test]
@@ -450,6 +495,24 @@ mod tests {
         assert!(!should_retry_with_browser_session(&Err(
             VideoError::Failed("ERROR: disk is full".to_owned())
         )));
+    }
+
+    #[test]
+    fn recognizes_forbidden_media_responses_and_selects_hls_fallback() {
+        assert!(is_forbidden(&Err(VideoError::Failed(
+            "ERROR: unable to download video data: HTTP Error 403: Forbidden".to_owned()
+        ))));
+        assert!(!is_forbidden(&Err(VideoError::Failed(
+            "ERROR: HTTP Error 404: Not Found".to_owned()
+        ))));
+        assert_eq!(
+            format_selector(true, VideoStrategy::YoutubeHls),
+            "bv*[protocol^=m3u8][height<=1080]+ba[protocol^=m3u8]/bv*[height<=1080]+ba/b[height<=1080]/b"
+        );
+        assert_eq!(
+            format_selector(false, VideoStrategy::YoutubeHls),
+            "b[height<=1080]/b"
+        );
     }
 
     #[cfg(unix)]

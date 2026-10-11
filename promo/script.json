@@ -9,7 +9,11 @@
     {
       "id": "hook",
       "en": "Downloads crawling? Stuck at ninety-nine percent? There's a better way.",
-      "tr": "İndirmeler sürünüyor mu? Yüzde doksan dokuzda mı takıldı? Bunun daha iyi bir yolu var."
+      "tr": "İndirmeler sürünüyor mu? Yüzde doksan dokuzda mı takıldı? Bunun daha iyi bir yolu var.",
+      "subtitle": {
+        "en": "Downloads crawling? Stuck at 99%? There's a better way.",
+        "tr": "İndirmeler sürünüyor mu? %99'da mı takıldı? Bunun daha iyi bir yolu var."
+      }
     },
     {
       "id": "intro",
@@ -19,7 +23,11 @@
     {
       "id": "segments",
       "en": "It splits every file into up to sixteen parallel connections, so downloads finish much faster. And if a server starts throttling, it adapts automatically.",
-      "tr": "Her dosyayı on altıya kadar paralel bağlantıya bölüyor, böylece indirmeler çok daha hızlı bitiyor. Sunucu yavaşlatırsa, kendini otomatik olarak ayarlıyor."
+      "tr": "Her dosyayı on altıya kadar paralel bağlantıya bölüyor, böylece indirmeler çok daha hızlı bitiyor. Sunucu yavaşlatırsa, kendini otomatik olarak ayarlıyor.",
+      "subtitle": {
+        "en": "It splits every file into up to 16 parallel connections, so downloads finish much faster. And if a server starts throttling, it adapts automatically.",
+        "tr": "Her dosyayı 16'ya kadar paralel bağlantıya bölüyor, böylece indirmeler çok daha hızlı bitiyor. Sunucu yavaşlatırsa, kendini otomatik olarak ayarlıyor."
+      }
     },
     {
       "id": "resume",

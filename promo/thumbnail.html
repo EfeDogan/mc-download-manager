@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>MC Download Manager thumbnail</title>
+<style>
+  html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: #070b1c; }
+  body { font-family: -apple-system, "SF Pro Display", system-ui, sans-serif; color: #f4f7ff; -webkit-font-smoothing: antialiased; }
+  .abs { position: absolute; }
+  #bg { inset: 0; background:
+      radial-gradient(40% 60% at 22% 50%, rgba(47,123,246,.55), transparent 70%),
+      radial-gradient(45% 55% at 85% 20%, rgba(130,80,230,.35), transparent 70%),
+      radial-gradient(50% 50% at 80% 100%, rgba(20,150,210,.35), transparent 70%),
+      linear-gradient(160deg, #0d1638, #060915); }
+  #grid { inset: 0; opacity: .55; background-image: linear-gradient(rgba(150,180,255,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(150,180,255,.08) 1px, transparent 1px);
+          background-size: 64px 64px; -webkit-mask: radial-gradient(70% 80% at 30% 50%, #000, transparent); }
+  #rays { left: -110px; top: -40px; width: 800px; height: 800px; border-radius: 50%;
+          background: repeating-conic-gradient(from 8deg, rgba(111,211,255,.13) 0deg 5deg, transparent 5deg 15deg);
+          -webkit-mask: radial-gradient(closest-side, #000 25%, transparent 100%); }
+  #halo { left: 20px; top: 130px; width: 460px; height: 460px; border-radius: 50%; background: radial-gradient(closest-side, rgba(111,211,255,.55), transparent); }
+  #icon { left: 60px; top: 170px; filter: drop-shadow(0 30px 50px rgba(0,0,0,.6)); }
+  .text { left: 540px; right: 40px; }
+  #pill { top: 92px; left: 546px; height: 52px; line-height: 52px; padding: 0 24px; border-radius: 26px; font-size: 26px; font-weight: 800; letter-spacing: 1.5px;
+          background: rgba(52,211,153,.16); border: 2px solid rgba(52,211,153,.7); color: #b5f5d8; white-space: nowrap; }
+  #l1 { top: 166px; font-size: 104px; font-weight: 800; letter-spacing: -3px; line-height: 1; white-space: nowrap; text-shadow: 0 6px 30px rgba(0,0,0,.5); }
+  #l2 { top: 268px; font-size: 168px; font-weight: 900; letter-spacing: -6px; line-height: 1; white-space: nowrap;
+        background: linear-gradient(95deg, #a5ecff 0%, #5ab0ff 50%, #b8a3ff 100%); -webkit-background-clip: text; color: transparent;
+        filter: drop-shadow(0 8px 30px rgba(80,170,255,.45)); padding-bottom: 10px; }
+  #l3 { top: 438px; font-size: 76px; font-weight: 800; letter-spacing: -2px; line-height: 1; white-space: nowrap; }
+  #lanes { left: 546px; top: 548px; width: 520px; }
+  .lane { height: 12px; border-radius: 6px; background: rgba(255,255,255,.1); margin-bottom: 9px; overflow: hidden; }
+  .lane i { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, #2f7bf6, #6fd3ff); box-shadow: 0 0 12px rgba(111,211,255,.7); }
+  #badge { left: 1090px; top: 548px; width: 150px; height: 120px; border-radius: 24px; background: rgba(111,211,255,.14); border: 2px solid rgba(111,211,255,.6);
+           display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  #badge b { font-size: 60px; font-weight: 900; letter-spacing: -2px; line-height: 1; }
+  #badge span { font-size: 18px; font-weight: 700; color: #bfe9ff; margin-top: 4px; letter-spacing: .5px; }
+  #name { left: 70px; top: 600px; width: 400px; text-align: center; font-size: 30px; font-weight: 800; letter-spacing: -.5px; color: #dbe8ff; }
+  #play { left: 540px; top: 260px; width: 200px; height: 200px; border-radius: 50%; background: rgba(255,0,51,.92); display: none;
+          box-shadow: 0 20px 60px rgba(0,0,0,.6); }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <linearGradient id="iconBg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b4673"/><stop offset="1" stop-color="#171f3e"/></linearGradient>
+  <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs></svg>
+<div id="bg" class="abs"></div>
+<div id="grid" class="abs"></div>
+<div id="rays" class="abs"></div>
+<div id="halo" class="abs"></div>
+<svg id="icon" class="abs" width="380" height="380" viewBox="0 0 512 512">
+  <rect x="52" y="52" width="408" height="408" rx="92" fill="url(#iconBg)" stroke="rgba(255,255,255,.22)" stroke-width="2"/>
+  <circle cx="256" cy="256" r="138" fill="none" stroke="#6fd3ff" stroke-width="22" filter="url(#glow)"/>
+  <g fill="#5aa9e6"><circle cx="256" cy="158" r="7" opacity=".7"/><circle cx="256" cy="186" r="8" opacity=".8"/><circle cx="256" cy="212" r="9" opacity=".9"/><rect x="246" y="232" width="20" height="30" rx="10" fill="#6fd3ff"/></g>
+  <g fill="none" stroke="#6fd3ff" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"><path d="M256 282 V346"/><path d="M204 296 L256 348 L308 296"/></g>
+</svg>
+<div id="name" class="abs">MC Download Manager</div>
+<div id="pill" class="abs"></div>
+<div id="l1" class="abs text"></div>
+<div id="l2" class="abs text"></div>
+<div id="l3" class="abs text"></div>
+<div id="lanes" class="abs"></div>
+<div id="badge" class="abs"><b>16</b><span></span></div>
+<div id="play" class="abs"><svg width="200" height="200" viewBox="0 0 200 200"><path d="M80 60 L145 100 L80 140Z" fill="#fff"/></svg></div>
+<script>
+  const T = {
+    en: { pill: "FREE · OPEN SOURCE", l1: "Download", l2: "FASTER", l3: "on your Mac", badge: "CONNECTIONS" },
+    tr: { pill: "ÜCRETSİZ · AÇIK KAYNAK", l1: "Mac'te çok", l2: "HIZLI", l3: "indirme", badge: "BAĞLANTI" },
+  };
+  const q = new URLSearchParams(location.search), t = T[q.get("lang") || "en"];
+  for (const k of ["pill", "l1", "l2", "l3"]) document.getElementById(k).textContent = t[k];
+  document.querySelector("#badge span").textContent = t.badge;
+  const fills = [.92, .78, .86, .7, .95, .82];
+  document.getElementById("lanes").innerHTML = fills.map((f) => `<div class="lane"><i style="width:${f * 100}%"></i></div>`).join("");
+  if (q.has("play")) {
+    document.getElementById("play").style.display = "block";
+    for (const id of ["l1", "l2", "l3", "pill", "lanes", "badge"]) document.getElementById(id).style.opacity = .35;
+  }
+</script>
+</body>
+</html>

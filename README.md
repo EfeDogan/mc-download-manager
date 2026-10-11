@@ -13,6 +13,11 @@
   <a href="README.tr.md">🇹🇷 Türkçe</a> · <a href="https://github.com/mstcvk/mc-download-manager/releases">Releases</a> · <a href="#building-from-source">Build</a>
 </p>
 
+<p align="center">
+  <a href="https://youtu.be/SsHWR9UFCM0"><img src="docs/video-en.png" width="720" alt="Watch the 1-minute MC Download Manager video on YouTube"></a><br>
+  <sub>▶ <a href="https://youtu.be/SsHWR9UFCM0">Watch the 1-minute overview</a> · <a href="https://youtu.be/Set5DFC5xmg">Türkçe video</a></sub>
+</p>
+
 ---
 
 Everything ships in a single `.app`: the Safari extension, the Chrome extension, `yt-dlp` and `ffmpeg` are bundled.

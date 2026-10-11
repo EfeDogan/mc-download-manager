@@ -13,6 +13,11 @@
   <a href="README.md">🇬🇧 English</a> · <a href="https://github.com/mstcvk/mc-download-manager/releases">Sürümler</a>
 </p>
 
+<p align="center">
+  <a href="https://youtu.be/Set5DFC5xmg"><img src="docs/video-tr.png" width="720" alt="1 dakikalık MC Download Manager tanıtım videosunu YouTube'da izleyin"></a><br>
+  <sub>▶ <a href="https://youtu.be/Set5DFC5xmg">1 dakikalık tanıtımı izleyin</a> · <a href="https://youtu.be/SsHWR9UFCM0">English video</a></sub>
+</p>
+
 ---
 
 Her şey tek bir `.app` içinde gelir: Safari uzantısı, Chrome uzantısı, `yt-dlp` ve `ffmpeg` uygulamaya gömülüdür.

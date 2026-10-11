@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="README.md">🇬🇧 English</a> · <a href="https://github.com/mstcvk/mc-download-manager/releases">Sürümler</a>
+  <a href="README.md">🇬🇧 English</a> · <a href="https://github.com/mstcvk/mc-download-manager/releases">Sürümler</a> · <a href="#kurulum">Homebrew</a>
 </p>
 
 <p align="center">
@@ -46,6 +46,16 @@ DMG'yi açıp uygulamayı *Applications* klasörüne sürüklemek yeterlidir. Ar
 
 ## Kurulum
 
+**Homebrew**
+
+```bash
+brew install --cask mstcvk/tap/mc-download-manager
+```
+
+Güncellemek için `brew upgrade --cask mc-download-manager`. Ardından aşağıdaki tarayıcı adımlarıyla (2 ve 3) devam edin.
+
+**Elle kurulum**
+
 1. [Sürümler](https://github.com/mstcvk/mc-download-manager/releases) sayfasından DMG'yi indirin, açın ve **MC Download Manager.app**'i *Applications*'a sürükleyin.
    - Notarize edilmemiş derlemelerde ilk açılışta macOS uyarı verir: *Sistem Ayarları ▸ Gizlilik ve Güvenlik ▸ "Yine de Aç"*.
 2. **Safari:** *Safari ▸ Ayarlar ▸ Uzantılar ▸ MC Download Manager* → etkinleştirin ve tüm web sitelerine izin verin.
@@ -73,6 +83,11 @@ CODESIGN_IDENTITY="Developer ID Application: Ad Soyad (TEAMID)" NOTARY_PROFILE=n
 ```
 
 GitHub Actions iş akışı (`.github/workflows/build.yml`) her push'ta DMG üretir ve `v*` etiketlerinde Release'e ekler.
+
+### Homebrew cask'ini güncelleme
+
+Bir sürümün DMG'si yüklendikten sonra `scripts/update-cask.sh`, [mstcvk/homebrew-tap](https://github.com/mstcvk/homebrew-tap) içindeki
+`Casks/mc-download-manager.rb` dosyasını `project.yml`'deki sürüme getirir (sağlama toplamı sürüm dosyasından alınır).
 
 ### Chrome eklentisini Web Store'da yayınlama
 

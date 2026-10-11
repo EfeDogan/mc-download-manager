@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="README.tr.md">🇹🇷 Türkçe</a> · <a href="https://github.com/mstcvk/mc-download-manager/releases">Releases</a> · <a href="#building-from-source">Build</a>
+  <a href="README.tr.md">🇹🇷 Türkçe</a> · <a href="https://github.com/mstcvk/mc-download-manager/releases">Releases</a> · <a href="#installation">Homebrew</a> · <a href="#building-from-source">Build</a>
 </p>
 
 <p align="center">
@@ -46,6 +46,16 @@ Open the DMG, drag the app to *Applications*, done. The interface is in **Englis
 
 ## Installation
 
+**Homebrew**
+
+```bash
+brew install --cask mstcvk/tap/mc-download-manager
+```
+
+Update with `brew upgrade --cask mc-download-manager`. Then continue with the browser steps (2 and 3) below.
+
+**Manual**
+
 1. Download the DMG from [Releases](https://github.com/mstcvk/mc-download-manager/releases), open it and drag **MC Download Manager.app** to *Applications*.
    - Builds that are not notarized trigger a Gatekeeper warning on first launch: *System Settings ▸ Privacy & Security ▸ "Open Anyway"*.
 2. **Safari:** *Safari ▸ Settings ▸ Extensions ▸ MC Download Manager* → enable and allow for all websites.
@@ -74,6 +84,11 @@ CODESIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)" NOTARY_PROFILE=
 
 The GitHub Actions workflow (`.github/workflows/build.yml`) builds a DMG on every push and attaches it to the release on `v*` tags.
 
+### Updating the Homebrew cask
+
+After a release's DMG is uploaded, `scripts/update-cask.sh` bumps `Casks/mc-download-manager.rb` in
+[mstcvk/homebrew-tap](https://github.com/mstcvk/homebrew-tap) to the version in `project.yml` (checksum taken from the release asset).
+
 ### Publishing the Chrome extension to the Web Store
 
 Chrome only installs extensions silently from the Chrome Web Store, so until the extension is published the app guides users through
@@ -100,7 +115,7 @@ App/Sources/DownloadManager/
 App/Resources/Localizable.xcstrings  English (base) + Turkish strings
 SafariExtension/                     Safari Web Extension target (native messaging launches the app)
 Extension/                           shared WebExtension (manifest v3, background, content, popup, _locales)
-scripts/                             fetch-tools.sh, build.sh, make_icons.swift
+scripts/                             fetch-tools.sh, build.sh, pack-extension.sh, update-cask.sh, make_icons.swift
 project.yml                          xcodegen project spec
 ```
 

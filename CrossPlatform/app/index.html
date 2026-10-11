@@ -19,7 +19,10 @@
             <p id="runtime-copy">Starting local bridge…</p>
           </div>
         </div>
-        <span id="bridge-status" class="status-pill pending">Starting</span>
+        <div class="topbar-actions">
+          <button id="extension-button" class="secondary-button" type="button">Browser extension</button>
+          <span id="bridge-status" class="status-pill pending">Starting</span>
+        </div>
       </header>
 
       <main>
@@ -27,13 +30,20 @@
           <div class="section-heading">
             <div>
               <p class="eyebrow">New download</p>
-              <h2 id="add-title">Paste a direct file URL</h2>
+              <h2 id="add-title">Paste a file or video page URL</h2>
             </div>
           </div>
           <form id="download-form">
             <label class="field url-field">
               <span>URL</span>
-              <input id="url-input" type="url" required autocomplete="url" placeholder="https://example.com/archive.zip" />
+              <input id="url-input" type="url" required autocomplete="url" placeholder="https://x.com/user/status/… or a direct file" />
+            </label>
+            <label class="field kind-field">
+              <span>Download type</span>
+              <select id="kind-input">
+                <option value="file">Direct file</option>
+                <option value="video">Video from page</option>
+              </select>
             </label>
             <label class="field name-field">
               <span>File name <small>optional</small></span>
@@ -43,7 +53,9 @@
               <span aria-hidden="true">↓</span> Download
             </button>
           </form>
+          <p class="form-hint">X/Twitter, YouTube and other supported page links use yt-dlp. Known video sites are selected automatically.</p>
           <p id="form-error" class="form-error" role="alert"></p>
+          <p id="extension-result" class="extension-result" role="status"></p>
         </section>
 
         <section class="downloads" aria-labelledby="downloads-title">

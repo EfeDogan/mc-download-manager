@@ -82,6 +82,15 @@ async fn slow_source(request: Request) -> Response<Body> {
     response
 }
 
+async fn html_page() -> Response<Body> {
+    let mut response = Response::new(Body::from("<html><body>video page</body></html>"));
+    response.headers_mut().insert(
+        header::CONTENT_TYPE,
+        HeaderValue::from_static("text/html; charset=utf-8"),
+    );
+    response
+}
+
 async fn start_source() -> SocketAddr {
     let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
     let address = listener.local_addr().unwrap();
@@ -90,12 +99,106 @@ async fn start_source() -> SocketAddr {
             listener,
             Router::new()
                 .route("/fixture.bin", get(source))
-                .route("/slow.bin", get(slow_source)),
+                .route("/slow.bin", get(slow_source))
+                .route("/watch/123", get(html_page)),
         )
         .await
         .unwrap();
     });
     address
+}
+
+#[tokio::test]
+async fn page_url_is_not_reported_as_a_completed_file_download() {
+    let source_address = start_source().await;
+    let directory = tempdir().unwrap();
+    let manager = DownloadManager::with_video_tool(directory.path(), None).unwrap();
+    let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let bridge_address = listener.local_addr().unwrap();
+    tokio::spawn(async move { serve(listener, manager).await.unwrap() });
+
+    let client = reqwest::Client::new();
+    let base = format!("http://{bridge_address}");
+    let response = extension_request(
+        &client,
+        reqwest::Method::POST,
+        format!("{base}/download"),
+        Some(json!({
+            "url": format!("http://{source_address}/watch/123"),
+            "kind": "file"
+        })),
+    )
+    .await;
+    assert_eq!(response.status(), StatusCode::OK);
+    let id = response.json::<Value>().await.unwrap()["id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+
+    for _ in 0..100 {
+        let item = find_download(&client, &base, &id).await;
+        if item["state"] == serde_json::to_value(DownloadState::Failed).unwrap() {
+            assert!(item["error"].as_str().unwrap().contains("HTML page"));
+            assert!(directory.path().read_dir().unwrap().next().is_none());
+            return;
+        }
+        sleep(Duration::from_millis(20)).await;
+    }
+    panic!("HTML page download did not fail in time");
+}
+
+#[cfg(unix)]
+#[tokio::test]
+async fn video_page_runs_the_configured_tool_and_tracks_the_output_file() {
+    use std::os::unix::fs::PermissionsExt;
+
+    let directory = tempdir().unwrap();
+    let output = directory.path().join("fixture-video.mp4");
+    let tool = directory.path().join("fake-yt-dlp");
+    let script = format!(
+        "#!/bin/sh\nprintf media > '{}'\nprintf 'MCDM_PROGRESS:5|5|NA|100\\n'\nprintf 'MCDM_FILE:{}\\n'\n",
+        output.display(),
+        output.display()
+    );
+    tokio::fs::write(&tool, script).await.unwrap();
+    tokio::fs::set_permissions(&tool, std::fs::Permissions::from_mode(0o755))
+        .await
+        .unwrap();
+
+    let manager = DownloadManager::with_video_tool(directory.path(), Some(tool.clone())).unwrap();
+    let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let bridge_address = listener.local_addr().unwrap();
+    tokio::spawn(async move { serve(listener, manager).await.unwrap() });
+    let client = reqwest::Client::new();
+    let base = format!("http://{bridge_address}");
+    let response = extension_request(
+        &client,
+        reqwest::Method::POST,
+        format!("{base}/download"),
+        Some(json!({
+            "url": "https://video.example/watch/123",
+            "kind": "video"
+        })),
+    )
+    .await;
+    assert_eq!(response.status(), StatusCode::OK);
+    let id = response.json::<Value>().await.unwrap()["id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+
+    for _ in 0..100 {
+        let item = find_download(&client, &base, &id).await;
+        if item["state"] == serde_json::to_value(DownloadState::Completed).unwrap() {
+            assert_eq!(item["name"], "fixture-video.mp4");
+            assert_eq!(item["received"], 5);
+            assert_eq!(item["total"], 5);
+            assert_eq!(tokio::fs::read(output).await.unwrap(), b"media");
+            return;
+        }
+        sleep(Duration::from_millis(20)).await;
+    }
+    panic!("video download did not complete in time");
 }
 
 async fn find_download(client: &reqwest::Client, base: &str, id: &str) -> Value {

@@ -18,10 +18,15 @@ Install the [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/) for
 your operating system, then:
 
 ```sh
+./scripts/fetch-cross-platform-tools.sh
 cd CrossPlatform/app
 npm install
 npm run tauri dev
 ```
+
+The fetch script downloads the pinned official `yt-dlp` executable for the host
+target and verifies its published SHA-256 checksum. The binary is ignored by
+Git and embedded into native packages as a platform resource.
 
 Release installers are produced with `npm run tauri build`. The CI workflow
 builds `.deb` and AppImage artifacts on Linux plus MSI and NSIS installers on
@@ -58,13 +63,17 @@ Implemented:
 - progress and pause/resume/cancel/remove state transitions;
 - end-to-end bridge-to-file integration test;
 - Tauri desktop UI for adding and controlling downloads;
+- page-video downloads through a bundled, checksum-verified `yt-dlp`;
+- scoped browser cookies passed to `yt-dlp` through a temporary mode-0600 jar;
+- HTML page detection that prevents a page URL being reported as a completed file;
 - one shared queue for desktop and browser-extension requests;
+- bundled Chromium extension with an in-app extraction button;
 - system-tray lifecycle on Linux and Windows;
 - Linux and Windows installer jobs in GitHub Actions.
 
 Not implemented yet:
 
 - persisted restart recovery and segmented range workers;
-- video downloads and packaged `yt-dlp`/`ffmpeg`/`deno` tools;
+- packaged `ffmpeg`/`deno`, video quality settings, and authenticated-site testing;
 - desktop notifications, clipboard capture, and autostart;
 - signing and release publication for native packages.

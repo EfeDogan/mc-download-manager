@@ -32,6 +32,11 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: CrossPlatform
+      - name: Fetch pinned video tool
+        if: runner.os != 'macOS'
+        shell: bash
+        run: ./scripts/fetch-cross-platform-tools.sh ${{ runner.os == 'Windows' && 'x86_64-pc-windows-msvc' || 'x86_64-unknown-linux-gnu' }}
+        working-directory: ${{ github.workspace }}
       - name: Install Linux desktop dependencies
         if: runner.os == 'Linux'
         run: |
@@ -81,6 +86,10 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: CrossPlatform
+      - name: Fetch pinned video tool
+        shell: bash
+        run: ./scripts/fetch-cross-platform-tools.sh ${{ runner.os == 'Windows' && 'x86_64-pc-windows-msvc' || 'x86_64-unknown-linux-gnu' }}
+        working-directory: ${{ github.workspace }}
       - name: Install Linux desktop dependencies
         if: runner.os == 'Linux'
         run: |

@@ -90,10 +90,11 @@ GitHub Actions iş akışı (`.github/workflows/build.yml`) her push'ta DMG üre
 
 Deneysel çapraz platform uygulaması [`CrossPlatform/`](CrossPlatform/README.md)
 altındadır. Şu anda Tauri masaüstü penceresi ve sistem tepsisi, tarayıcı
-eklentisi köprüsü, doğrudan HTTP(S) indirmeleri, ilerleme ve
+eklentisi köprüsü, doğrudan HTTP(S) indirmeleri, uygulamayla paketlenen
+`yt-dlp` üzerinden sayfa videosu indirme, ilerleme ve
 duraklat/sürdür/iptal et/kaldır işlevleri çalışmaktadır. CI, Linux ve Windows
 kurulum paketlerini üretir; macOS uygulamasındaki çok parçalı indirme, kalıcılık,
-video araçları, pano ve otomatik başlatma özellikleri henüz tamamlanmamıştır.
+tam video ayarları, pano ve otomatik başlatma özellikleri henüz tamamlanmamıştır.
 
 ### Homebrew cask'ini güncelleme
 

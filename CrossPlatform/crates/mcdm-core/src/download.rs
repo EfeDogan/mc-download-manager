@@ -1,5 +1,6 @@
 use std::{
     collections::HashMap,
+    env,
     path::{Path, PathBuf},
     sync::Arc,
     time::Instant,
@@ -19,14 +20,21 @@ use uuid::Uuid;
 use crate::{
     filename::{sanitize, unique_destination},
     model::{DownloadAction, DownloadKind, DownloadRequest, DownloadState, DownloadSummary},
+    video::{self, VideoEvent},
 };
 
 #[derive(Debug, Error)]
 pub enum DownloadError {
     #[error("invalid URL")]
     InvalidUrl,
-    #[error("video downloads are not implemented in the first cross-platform slice")]
-    VideoNotImplemented,
+    #[error("yt-dlp is required for video page downloads but was not found")]
+    VideoToolMissing,
+    #[error(
+        "this URL returned an HTML page; choose 'Video from page' for sites such as YouTube or X/Twitter"
+    )]
+    HtmlPageRequiresVideoMode,
+    #[error("video download failed: {0}")]
+    Video(String),
     #[error("download not found")]
     NotFound,
     #[error("action is not valid for the current download state")]
@@ -51,6 +59,7 @@ struct Inner {
     client: reqwest::Client,
     entries: RwLock<HashMap<Uuid, Entry>>,
     controls: Mutex<HashMap<Uuid, (u64, CancellationToken)>>,
+    video_tool: Option<PathBuf>,
 }
 
 #[derive(Clone)]
@@ -64,6 +73,13 @@ struct Entry {
 
 impl DownloadManager {
     pub fn new(directory: impl Into<PathBuf>) -> Result<Self, DownloadError> {
+        Self::with_video_tool(directory, discover_video_tool(None))
+    }
+
+    pub fn with_video_tool(
+        directory: impl Into<PathBuf>,
+        video_tool: Option<PathBuf>,
+    ) -> Result<Self, DownloadError> {
         let client = reqwest::Client::builder()
             .redirect(reqwest::redirect::Policy::limited(10))
             .build()?;
@@ -73,8 +89,13 @@ impl DownloadManager {
                 client,
                 entries: RwLock::new(HashMap::new()),
                 controls: Mutex::new(HashMap::new()),
+                video_tool,
             }),
         })
+    }
+
+    pub fn video_available(&self) -> bool {
+        self.inner.video_tool.is_some()
     }
 
     pub fn directory(&self) -> &Path {
@@ -86,17 +107,20 @@ impl DownloadManager {
         if !matches!(url.scheme(), "http" | "https") {
             return Err(DownloadError::InvalidUrl);
         }
-        if request.kind == DownloadKind::Video {
-            return Err(DownloadError::VideoNotImplemented);
+        if request.kind == DownloadKind::Video && !self.video_available() {
+            return Err(DownloadError::VideoToolMissing);
         }
 
         fs::create_dir_all(&self.inner.directory).await?;
         let id = Uuid::new_v4();
-        let inferred = url
-            .path_segments()
-            .and_then(|mut segments| segments.next_back())
-            .filter(|value| !value.is_empty())
-            .unwrap_or("download");
+        let inferred = if request.kind == DownloadKind::Video {
+            url.host_str().unwrap_or("video")
+        } else {
+            url.path_segments()
+                .and_then(|mut segments| segments.next_back())
+                .filter(|value| !value.is_empty())
+                .unwrap_or("download")
+        };
         let name = sanitize(if request.filename.trim().is_empty() {
             inferred
         } else {
@@ -263,6 +287,9 @@ impl DownloadManager {
         };
 
         let url = Url::parse(&request.url).map_err(|_| DownloadError::InvalidUrl)?;
+        if request.kind == DownloadKind::Video {
+            return self.transfer_video(id, generation, request, token).await;
+        }
         let existing = fs::metadata(&part_path)
             .await
             .map(|metadata| metadata.len())
@@ -290,6 +317,23 @@ impl DownloadManager {
         };
         if !response.status().is_success() {
             return Err(DownloadError::Http(response.status()));
+        }
+
+        let content_type = response
+            .headers()
+            .get(header::CONTENT_TYPE)
+            .and_then(|value| value.to_str().ok())
+            .unwrap_or_default()
+            .to_ascii_lowercase();
+        let extension = Path::new(&name)
+            .extension()
+            .and_then(|value| value.to_str())
+            .unwrap_or_default()
+            .to_ascii_lowercase();
+        if content_type.starts_with("text/html")
+            && !matches!(extension.as_str(), "html" | "htm" | "xhtml")
+        {
+            return Err(DownloadError::HtmlPageRequiresVideoMode);
         }
 
         let resumed = existing > 0 && response.status() == StatusCode::PARTIAL_CONTENT;
@@ -349,7 +393,78 @@ impl DownloadManager {
         Ok(destination)
     }
 
+    async fn transfer_video(
+        &self,
+        id: Uuid,
+        generation: u64,
+        request: DownloadRequest,
+        token: CancellationToken,
+    ) -> Result<PathBuf, DownloadError> {
+        let executable = self
+            .inner
+            .video_tool
+            .clone()
+            .ok_or(DownloadError::VideoToolMissing)?;
+        {
+            let mut entries = self.inner.entries.write().await;
+            let entry = entries.get_mut(&id).ok_or(DownloadError::NotFound)?;
+            if entry.generation != generation {
+                return Err(DownloadError::Interrupted);
+            }
+            entry.summary.state = DownloadState::Downloading;
+            entry.summary.stage = "Starting yt-dlp".to_owned();
+            entry.summary.total = -1;
+            entry.summary.received = 0;
+        }
+
+        let (events_tx, mut events_rx) = tokio::sync::mpsc::unbounded_channel();
+        let output_directory = self.inner.directory.clone();
+        let run = video::download(executable, request, output_directory, token, events_tx);
+        tokio::pin!(run);
+        let mut events_open = true;
+
+        loop {
+            tokio::select! {
+                result = &mut run => {
+                    return result.map_err(|error| match error {
+                        video::VideoError::Interrupted => DownloadError::Interrupted,
+                        other => DownloadError::Video(other.to_string()),
+                    });
+                }
+                event = events_rx.recv(), if events_open => {
+                    let Some(event) = event else {
+                        events_open = false;
+                        continue;
+                    };
+                    let mut entries = self.inner.entries.write().await;
+                    let entry = entries.get_mut(&id).ok_or(DownloadError::NotFound)?;
+                    if entry.generation != generation {
+                        return Err(DownloadError::Interrupted);
+                    }
+                    match event {
+                        VideoEvent::Progress { received, total, speed } => {
+                            entry.summary.received = received;
+                            entry.summary.total = total;
+                            entry.summary.speed = speed;
+                            entry.summary.progress = if total > 0 {
+                                (received as f64 / total as f64).clamp(0.0, 1.0)
+                            } else {
+                                0.0
+                            };
+                        }
+                        VideoEvent::Stage(stage) => entry.summary.stage = stage,
+                    }
+                }
+            }
+        }
+    }
+
     async fn finish(&self, id: Uuid, generation: u64, result: Result<PathBuf, DownloadError>) {
+        let completed_size = result
+            .as_ref()
+            .ok()
+            .and_then(|path| std::fs::metadata(path).ok())
+            .map(|metadata| metadata.len() as i64);
         {
             let mut controls = self.inner.controls.lock().await;
             if controls
@@ -369,12 +484,18 @@ impl DownloadManager {
         }
         match result {
             Ok(path) => {
+                if let Some(name) = path.file_name().and_then(|value| value.to_str()) {
+                    entry.summary.name = name.to_owned();
+                }
                 entry.summary.state = DownloadState::Completed;
                 entry.summary.progress = 1.0;
                 entry.summary.speed = 0.0;
                 entry.summary.stage.clear();
                 entry.summary.error = None;
-                if entry.summary.total <= 0 {
+                if let Some(size) = completed_size {
+                    entry.summary.received = size;
+                    entry.summary.total = size;
+                } else if entry.summary.total <= 0 {
                     entry.summary.total = entry.summary.received;
                 }
                 entry.final_path = Some(path);
@@ -400,4 +521,29 @@ impl DownloadManager {
             let _ = fs::remove_file(path).await;
         }
     }
+}
+
+pub fn discover_video_tool(preferred: Option<PathBuf>) -> Option<PathBuf> {
+    let executable_name = if cfg!(windows) {
+        "yt-dlp.exe"
+    } else {
+        "yt-dlp"
+    };
+    let mut candidates = Vec::new();
+    if let Some(path) = preferred {
+        candidates.push(path);
+    }
+    if let Some(path) = env::var_os("MCDM_YTDLP") {
+        candidates.push(PathBuf::from(path));
+    }
+    if let Ok(current) = env::current_exe()
+        && let Some(directory) = current.parent()
+    {
+        candidates.push(directory.join(executable_name));
+        candidates.push(directory.join("tools").join(executable_name));
+    }
+    if let Some(path) = env::var_os("PATH") {
+        candidates.extend(env::split_paths(&path).map(|directory| directory.join(executable_name)));
+    }
+    candidates.into_iter().find(|path| path.is_file())
 }

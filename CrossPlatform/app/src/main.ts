@@ -10,6 +10,7 @@ type DownloadState =
   | "cancelled";
 
 type DownloadAction = "pause" | "resume" | "cancel" | "remove";
+type DownloadKind = "file" | "video";
 
 interface DownloadSummary {
   id: string;
@@ -27,6 +28,7 @@ interface RuntimeInfo {
   bridgePort: number;
   bridgeStatus: string;
   downloadDirectory: string;
+  videoAvailable: boolean;
 }
 
 const stateLabels: Record<DownloadState, string> = {
@@ -45,8 +47,34 @@ const count = document.querySelector<HTMLElement>("#download-count")!;
 const form = document.querySelector<HTMLFormElement>("#download-form")!;
 const urlInput = document.querySelector<HTMLInputElement>("#url-input")!;
 const filenameInput = document.querySelector<HTMLInputElement>("#filename-input")!;
+const kindInput = document.querySelector<HTMLSelectElement>("#kind-input")!;
 const submitButton = document.querySelector<HTMLButtonElement>("#download-button")!;
 const formError = document.querySelector<HTMLElement>("#form-error")!;
+const extensionButton = document.querySelector<HTMLButtonElement>("#extension-button")!;
+const extensionResult = document.querySelector<HTMLElement>("#extension-result")!;
+let kindWasChosenManually = false;
+
+const videoHosts = [
+  "youtube.com", "youtu.be", "vimeo.com", "dailymotion.com", "twitter.com", "x.com",
+  "instagram.com", "tiktok.com", "twitch.tv", "facebook.com", "reddit.com", "bilibili.com",
+];
+
+function looksLikeVideoPage(value: string): boolean {
+  try {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase();
+    return videoHosts.some((candidate) => host === candidate || host.endsWith(`.${candidate}`));
+  } catch {
+    return false;
+  }
+}
+
+function syncKindUi(): void {
+  const video = kindInput.value === "video";
+  filenameInput.disabled = video;
+  filenameInput.placeholder = video ? "Chosen by yt-dlp" : "archive.zip";
+  if (video) filenameInput.value = "";
+}
 
 function formatBytes(value: number): string {
   if (value < 0 || !Number.isFinite(value)) return "Unknown";
@@ -144,7 +172,7 @@ async function refreshRuntime(): Promise<void> {
     status.textContent = running ? "Bridge online" : info.bridgeStatus;
     status.className = `status-pill ${running ? "online" : "error"}`;
     copy.textContent = running
-      ? `Listening locally on port ${info.bridgePort}`
+      ? `Listening on port ${info.bridgePort} · ${info.videoAvailable ? "yt-dlp ready" : "yt-dlp missing"}`
       : "Browser bridge is unavailable";
     directory.textContent = `Saving to ${info.downloadDirectory}`;
   } catch (error) {
@@ -162,9 +190,13 @@ form.addEventListener("submit", async (event) => {
     await invoke("add_download", {
       url: urlInput.value.trim(),
       filename: filenameInput.value.trim() || null,
+      kind: kindInput.value as DownloadKind,
     });
     urlInput.value = "";
     filenameInput.value = "";
+    kindInput.value = "file";
+    kindWasChosenManually = false;
+    syncKindUi();
     await refreshDownloads();
   } catch (error) {
     formError.textContent = String(error);
@@ -173,7 +205,33 @@ form.addEventListener("submit", async (event) => {
   }
 });
 
+kindInput.addEventListener("change", () => {
+  kindWasChosenManually = true;
+  syncKindUi();
+});
+
+urlInput.addEventListener("input", () => {
+  if (!kindWasChosenManually) {
+    kindInput.value = looksLikeVideoPage(urlInput.value.trim()) ? "video" : "file";
+    syncKindUi();
+  }
+});
+
+extensionButton.addEventListener("click", async () => {
+  extensionButton.disabled = true;
+  extensionResult.textContent = "";
+  try {
+    const path = await invoke<string>("install_browser_extension");
+    extensionResult.textContent = `Extension copied to ${path}. Open chrome://extensions, enable Developer mode, then choose Load unpacked.`;
+  } catch (error) {
+    extensionResult.textContent = String(error);
+  } finally {
+    extensionButton.disabled = false;
+  }
+});
+
 void refreshRuntime();
 void refreshDownloads();
+syncKindUi();
 window.setInterval(refreshDownloads, 750);
 window.setInterval(refreshRuntime, 5000);

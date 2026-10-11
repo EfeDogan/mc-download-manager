@@ -90,9 +90,10 @@ The GitHub Actions workflow (`.github/workflows/build.yml`) builds a DMG on ever
 
 The experimental cross-platform implementation lives in [`CrossPlatform/`](CrossPlatform/README.md).
 It currently provides a Tauri desktop window and tray, the browser-extension
-bridge, direct HTTP(S) downloads, progress, and pause/resume/cancel/remove. CI
+bridge, direct HTTP(S) downloads, page-video downloads through bundled
+`yt-dlp`, progress, and pause/resume/cancel/remove. CI
 builds Linux and Windows installers; feature parity with the macOS application
-(segmented downloads, persistence, video tools, clipboard, and autostart) is
+(segmented downloads, persistence, full video settings, clipboard, and autostart) is
 still in progress.
 
 ### Updating the Homebrew cask

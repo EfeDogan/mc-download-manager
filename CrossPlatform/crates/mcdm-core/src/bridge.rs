@@ -179,7 +179,7 @@ async fn ping(State(state): State<BridgeState>) -> Json<Value> {
         "ok": true,
         "app": "MCDownloadManager",
         "version": env!("CARGO_PKG_VERSION"),
-        "ytdlp": false,
+        "ytdlp": state.manager.video_available(),
         "active": state.manager.active_count().await,
         "captureExtensions": default_capture_extensions(),
     }))

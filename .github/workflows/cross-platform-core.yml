@@ -24,12 +24,76 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: CrossPlatform/app/package-lock.json
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: CrossPlatform
+      - name: Install Linux desktop dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+        working-directory: .
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: CrossPlatform/app
+      - name: Build frontend
+        run: npm run build
+        working-directory: CrossPlatform/app
       - name: Format
         run: cargo fmt --all --check
       - name: Lint
         run: cargo clippy --workspace --all-targets -- -D warnings
       - name: Test
         run: cargo test --workspace --locked
+
+  package:
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: linux-installers
+            bundles: deb,appimage
+            paths: |
+              CrossPlatform/target/release/bundle/deb/*.deb
+              CrossPlatform/target/release/bundle/appimage/*.AppImage
+          - os: windows-latest
+            artifact: windows-installers
+            bundles: msi,nsis
+            paths: |
+              CrossPlatform/target/release/bundle/msi/*.msi
+              CrossPlatform/target/release/bundle/nsis/*-setup.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: CrossPlatform/app/package-lock.json
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: CrossPlatform
+      - name: Install Linux desktop dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: CrossPlatform/app
+      - name: Build native installers
+        run: npm run tauri build -- --bundles ${{ matrix.bundles }}
+        working-directory: CrossPlatform/app
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.paths }}
+          if-no-files-found: error

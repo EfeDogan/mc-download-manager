@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="description" content="A fast, cross-platform download manager." />
+    <link rel="stylesheet" href="/src/styles.css" />
+    <title>MC Download Manager</title>
+    <script type="module" src="/src/main.ts" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">M</span>
+          <div>
+            <h1>MC Download Manager</h1>
+            <p id="runtime-copy">Starting local bridge…</p>
+          </div>
+        </div>
+        <span id="bridge-status" class="status-pill pending">Starting</span>
+      </header>
+
+      <main>
+        <section class="new-download" aria-labelledby="add-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">New download</p>
+              <h2 id="add-title">Paste a direct file URL</h2>
+            </div>
+          </div>
+          <form id="download-form">
+            <label class="field url-field">
+              <span>URL</span>
+              <input id="url-input" type="url" required autocomplete="url" placeholder="https://example.com/archive.zip" />
+            </label>
+            <label class="field name-field">
+              <span>File name <small>optional</small></span>
+              <input id="filename-input" type="text" autocomplete="off" placeholder="archive.zip" />
+            </label>
+            <button id="download-button" class="primary-button" type="submit">
+              <span aria-hidden="true">↓</span> Download
+            </button>
+          </form>
+          <p id="form-error" class="form-error" role="alert"></p>
+        </section>
+
+        <section class="downloads" aria-labelledby="downloads-title">
+          <div class="section-heading downloads-heading">
+            <div>
+              <p class="eyebrow">Queue</p>
+              <h2 id="downloads-title">Downloads</h2>
+            </div>
+            <span id="download-count" class="count">0 items</span>
+          </div>
+          <div id="download-list" class="download-list" aria-live="polite"></div>
+          <div id="empty-state" class="empty-state">
+            <span aria-hidden="true">↓</span>
+            <h3>No downloads yet</h3>
+            <p>Add a direct URL above or send a file from the browser extension.</p>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <span>Closing the window keeps the bridge running in the system tray.</span>
+        <span id="download-directory"></span>
+      </footer>
+    </div>
+  </body>
+</html>

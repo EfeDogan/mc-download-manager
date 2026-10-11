@@ -5,7 +5,7 @@
 <h1 align="center">MC Download Manager</h1>
 
 <p align="center">
-  macOS için hızlı, açık kaynaklı bir indirme yöneticisi.<br>
+  macOS için hızlı, açık kaynaklı bir indirme yöneticisi; Linux ve Windows desteği geliştiriliyor.<br>
   Safari, Chrome ve Firefox indirmelerini yakalar, 16'ya kadar paralel bağlantıyla hızlandırır ve sayfalardaki videoları indirir.
 </p>
 
@@ -85,6 +85,15 @@ CODESIGN_IDENTITY="Developer ID Application: Ad Soyad (TEAMID)" NOTARY_PROFILE=n
 ```
 
 GitHub Actions iş akışı (`.github/workflows/build.yml`) her push'ta DMG üretir ve `v*` etiketlerinde Release'e ekler.
+
+### Linux ve Windows geliştirmesi
+
+Deneysel çapraz platform uygulaması [`CrossPlatform/`](CrossPlatform/README.md)
+altındadır. Şu anda Tauri masaüstü penceresi ve sistem tepsisi, tarayıcı
+eklentisi köprüsü, doğrudan HTTP(S) indirmeleri, ilerleme ve
+duraklat/sürdür/iptal et/kaldır işlevleri çalışmaktadır. CI, Linux ve Windows
+kurulum paketlerini üretir; macOS uygulamasındaki çok parçalı indirme, kalıcılık,
+video araçları, pano ve otomatik başlatma özellikleri henüz tamamlanmamıştır.
 
 ### Homebrew cask'ini güncelleme
 

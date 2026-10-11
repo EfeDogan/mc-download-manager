@@ -5,7 +5,7 @@
 <h1 align="center">MC Download Manager</h1>
 
 <p align="center">
-  A fast, open-source download manager for macOS.<br>
+  A fast, open-source download manager for macOS, with Linux and Windows support in development.<br>
   Captures Safari, Chrome and Firefox downloads, accelerates them with up to 16 parallel connections and downloads videos from web pages.
 </p>
 
@@ -85,6 +85,15 @@ CODESIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)" NOTARY_PROFILE=
 ```
 
 The GitHub Actions workflow (`.github/workflows/build.yml`) builds a DMG on every push and attaches it to the release on `v*` tags.
+
+### Linux and Windows development
+
+The experimental cross-platform implementation lives in [`CrossPlatform/`](CrossPlatform/README.md).
+It currently provides a Tauri desktop window and tray, the browser-extension
+bridge, direct HTTP(S) downloads, progress, and pause/resume/cancel/remove. CI
+builds Linux and Windows installers; feature parity with the macOS application
+(segmented downloads, persistence, video tools, clipboard, and autostart) is
+still in progress.
 
 ### Updating the Homebrew cask
 

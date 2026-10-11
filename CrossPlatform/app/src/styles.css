@@ -1,0 +1,109 @@
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #e8edf7;
+  background: #0a0d14;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; min-height: 100vh; }
+button, input { font: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: wait; opacity: 0.55; }
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 15% 0%, rgba(77, 102, 205, 0.16), transparent 35%),
+    radial-gradient(circle at 100% 50%, rgba(24, 171, 132, 0.09), transparent 30%);
+}
+
+.app-shell { position: relative; min-height: 100vh; display: flex; flex-direction: column; }
+.topbar, main, footer { width: min(960px, calc(100% - 48px)); margin-inline: auto; }
+.topbar { min-height: 112px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.brand { display: flex; align-items: center; gap: 15px; }
+.brand-mark {
+  width: 45px; height: 45px; display: grid; place-items: center;
+  border-radius: 14px; color: white; font-weight: 800; font-size: 20px;
+  background: linear-gradient(145deg, #6d7dff, #4655d6);
+  box-shadow: 0 10px 30px rgba(80, 96, 230, 0.28);
+}
+h1 { font-size: 18px; margin: 0 0 3px; letter-spacing: -0.02em; }
+.brand p { color: #818b9f; font-size: 12px; margin: 0; }
+.status-pill, .state-badge {
+  border-radius: 999px; padding: 6px 11px; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.status-pill.online { color: #70e5bd; background: rgba(28, 153, 113, 0.13); border: 1px solid rgba(62, 210, 160, 0.2); }
+.status-pill.pending { color: #ffc66d; background: rgba(255, 176, 50, 0.1); }
+.status-pill.error { max-width: 340px; color: #ff8b93; background: rgba(255, 84, 98, 0.1); overflow: hidden; text-overflow: ellipsis; }
+
+main { flex: 1; }
+section {
+  background: rgba(19, 24, 35, 0.88); border: 1px solid #242b3b;
+  border-radius: 20px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+}
+.new-download { padding: 26px; }
+.section-heading { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; }
+.eyebrow { color: #7581a2; text-transform: uppercase; letter-spacing: 0.13em; font-size: 10px; font-weight: 700; margin: 0 0 4px; }
+h2 { margin: 0; font-size: 20px; letter-spacing: -0.025em; }
+form { display: grid; grid-template-columns: minmax(240px, 1fr) minmax(160px, 0.45fr) auto; gap: 12px; align-items: end; }
+.field { display: grid; gap: 7px; color: #a7afbf; font-size: 12px; font-weight: 600; }
+.field small { color: #5f687b; font-weight: 500; }
+input {
+  width: 100%; height: 43px; padding: 0 13px; color: #e8edf7; background: #0d111a;
+  border: 1px solid #2a3243; border-radius: 10px; outline: none; transition: border-color 150ms, box-shadow 150ms;
+}
+input::placeholder { color: #4e586a; }
+input:focus { border-color: #6979f1; box-shadow: 0 0 0 3px rgba(105, 121, 241, 0.12); }
+.primary-button {
+  height: 43px; padding: 0 18px; color: white; font-weight: 700; border: 0; border-radius: 10px;
+  background: linear-gradient(135deg, #6676ed, #5262db); box-shadow: 0 8px 22px rgba(73, 88, 210, 0.24);
+}
+.primary-button:hover { filter: brightness(1.08); }
+.primary-button span { font-size: 18px; margin-right: 5px; }
+.form-error { min-height: 18px; margin: 10px 0 -7px; color: #ff8b93; font-size: 12px; }
+
+.downloads { margin-top: 18px; padding: 26px; min-height: 290px; }
+.downloads-heading { margin-bottom: 16px; }
+.count { color: #778096; font-size: 12px; }
+.download-list { display: grid; gap: 10px; }
+.download-card { background: #0e131d; border: 1px solid #242b3a; border-radius: 14px; padding: 16px; }
+.download-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.download-title-row h3 { margin: 0 0 3px; font-size: 14px; font-weight: 600; word-break: break-word; }
+.download-title-row p { margin: 0; color: #7d879a; font-size: 11px; word-break: break-word; }
+.state-badge { flex: none; padding: 4px 8px; color: #9aa4b9; background: #1a202d; }
+.state-badge.downloading, .state-badge.probing { color: #8291ff; background: rgba(91, 108, 231, 0.13); }
+.state-badge.completed { color: #6de0b7; background: rgba(31, 169, 125, 0.12); }
+.state-badge.failed, .state-badge.cancelled { color: #ff838c; background: rgba(221, 65, 79, 0.12); }
+.state-badge.paused { color: #f6bd68; background: rgba(220, 151, 45, 0.12); }
+.progress-track { height: 4px; margin: 14px 0; overflow: hidden; border-radius: 999px; background: #202736; }
+.progress-bar { height: 100%; min-width: 0; border-radius: inherit; background: linear-gradient(90deg, #6071e8, #8591ff); transition: width 250ms ease; }
+.progress-bar.completed { background: #40c798; }
+.progress-bar.failed, .progress-bar.cancelled { background: #dc5663; }
+.download-actions { min-height: 28px; display: flex; justify-content: flex-end; gap: 7px; }
+.icon-button { padding: 5px 9px; color: #aab3c5; background: #171d29; border: 1px solid #293143; border-radius: 7px; font-size: 11px; }
+.icon-button:hover { color: white; border-color: #4a5775; }
+.icon-button.danger:hover { color: #ff8b93; border-color: #8a3942; }
+.empty-state { padding: 48px 20px; text-align: center; color: #616b7f; }
+.empty-state[hidden] { display: none; }
+.empty-state > span { width: 48px; height: 48px; margin: 0 auto 12px; display: grid; place-items: center; border: 1px solid #293143; border-radius: 15px; font-size: 24px; }
+.empty-state h3 { margin: 0 0 5px; color: #9da6b8; font-size: 14px; }
+.empty-state p { margin: 0; font-size: 12px; }
+
+footer { padding: 20px 0 24px; display: flex; justify-content: space-between; gap: 16px; color: #818b9f; font-size: 12px; }
+#download-directory { max-width: 50%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+@media (max-width: 760px) {
+  .topbar, main, footer { width: min(100% - 28px, 960px); }
+  form { grid-template-columns: 1fr; }
+  .topbar { min-height: 96px; }
+  .new-download, .downloads { padding: 20px; }
+  footer { flex-direction: column; }
+  #download-directory { max-width: 100%; }
+}

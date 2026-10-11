@@ -11,6 +11,7 @@ type DownloadState =
 
 type DownloadAction = "pause" | "resume" | "cancel" | "remove";
 type DownloadKind = "file" | "video";
+type ThemeName = "ink-wash" | "lush-forest" | "stormy-morning";
 
 interface DownloadSummary {
   id: string;
@@ -53,7 +54,55 @@ const formError = document.querySelector<HTMLElement>("#form-error")!;
 const extensionButton = document.querySelector<HTMLButtonElement>("#extension-button")!;
 const firefoxExtensionButton = document.querySelector<HTMLButtonElement>("#firefox-extension-button")!;
 const extensionResult = document.querySelector<HTMLElement>("#extension-result")!;
+const settingsButton = document.querySelector<HTMLButtonElement>("#settings-button")!;
+const settingsDialog = document.querySelector<HTMLDialogElement>("#settings-dialog")!;
+const settingsClose = document.querySelector<HTMLButtonElement>("#settings-close")!;
+const themeInputs = Array.from(document.querySelectorAll<HTMLInputElement>('input[name="theme"]'));
 let kindWasChosenManually = false;
+
+const themeLabels: Record<ThemeName, string> = {
+  "ink-wash": "Ink wash",
+  "lush-forest": "Lush forest",
+  "stormy-morning": "Stormy morning",
+};
+
+const isTauriRuntime = "__TAURI_INTERNALS__" in window;
+
+async function appInvoke<T>(command: string, args?: Record<string, unknown>): Promise<T> {
+  if (isTauriRuntime) return invoke<T>(command, args);
+
+  // Keep the browser-based design preview representative without weakening the
+  // desktop runtime path, which always delegates to Tauri above.
+  if (command === "runtime_info") {
+    return {
+      bridgePort: 48213,
+      bridgeStatus: "running",
+      downloadDirectory: "~/Downloads/MC Download Manager",
+      videoAvailable: true,
+    } as T;
+  }
+  if (command === "list_downloads") return [] as T;
+  if (command === "download_action") return undefined as T;
+
+  throw new Error("This action is available in the desktop app.");
+}
+
+function storedTheme(): ThemeName {
+  try {
+    const value = window.localStorage.getItem("mcdm-theme");
+    if (value && Object.prototype.hasOwnProperty.call(themeLabels, value)) return value as ThemeName;
+  } catch {}
+  return "ink-wash";
+}
+
+function applyTheme(theme: ThemeName): void {
+  document.documentElement.dataset.theme = theme;
+  settingsButton.textContent = `Settings · ${themeLabels[theme]}`;
+  for (const input of themeInputs) input.checked = input.value === theme;
+  try { window.localStorage.setItem("mcdm-theme", theme); } catch {}
+}
+
+applyTheme(storedTheme());
 
 const videoHosts = [
   "youtube.com", "youtu.be", "vimeo.com", "dailymotion.com", "twitter.com", "x.com",
@@ -95,7 +144,7 @@ function actionButton(label: string, action: DownloadAction, item: DownloadSumma
   button.addEventListener("click", async () => {
     button.disabled = true;
     try {
-      await invoke("download_action", { id: item.id, action });
+      await appInvoke("download_action", { id: item.id, action });
       await refreshDownloads();
     } catch (error) {
       formError.textContent = String(error);
@@ -154,7 +203,7 @@ function renderDownload(item: DownloadSummary): HTMLElement {
 
 async function refreshDownloads(): Promise<void> {
   try {
-    const items = await invoke<DownloadSummary[]>("list_downloads");
+    const items = await appInvoke<DownloadSummary[]>("list_downloads");
     list.replaceChildren(...items.map(renderDownload));
     emptyState.hidden = items.length > 0;
     count.textContent = `${items.length} ${items.length === 1 ? "item" : "items"}`;
@@ -168,7 +217,7 @@ async function refreshRuntime(): Promise<void> {
   const copy = document.querySelector<HTMLElement>("#runtime-copy")!;
   const directory = document.querySelector<HTMLElement>("#download-directory")!;
   try {
-    const info = await invoke<RuntimeInfo>("runtime_info");
+    const info = await appInvoke<RuntimeInfo>("runtime_info");
     const running = info.bridgeStatus === "running";
     status.textContent = running ? "Bridge online" : info.bridgeStatus;
     status.className = `status-pill ${running ? "online" : "error"}`;
@@ -188,7 +237,7 @@ form.addEventListener("submit", async (event) => {
   formError.textContent = "";
   submitButton.disabled = true;
   try {
-    await invoke("add_download", {
+    await appInvoke("add_download", {
       url: urlInput.value.trim(),
       filename: filenameInput.value.trim() || null,
       kind: kindInput.value as DownloadKind,
@@ -222,7 +271,7 @@ extensionButton.addEventListener("click", async () => {
   extensionButton.disabled = true;
   extensionResult.textContent = "";
   try {
-    const path = await invoke<string>("install_browser_extension");
+    const path = await appInvoke<string>("install_browser_extension");
     extensionResult.textContent = `Chromium extension updated at ${path}. If it is already loaded, open chrome://extensions and click Reload on MC Download Manager. Otherwise enable Developer mode and choose Load unpacked.`;
   } catch (error) {
     extensionResult.textContent = String(error);
@@ -235,7 +284,7 @@ firefoxExtensionButton.addEventListener("click", async () => {
   firefoxExtensionButton.disabled = true;
   extensionResult.textContent = "";
   try {
-    const manifestPath = await invoke<string>("install_firefox_extension");
+    const manifestPath = await appInvoke<string>("install_firefox_extension");
     extensionResult.textContent = `Firefox extension prepared at ${manifestPath}. Open about:debugging#/runtime/this-firefox, choose Load Temporary Add-on, then select this manifest.json. Temporary add-ons are removed when Firefox restarts.`;
   } catch (error) {
     extensionResult.textContent = String(error);
@@ -243,6 +292,15 @@ firefoxExtensionButton.addEventListener("click", async () => {
     firefoxExtensionButton.disabled = false;
   }
 });
+
+settingsButton.addEventListener("click", () => settingsDialog.showModal());
+settingsClose.addEventListener("click", () => settingsDialog.close());
+settingsDialog.addEventListener("click", (event) => {
+  if (event.target === settingsDialog) settingsDialog.close();
+});
+for (const input of themeInputs) {
+  input.addEventListener("change", () => applyTheme(input.value as ThemeName));
+}
 
 void refreshRuntime();
 void refreshDownloads();

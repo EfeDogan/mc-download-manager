@@ -22,9 +22,49 @@
         <div class="topbar-actions">
           <button id="extension-button" class="secondary-button" type="button">Chromium extension</button>
           <button id="firefox-extension-button" class="secondary-button" type="button">Firefox extension</button>
+          <button id="settings-button" class="secondary-button settings-button" type="button">Settings</button>
           <span id="bridge-status" class="status-pill pending">Starting</span>
         </div>
       </header>
+
+      <dialog id="settings-dialog" aria-labelledby="settings-title">
+        <div class="settings-panel">
+          <div class="settings-header">
+            <div>
+              <p class="eyebrow">Appearance</p>
+              <h2 id="settings-title">Settings</h2>
+            </div>
+            <button id="settings-close" class="secondary-button" type="button">Close</button>
+          </div>
+          <fieldset class="theme-fieldset">
+            <legend>Theme</legend>
+            <p class="settings-copy">Choose a quiet palette for the desktop app. Your selection is saved automatically.</p>
+            <div class="theme-grid">
+              <label class="theme-option ink-wash-option">
+                <input type="radio" name="theme" value="ink-wash" />
+                <span class="theme-option-body">
+                  <span class="theme-option-heading"><strong>Ink wash</strong><span>Neutral ivory and slate</span></span>
+                  <span class="theme-swatches" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+                </span>
+              </label>
+              <label class="theme-option lush-forest-option">
+                <input type="radio" name="theme" value="lush-forest" />
+                <span class="theme-option-body">
+                  <span class="theme-option-heading"><strong>Lush forest</strong><span>Deep green and soft mint</span></span>
+                  <span class="theme-swatches" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+                </span>
+              </label>
+              <label class="theme-option stormy-morning-option">
+                <input type="radio" name="theme" value="stormy-morning" />
+                <span class="theme-option-body">
+                  <span class="theme-option-heading"><strong>Stormy morning</strong><span>Cool blue and cloud grey</span></span>
+                  <span class="theme-swatches" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+                </span>
+              </label>
+            </div>
+          </fieldset>
+        </div>
+      </dialog>
 
       <main>
         <section class="new-download" aria-labelledby="add-title">
@@ -50,9 +90,7 @@
               <span>File name <small>optional</small></span>
               <input id="filename-input" type="text" autocomplete="off" placeholder="archive.zip" />
             </label>
-            <button id="download-button" class="primary-button" type="submit">
-              <span aria-hidden="true">↓</span> Download
-            </button>
+            <button id="download-button" class="primary-button" type="submit">Download</button>
           </form>
           <p class="form-hint">X/Twitter, YouTube and other supported page links use yt-dlp. Known video sites are selected automatically.</p>
           <p id="form-error" class="form-error" role="alert"></p>
@@ -69,7 +107,6 @@
           </div>
           <div id="download-list" class="download-list" aria-live="polite"></div>
           <div id="empty-state" class="empty-state">
-            <span aria-hidden="true">↓</span>
             <h3>No downloads yet</h3>
             <p>Add a direct URL above or send a file from the browser extension.</p>
           </div>

@@ -20,8 +20,14 @@
 
 ---
 
-Everything ships in a single `.app`: the Safari extension, the Chrome and Firefox extensions, `yt-dlp` and `ffmpeg` are bundled.
-Open the DMG, drag the app to *Applications*, done. The interface is in **English** and **Turkish** (follows the system language).
+The stable macOS release ships in a single `.app`: the Safari extension, the Chrome and Firefox extensions, `yt-dlp` and `ffmpeg` are bundled.
+Open the DMG, drag the app to *Applications*, done. The macOS interface is in **English** and **Turkish** (follows the system language).
+
+> **Platform status:** Linux support has been manually exercised on Ubuntu and
+> remains experimental. Windows currently has CI-built packages but has not yet
+> been verified on a real Windows installation. The feature list below describes
+> the mature macOS application; see [Current cross-platform scope](CrossPlatform/README.md#current-scope)
+> for the Linux and Windows gaps.
 
 ## Features
 
@@ -46,6 +52,45 @@ Open the DMG, drag the app to *Applications*, done. The interface is in **Englis
 
 ## Installation
 
+### Linux (experimental)
+
+Linux packages are produced by the [cross-platform workflow](.github/workflows/cross-platform-core.yml). Download the `linux-installers`
+artifact from a successful GitHub Actions run and extract it. GitHub may require
+you to sign in before downloading workflow artifacts.
+
+Choose one package:
+
+- **AppImage** — portable; no installation is required:
+
+  ```bash
+  chmod +x "MC Download Manager_"*.AppImage
+  ./"MC Download Manager_"*.AppImage
+  ```
+
+- **Debian/Ubuntu package** — integrates the launcher and application icon:
+
+  ```bash
+  sudo apt install ./"MC Download Manager_"*.deb
+  ```
+
+The AppImage and browser-extension workflow have been manually exercised on
+Ubuntu. Other Linux distributions and desktop environments still need broader
+testing. If no workflow artifact is available, follow the
+[cross-platform source-build instructions](CrossPlatform/README.md#build-from-source).
+
+### Windows (experimental)
+
+Download and extract the `windows-installers` artifact from a successful
+[cross-platform workflow](.github/workflows/cross-platform-core.yml) run, then
+launch either the NSIS `*-setup.exe` installer or the `.msi` package. These
+packages are not code-signed yet, so Windows SmartScreen may warn before launch.
+
+Windows packages compile in CI, but have not yet been verified on a real Windows
+installation. See [CrossPlatform/README.md](CrossPlatform/README.md) for the
+current limitations and source-build steps.
+
+### macOS
+
 **Homebrew**
 
 ```bash
@@ -66,6 +111,51 @@ Update with `brew upgrade --cask mc-download-manager`. Then continue with the br
    with the app; Firefox asks for confirmation once and keeps it installed (Firefox 140 or later).
 
 The app runs a tiny HTTP bridge on `127.0.0.1:48213` that only accepts requests from browser extensions (`Origin` check).
+
+## Linux and Windows usage
+
+1. Start **MC Download Manager** and confirm that the status in the upper-right
+   corner says **Bridge online**. Closing the window keeps the application
+   running in the system tray; use **Quit** from the tray menu to stop it.
+2. To download directly, paste an HTTP(S) URL into the main window. Known video
+   sites such as YouTube and X/Twitter are selected as **Video from page**
+   automatically. You can also choose the download type manually.
+3. Open **Settings** to select the light/dark appearance, color palette, and
+   maximum video quality. Video-quality choices range from 360p through 2160p,
+   plus **Best available**. The same setting applies to downloads started by the
+   browser extensions.
+4. Use **Open download folder** to open the current destination without finding
+   it manually. By default files are saved under the operating system's Downloads
+   directory in `MC Download Manager`.
+
+### Chromium, Chrome, Brave, and Edge
+
+1. Click **Chromium extension** in the desktop application. The application
+   copies the unpacked extension into its download directory and displays the
+   exact path.
+2. Open the browser's extension page (`chrome://extensions` for Chrome/Chromium,
+   `brave://extensions` for Brave, or `edge://extensions` for Edge).
+3. Enable **Developer mode**, choose **Load unpacked**, and select the displayed
+   `ChromiumExtension` directory. If it was already loaded, click **Reload** on
+   the extension card after updating the application.
+4. Keep the desktop application running. The extension can redirect browser
+   downloads, detect media playing in the active tab, or send the current video
+   page to yt-dlp.
+
+### Firefox
+
+1. Click **Firefox extension** in the desktop application.
+2. Open `about:debugging#/runtime/this-firefox`, choose **Load Temporary Add-on**,
+   and select the displayed `FirefoxExtension/manifest.json` file.
+3. Keep the desktop application running while downloading.
+
+The cross-platform Firefox extension is currently a temporary development
+add-on and is removed when Firefox restarts. Permanent installation requires a
+Mozilla-signed XPI, which is not published for these builds yet.
+
+For the highest video resolutions, install `ffmpeg` and make sure it is available
+on `PATH`; yt-dlp needs it to merge separate video and audio streams. The packaged
+application currently includes yt-dlp but not ffmpeg.
 
 ## Building from source
 
@@ -94,7 +184,7 @@ bridge, direct HTTP(S) downloads, page-video downloads through bundled
 `yt-dlp`, progress, pause/resume/cancel/remove, and Chromium plus temporary
 Firefox extension installation. CI builds Linux
 and Windows installers; feature parity with the macOS application
-(segmented downloads, persistence, full video settings, clipboard, and autostart) is
+(segmented downloads, persistence, clipboard, notifications, and autostart) is
 still in progress.
 
 ### Updating the Homebrew cask
@@ -151,7 +241,7 @@ project.yml                          xcodegen project spec
 | Endpoint | Description |
 |---|---|
 | `GET /ping` | version, yt-dlp availability, active download count |
-| `POST /download` | `{url, filename?, referer?, userAgent?, cookieHeader?, cookies?[], kind: "file"\|"video", segments?}` |
+| `POST /download` | `{url, filename?, referer?, userAgent?, cookieHeader?, cookies?[], kind: "file"\|"video", videoQuality?, segments?}` |
 | `GET /downloads` | status of the last 50 downloads |
 | `POST /action` | `{id, action: "pause"\|"resume"\|"cancel"\|"remove"}` |
 

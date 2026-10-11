@@ -20,8 +20,14 @@
 
 ---
 
-Her şey tek bir `.app` içinde gelir: Safari uzantısı, Chrome ve Firefox eklentileri, `yt-dlp` ve `ffmpeg` uygulamaya gömülüdür.
-DMG'yi açıp uygulamayı *Applications* klasörüne sürüklemek yeterlidir. Arayüz **İngilizce** ve **Türkçe**dir (sistem dilini izler).
+Kararlı macOS sürümünde her şey tek bir `.app` içinde gelir: Safari uzantısı, Chrome ve Firefox eklentileri, `yt-dlp` ve `ffmpeg` uygulamaya gömülüdür.
+DMG'yi açıp uygulamayı *Applications* klasörüne sürüklemek yeterlidir. macOS arayüzü **İngilizce** ve **Türkçe**dir (sistem dilini izler).
+
+> **Platform durumu:** Linux desteği Ubuntu üzerinde elle denenmiştir ve hâlâ
+> deneyseldir. Windows paketleri CI üzerinde üretilmektedir ancak gerçek bir
+> Windows kurulumunda henüz doğrulanmamıştır. Aşağıdaki özellik listesi olgun
+> macOS uygulamasını anlatır; Linux ve Windows eksikleri için
+> [Güncel çapraz platform kapsamına](CrossPlatform/README.md#current-scope) bakın.
 
 ## Özellikler
 
@@ -46,6 +52,46 @@ DMG'yi açıp uygulamayı *Applications* klasörüne sürüklemek yeterlidir. Ar
 
 ## Kurulum
 
+### Linux (deneysel)
+
+Linux paketleri [çapraz platform iş akışı](.github/workflows/cross-platform-core.yml)
+tarafından üretilir. Başarılı bir GitHub Actions çalıştırmasındaki
+`linux-installers` dosyasını indirip arşivden çıkarın. GitHub, iş akışı
+dosyalarını indirmek için oturum açmanızı isteyebilir.
+
+Paketlerden birini seçin:
+
+- **AppImage** — taşınabilirdir, kurulum gerektirmez:
+
+  ```bash
+  chmod +x "MC Download Manager_"*.AppImage
+  ./"MC Download Manager_"*.AppImage
+  ```
+
+- **Debian/Ubuntu paketi** — uygulama başlatıcısını ve simgesini sisteme ekler:
+
+  ```bash
+  sudo apt install ./"MC Download Manager_"*.deb
+  ```
+
+AppImage ve tarayıcı eklentisi akışı Ubuntu üzerinde elle denenmiştir. Diğer
+Linux dağıtımları ve masaüstü ortamları için daha geniş test gereklidir. Hazır
+iş akışı dosyası yoksa [kaynaktan çapraz platform derleme](CrossPlatform/README.md#build-from-source)
+adımlarını kullanın.
+
+### Windows (deneysel)
+
+Başarılı bir [çapraz platform iş akışı](.github/workflows/cross-platform-core.yml)
+çalıştırmasındaki `windows-installers` dosyasını indirip arşivden çıkarın;
+ardından NSIS `*-setup.exe` kurucusunu veya `.msi` paketini çalıştırın. Paketler
+henüz kod imzalı olmadığı için Windows SmartScreen ilk açılışta uyarı verebilir.
+
+Windows paketleri CI üzerinde derlenmektedir ancak gerçek bir Windows
+kurulumunda henüz doğrulanmamıştır. Güncel sınırlamalar ve kaynaktan derleme
+adımları için [CrossPlatform/README.md](CrossPlatform/README.md) dosyasına bakın.
+
+### macOS
+
 **Homebrew**
 
 ```bash
@@ -66,6 +112,51 @@ Güncellemek için `brew upgrade --cask mc-download-manager`. Ardından aşağı
    uygulamayla birlikte gelir; Firefox bir kez onay ister ve eklentiyi kalıcı olarak kurar (Firefox 140 veya üstü).
 
 Uygulama `127.0.0.1:48213` üzerinde yalnızca tarayıcı uzantılarından (`Origin` denetimi) istek kabul eden küçük bir HTTP köprüsü çalıştırır.
+
+## Linux ve Windows'ta kullanım
+
+1. **MC Download Manager**'ı başlatın ve sağ üstte **Bridge online** yazdığını
+   doğrulayın. Pencereyi kapatmak uygulamayı kapatmaz; sistem tepsisinde çalışmaya
+   devam eder. Tamamen kapatmak için tepsi menüsündeki **Quit** seçeneğini kullanın.
+2. Doğrudan indirmek için ana pencereye bir HTTP(S) adresi yapıştırın. YouTube ve
+   X/Twitter gibi bilinen video siteleri otomatik olarak **Video from page**
+   türüne geçirilir; indirme türünü elle de seçebilirsiniz.
+3. Açık/koyu görünüm, renk paleti ve en yüksek video çözünürlüğünü belirlemek için
+   **Settings**'i açın. 360p ile 2160p arasında veya **Best available** seçilebilir.
+   Bu ayar tarayıcı eklentilerinden başlatılan video indirmelerine de uygulanır.
+4. İndirme klasörünü dosya yöneticisinde doğrudan açmak için
+   **Open download folder** düğmesini kullanın. Dosyalar varsayılan olarak işletim
+   sisteminin İndirilenler klasöründeki `MC Download Manager` altına kaydedilir.
+
+### Chromium, Chrome, Brave ve Edge
+
+1. Masaüstü uygulamasındaki **Chromium extension** düğmesine basın. Uygulama,
+   paketlenmemiş eklentiyi indirme klasörüne kopyalar ve tam yolu gösterir.
+2. Tarayıcının eklenti sayfasını açın: Chrome/Chromium için
+   `chrome://extensions`, Brave için `brave://extensions`, Edge için
+   `edge://extensions`.
+3. **Geliştirici modu**nu etkinleştirin, **Paketlenmemiş öğe yükle**yi seçin ve
+   gösterilen `ChromiumExtension` klasörünü açın. Eklenti önceden yüklüyse
+   uygulamayı güncelledikten sonra eklenti kartındaki **Yeniden yükle**ye basın.
+4. Masaüstü uygulamasını çalışır durumda bırakın. Eklenti tarayıcı indirmelerini
+   uygulamaya yönlendirebilir, etkin sekmede oynayan medyayı algılayabilir ve
+   açık video sayfasını yt-dlp'ye gönderebilir.
+
+### Firefox
+
+1. Masaüstü uygulamasındaki **Firefox extension** düğmesine basın.
+2. `about:debugging#/runtime/this-firefox` sayfasını açın,
+   **Geçici Eklenti Yükle**yi seçin ve gösterilen
+   `FirefoxExtension/manifest.json` dosyasını açın.
+3. İndirme sırasında masaüstü uygulamasını çalışır durumda bırakın.
+
+Çapraz platform Firefox eklentisi şimdilik geçici bir geliştirme eklentisidir ve
+Firefox yeniden başladığında kaldırılır. Kalıcı kurulum için Mozilla imzalı XPI
+gerekir; bu paketler için henüz yayımlanmamaktadır.
+
+En yüksek video çözünürlükleri için `ffmpeg` kurulu ve `PATH` üzerinde erişilebilir
+olmalıdır; yt-dlp ayrı video ve ses akışlarını birleştirmek için ffmpeg kullanır.
+Paketli uygulama şu anda yt-dlp'yi içerir ancak ffmpeg'i içermez.
 
 ## Kaynaktan derleme
 
@@ -95,7 +186,7 @@ eklentisi köprüsü, doğrudan HTTP(S) indirmeleri, uygulamayla paketlenen
 duraklat/sürdür/iptal et/kaldır işlevleri ile Chromium ve geçici Firefox
 eklenti kurulumu çalışmaktadır. CI, Linux ve Windows
 kurulum paketlerini üretir; macOS uygulamasındaki çok parçalı indirme, kalıcılık,
-tam video ayarları, pano ve otomatik başlatma özellikleri henüz tamamlanmamıştır.
+pano, bildirim ve otomatik başlatma özellikleri henüz tamamlanmamıştır.
 
 ### Homebrew cask'ini güncelleme
 
@@ -133,7 +224,7 @@ Anahtar yoksa imzasız eklenti eklenir; Firefox onu yalnızca `about:debugging` 
 | Uç nokta | Açıklama |
 |---|---|
 | `GET /ping` | sürüm, yt-dlp durumu, aktif indirme sayısı |
-| `POST /download` | `{url, filename?, referer?, userAgent?, cookieHeader?, cookies?[], kind: "file"\|"video", segments?}` |
+| `POST /download` | `{url, filename?, referer?, userAgent?, cookieHeader?, cookies?[], kind: "file"\|"video", videoQuality?, segments?}` |
 | `GET /downloads` | son 50 indirmenin durumu |
 | `POST /action` | `{id, action: "pause"\|"resume"\|"cancel"\|"remove"}` |
 

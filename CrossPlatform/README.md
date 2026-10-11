@@ -12,7 +12,32 @@ supports progress plus pause/resume/cancel/remove actions, writes to a private
 `.part` file, and atomically renames completed files. Closing the window hides
 it while the bridge continues to run from the system tray.
 
-## Run the desktop app
+## Install a packaged build
+
+The `cross-platform-core.yml` GitHub Actions workflow produces two downloadable
+artifacts:
+
+- `linux-installers`: a portable AppImage and a Debian/Ubuntu `.deb` package;
+- `windows-installers`: an NSIS `*-setup.exe` installer and an `.msi` package.
+
+The packages are currently unsigned experimental builds. Linux AppImage,
+Chromium, and Firefox flows have been manually exercised on Ubuntu. Windows
+packages compile in CI but have not yet been run on a real Windows installation.
+
+On Linux, either run the AppImage directly or install the Debian package:
+
+```sh
+chmod +x "MC Download Manager_"*.AppImage
+./"MC Download Manager_"*.AppImage
+
+# Or, on Debian/Ubuntu:
+sudo apt install ./"MC Download Manager_"*.deb
+```
+
+On Windows, extract the workflow artifact and start either `*-setup.exe` or the
+`.msi`. SmartScreen may warn because the packages are not code-signed yet.
+
+## Build from source
 
 Install the [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/) for
 your operating system, then:
@@ -31,6 +56,44 @@ Git and embedded into native packages as a platform resource.
 Release installers are produced with `npm run tauri build`. The CI workflow
 builds `.deb` and AppImage artifacts on Linux plus MSI and NSIS installers on
 Windows.
+
+After fetching the host's yt-dlp binary as shown above, run the package command
+from `CrossPlatform/app`:
+
+```sh
+# Linux
+npm run tauri -- build --bundles deb,appimage
+
+# Windows (PowerShell or Command Prompt)
+npm run tauri -- build --bundles msi,nsis
+```
+
+The tool-fetch script requires Bash. A complete Windows build from the repository
+root is:
+
+```sh
+bash scripts/fetch-cross-platform-tools.sh x86_64-pc-windows-msvc
+cd CrossPlatform/app
+npm ci
+npm run tauri -- build --bundles msi,nsis
+```
+
+## Use the desktop app
+
+- Paste a direct HTTP(S) URL into the main window, or select **Video from page**
+  for a site supported by yt-dlp. Known sites such as YouTube and X/Twitter are
+  classified automatically.
+- Open **Settings** to choose the color mode, palette, and maximum video
+  resolution. The quality setting also applies to video requests sent by the
+  browser extensions.
+- Use **Open download folder** to open the destination in the platform file
+  manager.
+- Closing the main window leaves the bridge running in the system tray. Use
+  **Quit** from the tray menu to stop the process.
+
+The package includes yt-dlp. Install `ffmpeg` separately and expose it on
+`PATH` to merge separate video and audio streams, which is required for many
+high-resolution formats.
 
 ## Run the core tests
 
@@ -70,13 +133,16 @@ Implemented:
 - bundled Chromium extension with an in-app extraction button;
 - Firefox-specific Manifest V3 preparation with a temporary `about:debugging`
   installation flow;
+- selectable video quality from 360p through 2160p or best available, shared by
+  desktop and extension-initiated downloads;
+- selectable light/dark mode and three non-neon color palettes;
 - system-tray lifecycle on Linux and Windows;
 - Linux and Windows installer jobs in GitHub Actions.
 
 Not implemented yet:
 
 - persisted restart recovery and segmented range workers;
-- packaged `ffmpeg`/`deno`, video quality settings, and authenticated-site testing;
+- packaged `ffmpeg`/`deno` and authenticated-site testing;
 - desktop notifications, clipboard capture, and autostart;
 - Mozilla signing and permanent Firefox add-on distribution for cross-platform releases;
 - signing and release publication for native packages.

@@ -42,7 +42,55 @@ pub async fn download(
     token: CancellationToken,
     events: UnboundedSender<VideoEvent>,
 ) -> Result<PathBuf, VideoError> {
-    let cookie_file = write_cookie_file(&output_directory, &request.cookies).await?;
+    let has_browser_session = !request.cookies.is_empty() || !request.cookie_header.is_empty();
+    // YouTube account cookies can select clients whose media formats require a PO token.
+    // Public videos are more reliable without account cookies; keep them as a fallback for
+    // age-restricted, private, or members-only content.
+    if has_browser_session && is_youtube_url(&request.url) {
+        let _ = events.send(VideoEvent::Stage(
+            "Opening public YouTube stream".to_owned(),
+        ));
+        let public_result = download_once(
+            executable.clone(),
+            &request,
+            &output_directory,
+            &token,
+            events.clone(),
+            false,
+        )
+        .await;
+        if !should_retry_with_browser_session(&public_result) {
+            return public_result;
+        }
+        let _ = events.send(VideoEvent::Stage(
+            "Retrying with browser session".to_owned(),
+        ));
+    }
+
+    download_once(
+        executable,
+        &request,
+        &output_directory,
+        &token,
+        events,
+        true,
+    )
+    .await
+}
+
+async fn download_once(
+    executable: PathBuf,
+    request: &DownloadRequest,
+    output_directory: &std::path::Path,
+    token: &CancellationToken,
+    events: UnboundedSender<VideoEvent>,
+    use_browser_session: bool,
+) -> Result<PathBuf, VideoError> {
+    let cookie_file = if use_browser_session {
+        write_cookie_file(output_directory, &request.cookies).await?
+    } else {
+        None
+    };
     let ffmpeg = discover_ffmpeg();
     let mut command = Command::new(executable);
     command
@@ -56,7 +104,7 @@ pub async fn download(
         .arg("-N")
         .arg("4")
         .arg("-P")
-        .arg(&output_directory)
+        .arg(output_directory)
         .arg("-o")
         .arg("%(title).150B [%(id)s].%(ext)s")
         .arg("-f")
@@ -81,13 +129,15 @@ pub async fn download(
 
     add_header(&mut command, "User-Agent", &request.user_agent);
     add_header(&mut command, "Referer", &request.referer);
-    if let Some(path) = &cookie_file {
-        command.arg("--cookies").arg(path);
-    } else {
-        add_header(&mut command, "Cookie", &request.cookie_header);
+    if use_browser_session {
+        if let Some(path) = &cookie_file {
+            command.arg("--cookies").arg(path);
+        } else {
+            add_header(&mut command, "Cookie", &request.cookie_header);
+        }
     }
-    for (name, value) in request.headers {
-        add_header(&mut command, &name, &value);
+    for (name, value) in &request.headers {
+        add_header(&mut command, name, value);
     }
     command
         .arg(&request.url)
@@ -112,6 +162,37 @@ pub async fn download(
         let _ = tokio::fs::remove_file(path).await;
     }
     result
+}
+
+fn is_youtube_url(value: &str) -> bool {
+    let Ok(url) = reqwest::Url::parse(value) else {
+        return false;
+    };
+    let Some(host) = url.host_str() else {
+        return false;
+    };
+    host == "youtu.be"
+        || host == "youtube.com"
+        || host.ends_with(".youtube.com")
+        || host == "youtube-nocookie.com"
+        || host.ends_with(".youtube-nocookie.com")
+}
+
+fn should_retry_with_browser_session(result: &Result<PathBuf, VideoError>) -> bool {
+    let Err(VideoError::Failed(message)) = result else {
+        return false;
+    };
+    let message = message.to_ascii_lowercase();
+    [
+        "requested format is not available",
+        "sign in",
+        "login",
+        "private video",
+        "members-only",
+        "age-restricted",
+    ]
+    .iter()
+    .any(|needle| message.contains(needle))
 }
 
 fn discover_ffmpeg() -> Option<PathBuf> {
@@ -318,7 +399,10 @@ mod tests {
     use serde_json::json;
     use tempfile::tempdir;
 
-    use super::{VideoEvent, parse_progress, stage_for, write_cookie_file};
+    use super::{
+        VideoError, VideoEvent, is_youtube_url, parse_progress, should_retry_with_browser_session,
+        stage_for, write_cookie_file,
+    };
 
     #[test]
     fn parses_ytdlp_progress_template() {
@@ -339,6 +423,88 @@ mod tests {
             stage_for("[Merger] Merging formats into video.mp4"),
             Some("Merging video and audio".to_owned())
         );
+    }
+
+    #[test]
+    fn recognizes_youtube_hosts_without_accepting_suffix_tricks() {
+        assert!(is_youtube_url("https://www.youtube.com/watch?v=fixture"));
+        assert!(is_youtube_url("https://youtu.be/fixture"));
+        assert!(is_youtube_url(
+            "https://www.youtube-nocookie.com/embed/fixture"
+        ));
+        assert!(!is_youtube_url("https://youtube.com.example.test/watch"));
+        assert!(!is_youtube_url("https://video.example.test/watch"));
+    }
+
+    #[test]
+    fn retries_only_extract_failures_that_browser_login_can_help() {
+        assert!(should_retry_with_browser_session(&Err(VideoError::Failed(
+            "ERROR: Sign in to confirm your age".to_owned()
+        ))));
+        assert!(should_retry_with_browser_session(&Err(VideoError::Failed(
+            "ERROR: Requested format is not available".to_owned()
+        ))));
+        assert!(!should_retry_with_browser_session(&Err(
+            VideoError::Interrupted
+        )));
+        assert!(!should_retry_with_browser_session(&Err(
+            VideoError::Failed("ERROR: disk is full".to_owned())
+        )));
+    }
+
+    #[cfg(unix)]
+    #[tokio::test]
+    async fn youtube_extension_session_starts_without_browser_cookies() {
+        use std::{collections::HashMap, os::unix::fs::PermissionsExt};
+
+        use tokio::sync::mpsc::unbounded_channel;
+        use tokio_util::sync::CancellationToken;
+
+        use crate::model::{DownloadKind, DownloadRequest};
+
+        let directory = tempdir().unwrap();
+        let output = directory.path().join("youtube-fixture.mp4");
+        let tool = directory.path().join("fake-yt-dlp");
+        let script = format!(
+            "#!/bin/sh\nfor arg in \"$@\"; do\n  if [ \"$arg\" = '--cookies' ]; then\n    printf 'ERROR: Requested format is not available\\n' >&2\n    exit 1\n  fi\ndone\nprintf media > '{}'\nprintf 'MCDM_FILE:{}\\n'\n",
+            output.display(),
+            output.display()
+        );
+        tokio::fs::write(&tool, script).await.unwrap();
+        tokio::fs::set_permissions(&tool, std::fs::Permissions::from_mode(0o755))
+            .await
+            .unwrap();
+        let request = DownloadRequest {
+            url: "https://www.youtube.com/watch?v=fixture".to_owned(),
+            filename: String::new(),
+            referer: "https://www.youtube.com/watch?v=fixture".to_owned(),
+            user_agent: "Fixture Browser".to_owned(),
+            cookie_header: "SID=fixture".to_owned(),
+            cookies: vec![json!({
+                "name": "SID",
+                "value": "fixture",
+                "domain": ".youtube.com",
+                "path": "/",
+                "secure": true
+            })],
+            kind: DownloadKind::Video,
+            headers: HashMap::new(),
+            segments: None,
+        };
+        let (events, _) = unbounded_channel();
+
+        let result = super::download(
+            tool,
+            request,
+            directory.path().to_path_buf(),
+            CancellationToken::new(),
+            events,
+        )
+        .await
+        .unwrap();
+
+        assert_eq!(result, output);
+        assert_eq!(tokio::fs::read(result).await.unwrap(), b"media");
     }
 
     #[tokio::test]

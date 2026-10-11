@@ -1,6 +1,9 @@
 // MC Download Manager — content script
 // 1) In Safari (no downloads API) intercepts clicks on file links.
 // 2) Reports <video>/<audio>/<source> URLs on the page to the background script.
+//    MSE players (YouTube, X, etc.) expose blob: URLs, so playing <video> elements are
+//    also reported as page videos. Those entries are downloaded through yt-dlp using
+//    the page URL rather than the unusable, tab-local blob URL.
 (() => {
   'use strict';
   const api = typeof browser !== 'undefined' ? browser : chrome;
@@ -10,6 +13,15 @@
 
   // Firefox's browser.runtime.sendMessage only returns a promise (a callback argument is rejected).
   const IS_FIREFOX = typeof browser !== 'undefined' && String(browser.runtime.getURL('')).startsWith('moz-extension:');
+
+  function sendMessage(message) {
+    try {
+      const result = api.runtime.sendMessage(message);
+      // Firefox returns a promise. Consume rejections when the extension is reloaded while
+      // a content script from the previous version is still attached to a tab.
+      if (result && typeof result.catch === 'function') result.catch(() => {});
+    } catch {}
+  }
 
   function refresh() {
     const apply = (r) => { if (r) state = r; };
@@ -37,25 +49,45 @@
     if (list.length ? !(ext && list.includes(ext)) : !(a.hasAttribute('download') || DL_EXT.test(href))) return;
     e.preventDefault();
     e.stopPropagation();
-    api.runtime.sendMessage({ type: 'download', url: href, filename: a.getAttribute('download') || '', referer: location.href, kind: 'file' });
+    sendMessage({ type: 'download', url: href, filename: a.getAttribute('download') || '', referer: location.href, kind: 'file' });
   }, true);
 
-  const reported = new Set();
+  const reported = new Map();
+  function addOnce(items, key, signature, item) {
+    if (reported.get(key) === signature) return;
+    reported.set(key, signature);
+    items.push(item);
+  }
+
   function scanMedia() {
     const items = [];
     document.querySelectorAll('video, audio, source').forEach((el) => {
       const src = el.currentSrc || el.src || el.getAttribute('src');
-      if (!src || !/^https?:/i.test(src) || reported.has(src)) return;
-      reported.add(src);
-      items.push({ url: src, type: el.getAttribute('type') || '', name: document.title ? document.title.slice(0, 80) : '' });
+      const type = el.getAttribute('type') || '';
+      const name = document.title ? document.title.trim().slice(0, 150) : '';
+
+      if (src && /^https?:/i.test(src)) {
+        addOnce(items, 'source:' + src, src, { url: src, type, name });
+      }
+
+      if (el.tagName === 'VIDEO' && !el.paused && !el.ended && el.readyState > 0 && /^https?:/i.test(location.href)) {
+        const signature = [location.href, name, src || ''].join('\n');
+        addOnce(items, 'page-video:' + location.href, signature, {
+          url: location.href,
+          pageUrl: location.href,
+          sourceUrl: src || '',
+          type,
+          name,
+          kind: 'page-video',
+        });
+      }
     });
-    if (items.length) {
-      try { api.runtime.sendMessage({ type: 'pageMedia', items }); } catch {}
-    }
+    if (items.length) sendMessage({ type: 'pageMedia', items });
   }
   scanMedia();
   document.addEventListener('play', scanMedia, true);
   document.addEventListener('loadedmetadata', scanMedia, true);
-  let n = 0;
-  const iv = setInterval(() => { scanMedia(); if (++n > 20) clearInterval(iv); }, 3000);
+  // YouTube and similar single-page apps replace players without reloading the content
+  // script. Keep the inexpensive scan alive so later videos are captured as well.
+  setInterval(scanMedia, 3000);
 })();

@@ -269,7 +269,16 @@ async function addMedia(tabId, info) {
   const idx = list.findIndex((m) => m.key === key);
   const entry = { ...info, key, name: info.name || guessName(info.url, info.type) };
   if (idx >= 0) {
-    if ((info.size || 0) > (list[idx].size || 0)) list[idx] = { ...list[idx], ...entry };
+    const previous = list[idx];
+    const shouldUpdate = (info.size || 0) > (previous.size || 0)
+      || entry.name !== previous.name
+      || entry.type !== previous.type
+      || entry.kind !== previous.kind
+      || entry.sourceUrl !== previous.sourceUrl;
+    if (shouldUpdate) {
+      list[idx] = { ...previous, ...entry };
+      await writeMedia(tabId, list);
+    }
     return;
   }
   list.unshift(entry);
@@ -385,6 +394,22 @@ api.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         case 'pageMedia': {
           if (sender.tab) {
             for (const m of msg.items || []) {
+              if (m.kind === 'page-video') {
+                const pageUrl = m.pageUrl || m.url;
+                if (/^https?:/i.test(pageUrl)) {
+                  await addMedia(sender.tab.id, {
+                    url: pageUrl,
+                    pageUrl,
+                    sourceUrl: m.sourceUrl || '',
+                    type: m.type || '',
+                    size: 0,
+                    kind: 'page-video',
+                    time: Date.now(),
+                    name: m.name,
+                  });
+                }
+                continue;
+              }
               const kind = classify(m.url, m.type || '');
               if (kind || MEDIA_EXT.test(m.url)) {
                 await addMedia(sender.tab.id, { url: m.url, type: m.type || '', size: 0, kind: kind || 'media', time: Date.now(), name: m.name });

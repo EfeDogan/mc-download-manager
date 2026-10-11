@@ -52,6 +52,9 @@ async function loadMedia() {
   tab = await currentTab();
   const list = (tab && (await send({ type: 'getMedia', tabId: tab.id }))) || [];
   const ul = $('media');
+  const signature = JSON.stringify(list.map((m) => [m.key, m.name, m.type, m.size, m.kind, m.sourceUrl]));
+  if (ul.dataset.signature === signature) return;
+  ul.dataset.signature = signature;
   ul.innerHTML = '';
   $('count').textContent = list.length ? `(${list.length})` : '';
   $('noMedia').classList.toggle('hidden', list.length > 0);
@@ -60,14 +63,21 @@ async function loadMedia() {
     const info = document.createElement('div'); info.className = 'info';
     const name = document.createElement('div'); name.className = 'name'; name.textContent = m.name || m.url; name.title = m.url;
     const meta = document.createElement('div'); meta.className = 'meta';
-    const kind = m.kind === 'hls' ? t('kindHls') : m.kind === 'dash' ? t('kindDash') : (m.type || t('kindMedia'));
+    const kind = m.kind === 'page-video'
+      ? t('kindPageVideo')
+      : m.kind === 'hls'
+        ? t('kindHls')
+        : m.kind === 'dash'
+          ? t('kindDash')
+          : (m.type || t('kindMedia'));
     meta.textContent = [kind, fmtSize(m.size)].filter(Boolean).join(' · ');
     info.append(name, meta);
     const btn = document.createElement('button'); btn.className = 'small'; btn.textContent = t('popupDownload');
     btn.onclick = async () => {
       btn.disabled = true; btn.textContent = '…';
-      const k = m.kind === 'hls' || m.kind === 'dash' ? 'video' : 'file';
-      const r = await send({ type: 'download', url: m.url, filename: k === 'file' ? m.name : '', referer: tab.url, kind: k });
+      const k = m.kind === 'page-video' || m.kind === 'hls' || m.kind === 'dash' ? 'video' : 'file';
+      const url = m.pageUrl || m.url;
+      const r = await send({ type: 'download', url, filename: k === 'file' ? m.name : '', referer: tab.url, kind: k });
       btn.textContent = r && r.ok ? t('popupSent') : t('popupError');
     };
     li.append(info, btn);
@@ -79,6 +89,7 @@ async function loadMedia() {
 const seenActive = new Set();   // ids that were active while this popup was open → keep showing their final state
 const STATE_LABEL = { queued: 'stateQueued', paused: 'statePaused', probing: 'stateProbing', completed: 'stateCompleted', failed: 'stateFailed', cancelled: 'stateCancelled' };
 let dlTimer = null;
+let mediaTimer = null;
 
 async function loadDownloads() {
   const all = (await send({ type: 'downloads' })) || [];
@@ -166,4 +177,5 @@ $('minSize').onchange = (e) => send({ type: 'setSettings', settings: { minSizeMB
 refresh();
 loadMedia();
 loadDownloads();
+mediaTimer = setInterval(loadMedia, 1000);
 dlTimer = setInterval(loadDownloads, 1000);

@@ -105,6 +105,9 @@
   "kindMedia": {
     "message": "media"
   },
+  "kindPageVideo": {
+    "message": "Playing page video"
+  },
   "popupDownloadsTitle": {
     "message": "Downloads"
   },

@@ -105,6 +105,9 @@
   "kindMedia": {
     "message": "medya"
   },
+  "kindPageVideo": {
+    "message": "Oynatılan sayfa videosu"
+  },
   "popupDownloadsTitle": {
     "message": "İndirmeler"
   },

@@ -117,12 +117,18 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          path: release-assets
-      - name: Create checksums
+          path: built-assets
+      - name: Prepare release assets and checksums
         shell: bash
         run: |
+          mkdir release-assets
+          while IFS= read -r -d '' asset; do
+            filename="$(basename "$asset")"
+            safe_name="${filename// /.}"
+            cp "$asset" "release-assets/$safe_name"
+          done < <(find built-assets -type f -print0)
           cd release-assets
-          find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
+          sha256sum MC.Download.Manager_* > SHA256SUMS.txt
       - name: Publish cross-platform preview
         shell: bash
         env:

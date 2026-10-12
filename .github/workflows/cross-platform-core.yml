@@ -33,7 +33,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: CrossPlatform
-      - name: Fetch pinned video tool
+      - name: Fetch pinned video tools
         if: runner.os != 'macOS'
         shell: bash
         run: ./scripts/fetch-cross-platform-tools.sh ${{ runner.os == 'Windows' && 'x86_64-pc-windows-msvc' || 'x86_64-unknown-linux-gnu' }}
@@ -87,7 +87,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: CrossPlatform
-      - name: Fetch pinned video tool
+      - name: Fetch pinned video tools
         shell: bash
         run: ./scripts/fetch-cross-platform-tools.sh ${{ runner.os == 'Windows' && 'x86_64-pc-windows-msvc' || 'x86_64-unknown-linux-gnu' }}
         working-directory: ${{ github.workspace }}

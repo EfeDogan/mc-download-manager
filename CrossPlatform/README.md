@@ -99,7 +99,8 @@ npm run tauri -- build --bundles msi,nsis
 - Closing the main window leaves the bridge running in the system tray. Use
   **Quit** from the tray menu to stop the process.
 
-The package includes yt-dlp. Install `ffmpeg` separately and expose it on
+The package includes yt-dlp and its recommended Deno JavaScript runtime for
+reliable YouTube extraction. Install `ffmpeg` separately and expose it on
 `PATH` to merge separate video and audio streams, which is required for many
 high-resolution formats.
 
@@ -134,7 +135,8 @@ Implemented:
 - progress and pause/resume/cancel/remove state transitions;
 - end-to-end bridge-to-file integration test;
 - Tauri desktop UI for adding and controlling downloads;
-- page-video downloads through a bundled, checksum-verified `yt-dlp`;
+- page-video downloads through bundled, checksum-verified `yt-dlp` and Deno
+  binaries;
 - scoped browser cookies passed to `yt-dlp` through a temporary mode-0600 jar;
 - HTML page detection that prevents a page URL being reported as a completed file;
 - one shared queue for desktop and browser-extension requests;
@@ -150,7 +152,7 @@ Implemented:
 Not implemented yet:
 
 - persisted restart recovery and segmented range workers;
-- packaged `ffmpeg`/`deno` and authenticated-site testing;
+- packaged `ffmpeg` and authenticated-site testing;
 - desktop notifications, clipboard capture, and autostart;
 - Mozilla signing and permanent Firefox add-on distribution for cross-platform releases;
 - signing and release publication for native packages.

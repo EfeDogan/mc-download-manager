@@ -121,8 +121,10 @@ async fn download_once(
         None
     };
     let ffmpeg = discover_ffmpeg();
+    let deno = discover_deno();
     let mut command = Command::new(executable);
     command
+        .arg("--ignore-config")
         .arg("--newline")
         .arg("--no-playlist")
         .arg("--no-colors")
@@ -146,6 +148,19 @@ async fn download_once(
         .arg("download:MCDM_PROGRESS:%(progress.downloaded_bytes)s|%(progress.total_bytes)s|%(progress.total_bytes_estimate)s|%(progress.speed)s")
         .arg("--print")
         .arg("after_move:MCDM_FILE:%(filepath)s");
+    if let Some(path) = deno {
+        command
+            .arg("--js-runtimes")
+            .arg(format!("deno:{}", path.display()));
+    }
+    if use_browser_session && is_youtube_url(&request.url) {
+        // YouTube's default logged-in client can currently return the misleading
+        // "page needs to be reloaded" error. These are the yt-dlp-maintainer
+        // recommended clients for cookie-authenticated requests.
+        command
+            .arg("--extractor-args")
+            .arg("youtube:player_client=default,web_embedded");
+    }
     if let Some(path) = ffmpeg {
         command
             .arg("--ffmpeg-location")
@@ -173,6 +188,8 @@ async fn download_once(
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .kill_on_drop(true);
+
+    hide_console_window(&mut command);
 
     let child = match command.spawn() {
         Ok(child) => child,
@@ -250,6 +267,7 @@ fn should_retry_with_browser_session(result: &Result<PathBuf, VideoError>) -> bo
         "private video",
         "members-only",
         "age-restricted",
+        "page needs to be reloaded",
     ]
     .iter()
     .any(|needle| message.contains(needle))
@@ -284,6 +302,38 @@ fn discover_ffmpeg() -> Option<PathBuf> {
     }
     candidates.into_iter().find(|path| path.is_file())
 }
+
+fn discover_deno() -> Option<PathBuf> {
+    discover_tool("MCDM_DENO", if cfg!(windows) { "deno.exe" } else { "deno" })
+}
+
+fn discover_tool(environment_variable: &str, executable_name: &str) -> Option<PathBuf> {
+    let mut candidates = Vec::new();
+    if let Some(path) = env::var_os(environment_variable) {
+        candidates.push(PathBuf::from(path));
+    }
+    if let Ok(current) = env::current_exe()
+        && let Some(directory) = current.parent()
+    {
+        candidates.push(directory.join(executable_name));
+        candidates.push(directory.join("tools").join(executable_name));
+    }
+    if let Some(path) = env::var_os("PATH") {
+        candidates.extend(env::split_paths(&path).map(|directory| directory.join(executable_name)));
+    }
+    candidates.into_iter().find(|path| path.is_file())
+}
+
+#[cfg(windows)]
+fn hide_console_window(command: &mut Command) {
+    use std::os::windows::process::CommandExt;
+
+    const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+    command.as_std_mut().creation_flags(CREATE_NO_WINDOW);
+}
+
+#[cfg(not(windows))]
+fn hide_console_window(_command: &mut Command) {}
 
 async fn write_cookie_file(
     output_directory: &std::path::Path,
@@ -513,6 +563,9 @@ mod tests {
         assert!(should_retry_with_browser_session(&Err(VideoError::Failed(
             "ERROR: Requested format is not available".to_owned()
         ))));
+        assert!(should_retry_with_browser_session(&Err(VideoError::Failed(
+            "ERROR: The page needs to be reloaded".to_owned()
+        ))));
         assert!(!should_retry_with_browser_session(&Err(
             VideoError::Interrupted
         )));
@@ -561,7 +614,7 @@ mod tests {
         let output = directory.path().join("youtube-fixture.mp4");
         let tool = directory.path().join("fake-yt-dlp");
         let script = format!(
-            "#!/bin/sh\nfor arg in \"$@\"; do\n  if [ \"$arg\" = '--cookies' ]; then\n    printf 'ERROR: Requested format is not available\\n' >&2\n    exit 1\n  fi\ndone\nprintf media > '{}'\nprintf 'MCDM_FILE:{}\\n'\n",
+            "#!/bin/sh\nhas_cookies=false\nhas_safe_clients=false\nfor arg in \"$@\"; do\n  if [ \"$arg\" = '--cookies' ]; then has_cookies=true; fi\n  if [ \"$arg\" = 'youtube:player_client=default,web_embedded' ]; then has_safe_clients=true; fi\ndone\nif [ \"$has_cookies\" = false ]; then\n  printf 'ERROR: Sign in to confirm your age\\n' >&2\n  exit 1\nfi\nif [ \"$has_safe_clients\" = false ]; then\n  printf 'ERROR: missing authenticated YouTube client override\\n' >&2\n  exit 1\nfi\nprintf media > '{}'\nprintf 'MCDM_FILE:{}\\n'\n",
             output.display(),
             output.display()
         );

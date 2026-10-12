@@ -24,10 +24,12 @@ The stable macOS release ships in a single `.app`: the Safari extension, the Chr
 Open the DMG, drag the app to *Applications*, done. The macOS interface is in **English** and **Turkish** (follows the system language).
 
 > **Platform status:** Linux support has been manually exercised on Ubuntu and
-> remains experimental. Windows currently has CI-built packages but has not yet
-> been verified on a real Windows installation. The feature list below describes
-> the mature macOS application; see [Current cross-platform scope](CrossPlatform/README.md#current-scope)
-> for the Linux and Windows gaps.
+> remains experimental. The Windows installer and Chromium extension have been
+> exercised on a real Windows installation; direct in-app YouTube URL downloads
+> still have a known failure that is being investigated. The feature list below
+> describes the mature macOS application; see
+> [Current cross-platform scope](CrossPlatform/README.md#current-scope) for the
+> Linux and Windows gaps.
 
 ## Features
 
@@ -79,7 +81,7 @@ testing.
 ### Windows (experimental)
 
 > **Direct download:**
-> [MC.Download.Manager_0.1.0_x64-setup.exe](https://github.com/EfeDogan/mc-download-manager/releases/download/cross-platform-v0.1.0-preview.1/MC.Download.Manager_0.1.0_x64-setup.exe)
+> [MC.Download.Manager_0.1.0_x64-setup.exe](https://github.com/EfeDogan/mc-download-manager/releases/download/cross-platform-v0.1.0-preview.2/MC.Download.Manager_0.1.0_x64-setup.exe)
 
 1. Open the [Windows download page](https://github.com/EfeDogan/mc-download-manager/releases).
 2. Expand **Assets** under the newest **Cross-platform preview** release. Do not
@@ -94,9 +96,11 @@ testing.
 5. Open **MC Download Manager** from the Start menu. When the upper-right status
    says **Bridge online**, it is ready to accept browser-extension requests.
 
-Windows packages compile in CI, but have not yet been verified on a real Windows
-installation. See [CrossPlatform/README.md](CrossPlatform/README.md) for the
-current limitations and source-build steps.
+The Windows installer and Chromium extension have been exercised on a real
+Windows installation. Direct in-app YouTube URL downloads still have a known
+failure under investigation. See
+[CrossPlatform/README.md](CrossPlatform/README.md) for the current limitations
+and source-build steps.
 
 ### macOS
 

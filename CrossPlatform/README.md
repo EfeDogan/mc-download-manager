@@ -28,8 +28,10 @@ workflow are internal build paths for GitHub Actions. Users do not create or
 navigate to those paths.
 
 The packages are currently unsigned experimental builds. Linux AppImage,
-Chromium, and Firefox flows have been manually exercised on Ubuntu. Windows
-packages compile in CI but have not yet been run on a real Windows installation.
+Chromium, and Firefox flows have been manually exercised on Ubuntu. The Windows
+installer and Chromium extension have been exercised on a real Windows
+installation; direct in-app YouTube URL downloads still have a known failure
+under investigation.
 
 On Linux, either run the AppImage directly or install the Debian package:
 

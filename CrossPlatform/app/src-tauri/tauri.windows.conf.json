@@ -3,7 +3,10 @@
   "bundle": {
     "resources": {
       "binaries/yt-dlp-x86_64-pc-windows-msvc.exe": "tools/yt-dlp.exe",
-      "binaries/deno-x86_64-pc-windows-msvc.exe": "tools/deno.exe"
+      "binaries/deno-x86_64-pc-windows-msvc.exe": "tools/deno.exe",
+      "binaries/ffmpeg-x86_64-pc-windows-msvc.exe": "tools/ffmpeg.exe",
+      "binaries/ffmpeg-license.txt": "licenses/FFmpeg-LICENSE.txt",
+      "../../THIRD_PARTY_NOTICES.md": "licenses/THIRD_PARTY_NOTICES.md"
     }
   }
 }

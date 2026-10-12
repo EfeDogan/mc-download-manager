@@ -1,4 +1,8 @@
-use std::{env, path::PathBuf, process::Stdio};
+use std::{
+    env,
+    path::{Path, PathBuf},
+    process::Stdio,
+};
 
 use thiserror::Error;
 use tokio::{
@@ -70,7 +74,7 @@ pub async fn download(
         // YouTube can intermittently reject a signed DASH URL with HTTP 403 even though
         // extraction succeeded. HLS uses a fresh manifest and is a reliable fallback when
         // ffmpeg is available to merge the video and audio streams.
-        if is_forbidden(&public_result) && discover_ffmpeg().is_some() {
+        if is_forbidden(&public_result) && discover_ffmpeg(&executable).is_some() {
             let _ = events.send(VideoEvent::Stage(
                 "Retrying YouTube with HLS stream".to_owned(),
             ));
@@ -120,8 +124,8 @@ async fn download_once(
     } else {
         None
     };
-    let ffmpeg = discover_ffmpeg();
-    let deno = discover_deno();
+    let ffmpeg = discover_ffmpeg(&executable);
+    let deno = discover_deno(&executable);
     let mut command = Command::new(executable);
     command
         .arg("--ignore-config")
@@ -281,36 +285,37 @@ fn is_forbidden(result: &Result<PathBuf, VideoError>) -> bool {
     message.contains("http error 403") || message.contains("http 403: forbidden")
 }
 
-fn discover_ffmpeg() -> Option<PathBuf> {
-    let executable_name = if cfg!(windows) {
-        "ffmpeg.exe"
-    } else {
-        "ffmpeg"
-    };
-    let mut candidates = Vec::new();
-    if let Some(path) = env::var_os("MCDM_FFMPEG") {
-        candidates.push(PathBuf::from(path));
-    }
-    if let Ok(current) = env::current_exe()
-        && let Some(directory) = current.parent()
-    {
-        candidates.push(directory.join(executable_name));
-        candidates.push(directory.join("tools").join(executable_name));
-    }
-    if let Some(path) = env::var_os("PATH") {
-        candidates.extend(env::split_paths(&path).map(|directory| directory.join(executable_name)));
-    }
-    candidates.into_iter().find(|path| path.is_file())
+fn discover_ffmpeg(video_executable: &Path) -> Option<PathBuf> {
+    discover_tool(
+        video_executable,
+        "MCDM_FFMPEG",
+        if cfg!(windows) {
+            "ffmpeg.exe"
+        } else {
+            "ffmpeg"
+        },
+    )
 }
 
-fn discover_deno() -> Option<PathBuf> {
-    discover_tool("MCDM_DENO", if cfg!(windows) { "deno.exe" } else { "deno" })
+fn discover_deno(video_executable: &Path) -> Option<PathBuf> {
+    discover_tool(
+        video_executable,
+        "MCDM_DENO",
+        if cfg!(windows) { "deno.exe" } else { "deno" },
+    )
 }
 
-fn discover_tool(environment_variable: &str, executable_name: &str) -> Option<PathBuf> {
+fn discover_tool(
+    video_executable: &Path,
+    environment_variable: &str,
+    executable_name: &str,
+) -> Option<PathBuf> {
     let mut candidates = Vec::new();
     if let Some(path) = env::var_os(environment_variable) {
         candidates.push(PathBuf::from(path));
+    }
+    if let Some(directory) = video_executable.parent() {
+        candidates.push(directory.join(executable_name));
     }
     if let Ok(current) = env::current_exe()
         && let Some(directory) = current.parent()
@@ -518,8 +523,9 @@ mod tests {
     use tempfile::tempdir;
 
     use super::{
-        VideoError, VideoEvent, VideoStrategy, format_selector, is_forbidden, is_youtube_url,
-        parse_progress, should_retry_with_browser_session, stage_for, write_cookie_file,
+        VideoError, VideoEvent, VideoStrategy, discover_tool, format_selector, is_forbidden,
+        is_youtube_url, parse_progress, should_retry_with_browser_session, stage_for,
+        write_cookie_file,
     };
     use crate::model::VideoQuality;
 
@@ -541,6 +547,19 @@ mod tests {
         assert_eq!(
             stage_for("[Merger] Merging formats into video.mp4"),
             Some("Merging video and audio".to_owned())
+        );
+    }
+
+    #[test]
+    fn finds_packaged_tools_beside_ytdlp() {
+        let directory = tempdir().unwrap();
+        let ytdlp = directory.path().join("yt-dlp");
+        let ffmpeg = directory.path().join("ffmpeg-fixture");
+        std::fs::write(&ffmpeg, b"fixture").unwrap();
+
+        assert_eq!(
+            discover_tool(&ytdlp, "MCDM_TEST_FFMPEG", "ffmpeg-fixture"),
+            Some(ffmpeg)
         );
     }
 

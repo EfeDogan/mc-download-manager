@@ -25,9 +25,10 @@ Open the DMG, drag the app to *Applications*, done. The macOS interface is in **
 
 > **Platform status:** Linux support has been manually exercised on Ubuntu and
 > remains experimental. The Windows installer and Chromium extension have been
-> exercised on a real Windows installation; direct in-app YouTube URL downloads
-> still have a known failure that is being investigated. The feature list below
-> describes the mature macOS application; see
+> exercised on a real Windows installation. The `preview.3` package adds bundled
+> FFmpeg support for direct in-app YouTube URL downloads; that correction has
+> been verified on Linux and still needs a real-Windows retest. The feature list
+> below describes the mature macOS application; see
 > [Current cross-platform scope](CrossPlatform/README.md#current-scope) for the
 > Linux and Windows gaps.
 
@@ -81,7 +82,7 @@ testing.
 ### Windows (experimental)
 
 > **Direct download:**
-> [MC.Download.Manager_0.1.0_x64-setup.exe](https://github.com/EfeDogan/mc-download-manager/releases/download/cross-platform-v0.1.0-preview.2/MC.Download.Manager_0.1.0_x64-setup.exe)
+> [MC.Download.Manager_0.1.0_x64-setup.exe](https://github.com/EfeDogan/mc-download-manager/releases/download/cross-platform-v0.1.0-preview.3/MC.Download.Manager_0.1.0_x64-setup.exe)
 
 1. Open the [Windows download page](https://github.com/EfeDogan/mc-download-manager/releases).
 2. Expand **Assets** under the newest **Cross-platform preview** release. Do not
@@ -97,8 +98,9 @@ testing.
    says **Bridge online**, it is ready to accept browser-extension requests.
 
 The Windows installer and Chromium extension have been exercised on a real
-Windows installation. Direct in-app YouTube URL downloads still have a known
-failure under investigation. See
+Windows installation. The `preview.3` package bundles FFmpeg to support videos
+whose audio and picture are supplied as separate streams. That direct in-app
+workflow has been verified on Linux and still needs a real-Windows retest. See
 [CrossPlatform/README.md](CrossPlatform/README.md) for the current limitations
 and source-build steps.
 
@@ -266,6 +268,10 @@ Issues and pull requests are welcome. Translations live in `App/Resources/Locali
 
 ## License
 
-The code is licensed under the MIT License (see `LICENSE`). Bundled binaries keep their own licenses:
-[yt-dlp](https://github.com/yt-dlp/yt-dlp) (Unlicense) and [FFmpeg](https://ffmpeg.org) (static build from martin-riedl.de, GPL).
-If you distribute builds with the GPL ffmpeg binary, keep the source-availability obligation in mind, or point `scripts/fetch-tools.sh` to an LGPL build.
+The code is licensed under the MIT License (see `LICENSE`). Bundled binaries
+keep their own licenses: [yt-dlp](https://github.com/yt-dlp/yt-dlp)
+(Unlicense), [Deno](https://github.com/denoland/deno) (MIT), and
+[FFmpeg](https://ffmpeg.org) (GPL build from
+[yt-dlp/FFmpeg-Builds](https://github.com/yt-dlp/FFmpeg-Builds)). See
+[`CrossPlatform/THIRD_PARTY_NOTICES.md`](CrossPlatform/THIRD_PARTY_NOTICES.md)
+for the pinned build and corresponding source links.

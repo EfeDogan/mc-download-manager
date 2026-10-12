@@ -146,7 +146,12 @@ jobs:
           - Windows: the file ending in `x64-setup.exe`
           - Linux: the file ending in `amd64.AppImage` or `amd64.deb`
 
-          The Linux build has been manually exercised on Ubuntu. Windows packages
-          are built and tested in CI but have not yet been verified on a real Windows
-          installation. Packages are not code-signed.
+          The Linux build has been manually exercised on Ubuntu. The Windows
+          installer and Chromium extension have been exercised on a real Windows
+          installation. Direct in-app video merging is included but still needs a
+          real-Windows retest. Packages are not code-signed.
+
+          FFmpeg source and build information:
+          - https://github.com/FFmpeg/FFmpeg/commit/d9242028a6
+          - https://github.com/yt-dlp/FFmpeg-Builds/tree/8fc3fe09d1d84a10cecc2b08706e303e27e64834
           EOF

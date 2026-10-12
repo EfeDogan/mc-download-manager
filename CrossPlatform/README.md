@@ -30,8 +30,9 @@ navigate to those paths.
 The packages are currently unsigned experimental builds. Linux AppImage,
 Chromium, and Firefox flows have been manually exercised on Ubuntu. The Windows
 installer and Chromium extension have been exercised on a real Windows
-installation; direct in-app YouTube URL downloads still have a known failure
-under investigation.
+installation. The `preview.3` package adds bundled FFmpeg support for direct
+in-app YouTube URL downloads; that correction has been verified on Linux and
+still needs a real-Windows retest.
 
 On Linux, either run the AppImage directly or install the Debian package:
 
@@ -101,10 +102,9 @@ npm run tauri -- build --bundles msi,nsis
 - Closing the main window leaves the bridge running in the system tray. Use
   **Quit** from the tray menu to stop the process.
 
-The package includes yt-dlp and its recommended Deno JavaScript runtime for
-reliable YouTube extraction. Install `ffmpeg` separately and expose it on
-`PATH` to merge separate video and audio streams, which is required for many
-high-resolution formats.
+The package includes yt-dlp, its recommended Deno JavaScript runtime, and
+FFmpeg for merging separate video and audio streams. The packaged tools are
+pinned to checksum-verified upstream builds.
 
 ## Run the core tests
 
@@ -137,8 +137,8 @@ Implemented:
 - progress and pause/resume/cancel/remove state transitions;
 - end-to-end bridge-to-file integration test;
 - Tauri desktop UI for adding and controlling downloads;
-- page-video downloads through bundled, checksum-verified `yt-dlp` and Deno
-  binaries;
+- page-video downloads through bundled, checksum-verified `yt-dlp`, Deno, and
+  FFmpeg binaries;
 - scoped browser cookies passed to `yt-dlp` through a temporary mode-0600 jar;
 - HTML page detection that prevents a page URL being reported as a completed file;
 - one shared queue for desktop and browser-extension requests;
@@ -154,7 +154,7 @@ Implemented:
 Not implemented yet:
 
 - persisted restart recovery and segmented range workers;
-- packaged `ffmpeg` and authenticated-site testing;
+- authenticated-site testing;
 - desktop notifications, clipboard capture, and autostart;
 - Mozilla signing and permanent Firefox add-on distribution for cross-platform releases;
 - signing and release publication for native packages.

@@ -9,3 +9,4 @@ CrossPlatform/target/
 CrossPlatform/node_modules/
 CrossPlatform/app/src-tauri/binaries/yt-dlp-*
 CrossPlatform/app/src-tauri/binaries/deno-*
+CrossPlatform/app/src-tauri/binaries/ffmpeg-*

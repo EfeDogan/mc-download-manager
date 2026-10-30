@@ -7,7 +7,8 @@ const t = (k, subs) => { try { return api.i18n.getMessage(k, subs) || k; } catch
 const IS_FIREFOX = typeof browser !== 'undefined' && String(browser.runtime.getURL('')).startsWith('moz-extension:');
 const IS_SAFARI = !IS_FIREFOX && typeof browser !== 'undefined' && !!browser.runtime.sendNativeMessage && !chrome.downloads?.onDeterminingFilename;
 
-const DEFAULTS = { port: 48213, intercept: true, minSizeMB: 0, sniff: true };
+const VIDEO_QUALITIES = new Set(['best', '2160p', '1440p', '1080p', '720p', '480p', '360p']);
+const DEFAULTS = { port: 48213, intercept: true, minSizeMB: 0, sniff: true, videoQuality: 'best' };
 const BROWSER = IS_FIREFOX ? 'firefox' : IS_SAFARI ? 'safari' : (navigator.brave ? 'brave' : (/Edg\//.test(navigator.userAgent) ? 'edge' : 'chrome'));
 
 const MEDIA_EXT = /\.(mp4|m4v|webm|mkv|mov|avi|flv|mp3|m4a|aac|ogg|opus|wav|flac)(\?|#|$)/i;
@@ -17,7 +18,9 @@ const IGNORED_HOSTS = /(^|\.)googlevideo\.com$|(^|\.)fbcdn\.net$|(^|\.)twimg\.co
 // ---------- Settings ----------
 async function getSettings() {
   const s = await api.storage.local.get('settings');
-  return { ...DEFAULTS, ...(s.settings || {}) };
+  const settings = { ...DEFAULTS, ...(s.settings || {}) };
+  if (!VIDEO_QUALITIES.has(settings.videoQuality)) settings.videoQuality = DEFAULTS.videoQuality;
+  return settings;
 }
 async function setSettings(patch) {
   const cur = await getSettings();
@@ -61,6 +64,13 @@ async function downloadAction(id, action) {
     tickProgress();
     return j;
   } catch (e) { return { ok: false, error: String(e) }; }
+}
+async function openDownloadFolder() {
+  try {
+    return await bridgeJSON('/open-download-directory', { method: 'POST' });
+  } catch (e) {
+    return { ok: false, error: String(e) };
+  }
 }
 const ACTIVE_STATES = new Set(['downloading', 'probing']);
 let progressTimer = null;
@@ -139,6 +149,7 @@ async function sendToApp({ url, filename, referer, kind }) {
   const payload = {
     url, filename: filename || '', referer: referer || '', kind: kind || 'file',
     userAgent: navigator.userAgent, cookieHeader: ck.header, cookies: ck.list,
+    videoQuality: kind === 'video' ? settings.videoQuality : undefined,
   };
   try {
     const r = await fetch(base(settings) + '/download', {
@@ -388,6 +399,7 @@ api.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         case 'getMedia': sendResponse(await readMedia(msg.tabId)); break;
         case 'downloads': sendResponse(await getDownloads()); break;
         case 'action': sendResponse(await downloadAction(msg.id, msg.action)); break;
+        case 'openDownloadFolder': sendResponse(await openDownloadFolder()); break;
         case 'download': sendResponse(await sendToApp(msg)); break;
         case 'setSettings': await setSettings(msg.settings || {}); sendResponse({ ok: true }); break;
         case 'launchApp': sendResponse({ ok: await launchApp() }); break;

@@ -148,8 +148,11 @@ jobs:
 
           The Linux build has been manually exercised on Ubuntu. The Windows
           installer and Chromium extension have been exercised on a real Windows
-          installation. Direct in-app video merging is included but still needs a
-          real-Windows retest. Packages are not code-signed.
+          installation. This preview adds video-quality and download-folder
+          controls to Chromium and Firefox, and defaults new video settings to
+          the best available quality. These changes pass the Linux, Windows, and
+          macOS CI matrix but still need real-Windows UI testing. Packages are not
+          code-signed.
 
           FFmpeg source and build information:
           - https://github.com/FFmpeg/FFmpeg/commit/d9242028a6

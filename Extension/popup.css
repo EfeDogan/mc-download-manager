@@ -11,9 +11,13 @@ section, details { padding: 10px 12px; border-bottom: 1px solid var(--line); }
 section h3 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
 button { display: block; width: 100%; margin: 4px 0; padding: 7px 10px; border: 1px solid var(--line); border-radius: 7px; background: transparent; color: var(--fg); cursor: pointer; font: inherit; }
 button:hover { border-color: var(--accent); }
+button:disabled { cursor: default; opacity: .55; }
 button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
 button.small { width: auto; margin: 0; padding: 4px 10px; font-size: 12px; }
 .toggle { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
+.select-control { display: grid; grid-template-columns: minmax(0, 1fr) 154px; align-items: center; gap: 10px; margin-top: 7px; }
+.select-control select { width: 100%; min-width: 0; padding: 5px 7px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); font: inherit; }
+.folder-button { margin-top: 8px; }
 .box { margin: 10px 12px; padding: 10px; border-radius: 8px; background: rgba(220, 60, 60, .12); color: #c33; }
 .hidden { display: none !important; }
 .muted { color: var(--muted); margin: 4px 0; }

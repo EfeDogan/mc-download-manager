@@ -25,9 +25,11 @@ Open the DMG, drag the app to *Applications*, done. The macOS interface is in **
 
 > **Platform status:** Linux support has been manually exercised on Ubuntu and
 > remains experimental. The Windows installer and Chromium extension have been
-> exercised on a real Windows installation. The `preview.3` package adds bundled
-> FFmpeg support for direct in-app YouTube URL downloads; that correction has
-> been verified on Linux and still needs a real-Windows retest. The feature list
+> exercised on a real Windows installation. The `preview.4` package adds video
+> quality and download-folder controls to the Chromium/Firefox extension, and
+> defaults new video settings to the best available quality. These changes are
+> covered by Linux, Windows, and macOS CI but still need real-Windows UI
+> testing. The feature list
 > below describes the mature macOS application; see
 > [Current cross-platform scope](CrossPlatform/README.md#current-scope) for the
 > Linux and Windows gaps.
@@ -41,7 +43,8 @@ Open the DMG, drag the app to *Applications*, done. The macOS interface is in **
   one at a time (extension files are placed in `~/Downloads/MC Download Manager/Browser Plugins/`).
   The browser download is cancelled and handed to the app together with cookies, `Referer` and `User-Agent`; captured file types are configurable.
 - **Video downloads** — `<video>`, `.m3u8` and `.mpd` streams on the page are detected; "Download video from this page" uses the bundled
-  yt-dlp (with ffmpeg merging). Default output is MP4 up to 1080p (container and resolution configurable). Browser cookies are passed to
+  yt-dlp (with ffmpeg merging). New installations default to the best available quality, with limits from 360p through 2160p selectable.
+  Browser cookies are passed to
   yt-dlp, and an in-app sign-in window handles age-restricted videos. yt-dlp can be updated from GitHub with one click.
 - **Clipboard** — copy a link and the app asks whether to download it; paste a link into the main window with ⌘V.
 - **UI** — sidebar categories (Images, Music, Video, Apps, Documents, Archives…), sortable table, search,
@@ -82,7 +85,7 @@ testing.
 ### Windows (experimental)
 
 > **Direct download:**
-> [MC.Download.Manager_0.1.0_x64-setup.exe](https://github.com/EfeDogan/mc-download-manager/releases/download/cross-platform-v0.1.0-preview.3/MC.Download.Manager_0.1.0_x64-setup.exe)
+> [MC.Download.Manager_0.1.0_x64-setup.exe](https://github.com/EfeDogan/mc-download-manager/releases/download/cross-platform-v0.1.0-preview.4/MC.Download.Manager_0.1.0_x64-setup.exe)
 
 1. Open the [Windows download page](https://github.com/EfeDogan/mc-download-manager/releases).
 2. Expand **Assets** under the newest **Cross-platform preview** release. Do not
@@ -98,9 +101,9 @@ testing.
    says **Bridge online**, it is ready to accept browser-extension requests.
 
 The Windows installer and Chromium extension have been exercised on a real
-Windows installation. The `preview.3` package bundles FFmpeg to support videos
-whose audio and picture are supplied as separate streams. That direct in-app
-workflow has been verified on Linux and still needs a real-Windows retest. See
+Windows installation. The `preview.4` changes are covered by CI on Windows,
+Linux, and macOS, but its new extension controls still need a real-Windows UI
+retest. See
 [CrossPlatform/README.md](CrossPlatform/README.md) for the current limitations
 and source-build steps.
 
@@ -137,8 +140,8 @@ The app runs a tiny HTTP bridge on `127.0.0.1:48213` that only accepts requests 
    automatically. You can also choose the download type manually.
 3. Open **Settings** to select the light/dark appearance, color palette, and
    maximum video quality. Video-quality choices range from 360p through 2160p,
-   plus **Best available**. The same setting applies to downloads started by the
-   browser extensions.
+   plus **Best available**, which is the default for new installations. The
+   browser extension has its own matching selector for downloads it starts.
 4. Use **Open download folder** to open the current destination without finding
    it manually. By default files are saved under the operating system's Downloads
    directory in `MC Download Manager`.
@@ -154,8 +157,8 @@ The app runs a tiny HTTP bridge on `127.0.0.1:48213` that only accepts requests 
    `ChromiumExtension` directory. If it was already loaded, click **Reload** on
    the extension card after updating the application.
 4. Keep the desktop application running. The extension can redirect browser
-   downloads, detect media playing in the active tab, or send the current video
-   page to yt-dlp.
+   downloads, detect media playing in the active tab, send the current video
+   page to yt-dlp at the selected quality, and open the app's download folder.
 
 ### Firefox
 
@@ -168,9 +171,8 @@ The cross-platform Firefox extension is currently a temporary development
 add-on and is removed when Firefox restarts. Permanent installation requires a
 Mozilla-signed XPI, which is not published for these builds yet.
 
-For the highest video resolutions, install `ffmpeg` and make sure it is available
-on `PATH`; yt-dlp needs it to merge separate video and audio streams. The packaged
-application currently includes yt-dlp but not ffmpeg.
+The packaged Linux and Windows application includes yt-dlp, Deno, and FFmpeg;
+no separate multimedia-tool installation is required.
 
 ## Building from source
 

@@ -7,8 +7,8 @@ use std::{
 };
 
 use mcdm_core::{
-    BridgeConfig, DownloadAction, DownloadKind, DownloadManager, DownloadRequest, DownloadSummary,
-    VideoQuality, discover_video_tool, serve_with_quality,
+    BridgeConfig, DirectoryOpener, DownloadAction, DownloadKind, DownloadManager, DownloadRequest,
+    DownloadSummary, VideoQuality, discover_video_tool, serve_with_quality_and_opener,
 };
 use serde::Serialize;
 use serde_json::{Value, json};
@@ -77,10 +77,14 @@ fn directory_opener() -> &'static str {
 
 #[tauri::command]
 fn open_download_directory(state: State<'_, AppState>) -> Result<(), String> {
-    fs::create_dir_all(&state.download_directory)
+    open_directory(&state.download_directory)
+}
+
+fn open_directory(directory: &Path) -> Result<(), String> {
+    fs::create_dir_all(directory)
         .map_err(|error| format!("could not create the download directory: {error}"))?;
     Command::new(directory_opener())
-        .arg(&state.download_directory)
+        .arg(directory)
         .spawn()
         .map(|_| ())
         .map_err(|error| format!("could not open the download directory: {error}"))
@@ -238,6 +242,9 @@ pub fn run() {
                 DownloadManager::with_video_tool(config.download_directory.clone(), video_tool)?;
             let bridge_status = Arc::new(RwLock::new(BRIDGE_STARTING.to_owned()));
             let video_quality = Arc::new(RwLock::new(VideoQuality::default()));
+            let opener_directory = config.download_directory.clone();
+            let directory_opener: DirectoryOpener =
+                Arc::new(move || open_directory(&opener_directory));
 
             app.manage(AppState {
                 manager: manager.clone(),
@@ -274,8 +281,13 @@ pub fn run() {
                 match TcpListener::bind(&address).await {
                     Ok(listener) => {
                         update_bridge_status(&bridge_status, "running");
-                        if let Err(error) =
-                            serve_with_quality(listener, manager, video_quality).await
+                        if let Err(error) = serve_with_quality_and_opener(
+                            listener,
+                            manager,
+                            video_quality,
+                            directory_opener,
+                        )
+                        .await
                         {
                             update_bridge_status(&bridge_status, format!("error: {error}"));
                         }

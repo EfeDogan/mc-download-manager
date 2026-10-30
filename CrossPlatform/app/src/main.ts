@@ -134,7 +134,7 @@ function storedVideoQuality(): VideoQuality {
       return value as VideoQuality;
     }
   } catch {}
-  return "1080p";
+  return "best";
 }
 
 async function applyVideoQuality(quality: VideoQuality, announce = true): Promise<void> {

@@ -40,11 +40,13 @@ async function refresh() {
     : t('popupOffline');
   $('offline').classList.toggle('hidden', online);
   $('launch').classList.toggle('hidden', !(st && st.isSafari));
+  $('openFolder').disabled = !online;
   if (st && st.settings) {
     $('intercept').checked = !!st.settings.intercept;
     $('sniff').checked = !!st.settings.sniff;
     $('port').value = st.settings.port;
     $('minSize').value = st.settings.minSizeMB || 0;
+    $('videoQuality').value = st.settings.videoQuality || 'best';
   }
 }
 
@@ -173,6 +175,17 @@ $('intercept').onchange = (e) => send({ type: 'setSettings', settings: { interce
 $('sniff').onchange = (e) => send({ type: 'setSettings', settings: { sniff: e.target.checked } });
 $('port').onchange = (e) => send({ type: 'setSettings', settings: { port: parseInt(e.target.value, 10) || 48213 } }).then(refresh);
 $('minSize').onchange = (e) => send({ type: 'setSettings', settings: { minSizeMB: parseInt(e.target.value, 10) || 0 } });
+$('videoQuality').onchange = (e) => send({ type: 'setSettings', settings: { videoQuality: e.target.value } });
+$('openFolder').onclick = async () => {
+  const button = $('openFolder');
+  const status = $('folderStatus');
+  button.disabled = true;
+  status.classList.add('hidden');
+  const result = await send({ type: 'openDownloadFolder' });
+  status.textContent = result && result.ok ? t('popupFolderOpened') : t('popupFolderError');
+  status.classList.remove('hidden');
+  await refresh();
+};
 
 refresh();
 loadMedia();

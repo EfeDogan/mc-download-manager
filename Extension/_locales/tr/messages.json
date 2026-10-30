@@ -57,6 +57,12 @@
   "popupSniff": {
     "message": "Sayfadaki videoları yakala"
   },
+  "popupVideoQuality": {
+    "message": "Video kalitesi"
+  },
+  "qualityBest": {
+    "message": "Maksimum (mevcut en iyi)"
+  },
   "popupPageVideo": {
     "message": "Bu sayfadaki videoyu indir (yt-dlp)"
   },
@@ -113,6 +119,15 @@
   },
   "popupNoDownloads": {
     "message": "Aktif indirme yok. Başlatılan indirmeler ilerlemesini burada ve araç çubuğu rozetinde gösterir."
+  },
+  "popupOpenFolder": {
+    "message": "İndirme klasörünü aç"
+  },
+  "popupFolderOpened": {
+    "message": "İndirme klasörü açıldı."
+  },
+  "popupFolderError": {
+    "message": "İndirme klasörü açılamadı."
   },
   "stateQueued": {
     "message": "Sırada"

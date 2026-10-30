@@ -22,6 +22,18 @@
   <section class="controls">
     <label class="toggle"><input type="checkbox" id="intercept"> <span data-i18n="popupIntercept">Send downloads to the app</span></label>
     <label class="toggle"><input type="checkbox" id="sniff"> <span data-i18n="popupSniff">Capture videos on pages</span></label>
+    <label class="select-control" for="videoQuality">
+      <span data-i18n="popupVideoQuality">Video quality</span>
+      <select id="videoQuality">
+        <option value="best" data-i18n="qualityBest">Maximum (best available)</option>
+        <option value="2160p">2160p (4K)</option>
+        <option value="1440p">1440p (2K)</option>
+        <option value="1080p">1080p</option>
+        <option value="720p">720p</option>
+        <option value="480p">480p</option>
+        <option value="360p">360p</option>
+      </select>
+    </label>
   </section>
 
   <section>
@@ -33,6 +45,8 @@
     <h3><span data-i18n="popupDownloadsTitle">Downloads</span></h3>
     <ul id="dl"></ul>
     <p id="noDl" class="muted" data-i18n="popupNoDownloads">No active downloads. Started downloads show their progress here and on the toolbar badge.</p>
+    <button id="openFolder" class="folder-button" data-i18n="popupOpenFolder" disabled>Open download folder</button>
+    <p id="folderStatus" class="muted hidden" role="status"></p>
   </section>
 
   <section>

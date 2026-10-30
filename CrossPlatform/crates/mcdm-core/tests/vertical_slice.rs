@@ -1,4 +1,12 @@
-use std::{convert::Infallible, net::SocketAddr, time::Duration};
+use std::{
+    convert::Infallible,
+    net::SocketAddr,
+    sync::{
+        Arc, RwLock,
+        atomic::{AtomicBool, Ordering},
+    },
+    time::Duration,
+};
 
 use axum::{
     Router,
@@ -8,7 +16,10 @@ use axum::{
     routing::get,
 };
 use futures_util::stream;
-use mcdm_core::{DownloadManager, DownloadState, serve};
+use mcdm_core::{
+    DirectoryOpener, DownloadManager, DownloadState, VideoQuality, serve,
+    serve_with_quality_and_opener,
+};
 use serde_json::{Value, json};
 use tempfile::tempdir;
 use tokio::{net::TcpListener, time::sleep};
@@ -367,4 +378,50 @@ async fn ordinary_web_origins_cannot_drive_the_bridge() {
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::FORBIDDEN);
+}
+
+#[tokio::test]
+async fn extension_can_open_the_app_download_directory() {
+    let directory = tempdir().unwrap();
+    let manager = DownloadManager::new(directory.path()).unwrap();
+    let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let bridge_address = listener.local_addr().unwrap();
+    let opened = Arc::new(AtomicBool::new(false));
+    let opened_by_callback = opened.clone();
+    let opener: DirectoryOpener = Arc::new(move || {
+        opened_by_callback.store(true, Ordering::SeqCst);
+        Ok(())
+    });
+    tokio::spawn(async move {
+        serve_with_quality_and_opener(
+            listener,
+            manager,
+            Arc::new(RwLock::new(VideoQuality::Best)),
+            opener,
+        )
+        .await
+        .unwrap()
+    });
+
+    let rejected = reqwest::Client::new()
+        .post(format!("http://{bridge_address}/open-download-directory"))
+        .header("Origin", "https://example.com")
+        .header("X-MCDM-Extension", "chrome")
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(rejected.status(), StatusCode::FORBIDDEN);
+    assert!(!opened.load(Ordering::SeqCst));
+
+    let response = extension_request(
+        &reqwest::Client::new(),
+        reqwest::Method::POST,
+        format!("http://{bridge_address}/open-download-directory"),
+        None,
+    )
+    .await;
+
+    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(response.json::<Value>().await.unwrap()["ok"], true);
+    assert!(opened.load(Ordering::SeqCst));
 }

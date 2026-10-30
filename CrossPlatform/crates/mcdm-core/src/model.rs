@@ -12,13 +12,13 @@ pub enum DownloadKind {
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub enum VideoQuality {
+    #[default]
     #[serde(rename = "best")]
     Best,
     #[serde(rename = "2160p")]
     P2160,
     #[serde(rename = "1440p")]
     P1440,
-    #[default]
     #[serde(rename = "1080p")]
     P1080,
     #[serde(rename = "720p")]
@@ -105,4 +105,14 @@ pub struct DownloadSummary {
     pub stage: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::VideoQuality;
+
+    #[test]
+    fn video_quality_defaults_to_best_available() {
+        assert_eq!(VideoQuality::default(), VideoQuality::Best);
+    }
 }

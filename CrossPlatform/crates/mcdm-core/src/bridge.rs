@@ -51,7 +51,10 @@ struct BridgeState {
     manager: DownloadManager,
     port: u16,
     video_quality: Arc<RwLock<VideoQuality>>,
+    directory_opener: Option<DirectoryOpener>,
 }
+
+pub type DirectoryOpener = Arc<dyn Fn() -> Result<(), String> + Send + Sync>;
 
 #[derive(Deserialize)]
 struct ActionRequest {
@@ -73,8 +76,30 @@ pub async fn serve_with_quality(
     manager: DownloadManager,
     video_quality: Arc<RwLock<VideoQuality>>,
 ) -> std::io::Result<()> {
+    serve_with_options(listener, manager, video_quality, None).await
+}
+
+pub async fn serve_with_quality_and_opener(
+    listener: TcpListener,
+    manager: DownloadManager,
+    video_quality: Arc<RwLock<VideoQuality>>,
+    directory_opener: DirectoryOpener,
+) -> std::io::Result<()> {
+    serve_with_options(listener, manager, video_quality, Some(directory_opener)).await
+}
+
+async fn serve_with_options(
+    listener: TcpListener,
+    manager: DownloadManager,
+    video_quality: Arc<RwLock<VideoQuality>>,
+    directory_opener: Option<DirectoryOpener>,
+) -> std::io::Result<()> {
     let port = listener.local_addr()?.port();
-    axum::serve(listener, router_with_quality(manager, port, video_quality)).await
+    axum::serve(
+        listener,
+        router_with_options(manager, port, video_quality, directory_opener),
+    )
+    .await
 }
 
 pub async fn run(config: BridgeConfig) -> Result<(), Box<dyn std::error::Error>> {
@@ -98,16 +123,30 @@ fn router_with_quality(
     port: u16,
     video_quality: Arc<RwLock<VideoQuality>>,
 ) -> Router {
+    router_with_options(manager, port, video_quality, None)
+}
+
+fn router_with_options(
+    manager: DownloadManager,
+    port: u16,
+    video_quality: Arc<RwLock<VideoQuality>>,
+    directory_opener: Option<DirectoryOpener>,
+) -> Router {
     let state = BridgeState {
         manager,
         port,
         video_quality,
+        directory_opener,
     };
     Router::new()
         .route("/ping", get(ping).options(preflight))
         .route("/download", post(download).options(preflight))
         .route("/downloads", get(downloads).options(preflight))
         .route("/action", post(action).options(preflight))
+        .route(
+            "/open-download-directory",
+            post(open_download_directory).options(preflight),
+        )
         .fallback(not_found)
         .layer(middleware::from_fn_with_state(state.clone(), authorize))
         .with_state(state)
@@ -247,6 +286,19 @@ async fn action(State(state): State<BridgeState>, Json(request): Json<ActionRequ
     match state.manager.action(id, request.action).await {
         Ok(()) => Json(json!({ "ok": true })).into_response(),
         Err(error) => json_error(StatusCode::BAD_REQUEST, &error.to_string()),
+    }
+}
+
+async fn open_download_directory(State(state): State<BridgeState>) -> Response {
+    let Some(open) = state.directory_opener else {
+        return json_error(
+            StatusCode::SERVICE_UNAVAILABLE,
+            "download directory opener is unavailable",
+        );
+    };
+    match open() {
+        Ok(()) => Json(json!({ "ok": true })).into_response(),
+        Err(error) => json_error(StatusCode::INTERNAL_SERVER_ERROR, &error),
     }
 }
 

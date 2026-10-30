@@ -24,8 +24,12 @@ Kararlı macOS sürümünde her şey tek bir `.app` içinde gelir: Safari uzant�
 DMG'yi açıp uygulamayı *Applications* klasörüne sürüklemek yeterlidir. macOS arayüzü **İngilizce** ve **Türkçe**dir (sistem dilini izler).
 
 > **Platform durumu:** Linux desteği Ubuntu üzerinde elle denenmiştir ve hâlâ
-> deneyseldir. Windows paketleri CI üzerinde üretilmektedir ancak gerçek bir
-> Windows kurulumunda henüz doğrulanmamıştır. Aşağıdaki özellik listesi olgun
+> deneyseldir. Windows kurucusu ve Chromium eklentisi gerçek bir Windows
+> kurulumunda denenmiştir. `preview.4`, Chromium/Firefox eklentisine video
+> kalitesi ve indirme klasörü kontrollerini ekler; yeni video ayarları varsayılan
+> olarak mümkün olan en yüksek kaliteyi kullanır. Bu değişiklikler Linux,
+> Windows ve macOS CI üzerinde doğrulanmıştır, ancak gerçek Windows arayüzünde
+> yeniden denenmelidir. Aşağıdaki özellik listesi olgun
 > macOS uygulamasını anlatır; Linux ve Windows eksikleri için
 > [Güncel çapraz platform kapsamına](CrossPlatform/README.md#current-scope) bakın.
 
@@ -38,7 +42,8 @@ DMG'yi açıp uygulamayı *Applications* klasörüne sürüklemek yeterlidir. ma
   tek tek ele alır (eklenti dosyaları `~/Downloads/MC Download Manager/Browser Plugins/` altına yerleştirilir).
   Tarayıcıdaki indirme iptal edilip çerezler, `Referer` ve `User-Agent` ile birlikte uygulamaya iletilir; yakalanan dosya türleri ayarlanabilir.
 - **Video indirme** — sayfadaki `<video>`, `.m3u8` ve `.mpd` akışları yakalanır; "Bu sayfadaki videoyu indir" gömülü yt-dlp'yi
-  (ffmpeg ile birleştirme dahil) kullanır. Varsayılan çıktı en fazla 1080p MP4'tür (kapsayıcı ve çözünürlük ayarlanabilir). Tarayıcı çerezleri
+  (ffmpeg ile birleştirme dahil) kullanır. Yeni kurulumlarda mümkün olan en yüksek
+  kalite varsayılandır; 360p ile 2160p arasında sınır seçilebilir. Tarayıcı çerezleri
   yt-dlp'ye aktarılır; yaş doğrulamalı videolar için uygulama içi giriş penceresi vardır. yt-dlp tek tıkla GitHub'dan güncellenebilir.
 - **Pano** — bir bağlantı kopyaladığınızda uygulama indirmek isteyip istemediğinizi sorar; ana pencereye ⌘V ile bağlantı yapıştırabilirsiniz.
 - **Arayüz** — kenar çubuğunda kategoriler (Resim, Müzik, Video, Uygulama, Belge, Arşiv…), sıralanabilir tablo, arama,
@@ -79,7 +84,7 @@ Linux dağıtımları ve masaüstü ortamları için daha geniş test gereklidir
 ### Windows (deneysel)
 
 > **Doğrudan indir:**
-> [MC.Download.Manager_0.1.0_x64-setup.exe](https://github.com/EfeDogan/mc-download-manager/releases/download/cross-platform-v0.1.0-preview.1/MC.Download.Manager_0.1.0_x64-setup.exe)
+> [MC.Download.Manager_0.1.0_x64-setup.exe](https://github.com/EfeDogan/mc-download-manager/releases/download/cross-platform-v0.1.0-preview.4/MC.Download.Manager_0.1.0_x64-setup.exe)
 
 1. [Windows indirme sayfasını](https://github.com/EfeDogan/mc-download-manager/releases)
    açın.
@@ -96,9 +101,11 @@ Linux dağıtımları ve masaüstü ortamları için daha geniş test gereklidir
    **Bridge online** göründüğünde uygulama tarayıcı eklentilerini kabul etmeye
    hazırdır.
 
-Windows paketleri CI üzerinde derlenmektedir ancak gerçek bir Windows
-kurulumunda henüz doğrulanmamıştır. Güncel sınırlamalar ve kaynaktan derleme
-adımları için [CrossPlatform/README.md](CrossPlatform/README.md) dosyasına bakın.
+Windows kurucusu ve Chromium eklentisi gerçek bir Windows kurulumunda
+denenmiştir. `preview.4` değişiklikleri Windows, Linux ve macOS CI üzerinde
+doğrulanmıştır; yeni eklenti kontrollerinin gerçek Windows arayüzünde yeniden
+denenmesi gerekir. Güncel sınırlamalar ve kaynaktan derleme adımları için
+[CrossPlatform/README.md](CrossPlatform/README.md) dosyasına bakın.
 
 ### macOS
 
@@ -132,8 +139,10 @@ Uygulama `127.0.0.1:48213` üzerinde yalnızca tarayıcı uzantılarından (`Ori
    X/Twitter gibi bilinen video siteleri otomatik olarak **Video from page**
    türüne geçirilir; indirme türünü elle de seçebilirsiniz.
 3. Açık/koyu görünüm, renk paleti ve en yüksek video çözünürlüğünü belirlemek için
-   **Settings**'i açın. 360p ile 2160p arasında veya **Best available** seçilebilir.
-   Bu ayar tarayıcı eklentilerinden başlatılan video indirmelerine de uygulanır.
+   **Settings**'i açın. 360p ile 2160p arasında veya **Best available** seçilebilir;
+   yeni kurulumlarda **Best available** varsayılandır. Tarayıcı eklentisinde,
+   eklentiden başlatılan indirmeler için ayrı ve aynı seçeneklere sahip bir liste
+   bulunur.
 4. İndirme klasörünü dosya yöneticisinde doğrudan açmak için
    **Open download folder** düğmesini kullanın. Dosyalar varsayılan olarak işletim
    sisteminin İndirilenler klasöründeki `MC Download Manager` altına kaydedilir.
@@ -149,8 +158,9 @@ Uygulama `127.0.0.1:48213` üzerinde yalnızca tarayıcı uzantılarından (`Ori
    gösterilen `ChromiumExtension` klasörünü açın. Eklenti önceden yüklüyse
    uygulamayı güncelledikten sonra eklenti kartındaki **Yeniden yükle**ye basın.
 4. Masaüstü uygulamasını çalışır durumda bırakın. Eklenti tarayıcı indirmelerini
-   uygulamaya yönlendirebilir, etkin sekmede oynayan medyayı algılayabilir ve
-   açık video sayfasını yt-dlp'ye gönderebilir.
+   uygulamaya yönlendirebilir, etkin sekmede oynayan medyayı algılayabilir,
+   açık video sayfasını seçilen kalitede yt-dlp'ye gönderebilir ve uygulamanın
+   indirme klasörünü açabilir.
 
 ### Firefox
 
@@ -164,9 +174,8 @@ Uygulama `127.0.0.1:48213` üzerinde yalnızca tarayıcı uzantılarından (`Ori
 Firefox yeniden başladığında kaldırılır. Kalıcı kurulum için Mozilla imzalı XPI
 gerekir; bu paketler için henüz yayımlanmamaktadır.
 
-En yüksek video çözünürlükleri için `ffmpeg` kurulu ve `PATH` üzerinde erişilebilir
-olmalıdır; yt-dlp ayrı video ve ses akışlarını birleştirmek için ffmpeg kullanır.
-Paketli uygulama şu anda yt-dlp'yi içerir ancak ffmpeg'i içermez.
+Paketli Linux ve Windows uygulaması yt-dlp, Deno ve FFmpeg'i içerir; ayrıca bir
+multimedya aracı kurmanız gerekmez.
 
 ## Kaynaktan derleme
 

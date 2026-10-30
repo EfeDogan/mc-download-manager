@@ -30,9 +30,9 @@ navigate to those paths.
 The packages are currently unsigned experimental builds. Linux AppImage,
 Chromium, and Firefox flows have been manually exercised on Ubuntu. The Windows
 installer and Chromium extension have been exercised on a real Windows
-installation. The `preview.3` package adds bundled FFmpeg support for direct
-in-app YouTube URL downloads; that correction has been verified on Linux and
-still needs a real-Windows retest.
+installation. The `preview.4` package adds video-quality and download-folder
+controls to the Chromium/Firefox extension. The changes are covered by Linux,
+Windows, and macOS CI but still need real-Windows UI testing.
 
 On Linux, either run the AppImage directly or install the Debian package:
 
@@ -95,8 +95,8 @@ npm run tauri -- build --bundles msi,nsis
   for a site supported by yt-dlp. Known sites such as YouTube and X/Twitter are
   classified automatically.
 - Open **Settings** to choose the color mode, palette, and maximum video
-  resolution. The quality setting also applies to video requests sent by the
-  browser extensions.
+  resolution. Best available is the default for new installations. The browser
+  extension has its own matching quality selector for requests it starts.
 - Use **Open download folder** to open the destination in the platform file
   manager.
 - Closing the main window leaves the bridge running in the system tray. Use
@@ -130,7 +130,8 @@ The process listens on `127.0.0.1:48213`. Requests must follow
 
 Implemented:
 
-- v1 `/ping`, `/download`, `/downloads`, and `/action` routes;
+- v1 `/ping`, `/download`, `/downloads`, and `/action` routes, plus the optional
+  cross-platform `/open-download-directory` extension route;
 - loopback `Host`, extension `Origin`, and marker-header checks;
 - single-stream HTTP(S) downloads with resumable partial files;
 - cross-platform filename sanitization and collision-safe destinations;
@@ -145,8 +146,9 @@ Implemented:
 - bundled Chromium extension with an in-app extraction button;
 - Firefox-specific Manifest V3 preparation with a temporary `about:debugging`
   installation flow;
-- selectable video quality from 360p through 2160p or best available, shared by
-  desktop and extension-initiated downloads;
+- selectable video quality from 360p through 2160p or best available in both
+  the desktop app and browser extension, with best available as the default;
+- a browser-extension button that opens the app's configured download folder;
 - selectable light/dark mode and three non-neon color palettes;
 - system-tray lifecycle on Linux and Windows;
 - Linux and Windows installer jobs in GitHub Actions.

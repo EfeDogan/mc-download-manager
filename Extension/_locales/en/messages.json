@@ -57,6 +57,12 @@
   "popupSniff": {
     "message": "Capture videos on pages"
   },
+  "popupVideoQuality": {
+    "message": "Video quality"
+  },
+  "qualityBest": {
+    "message": "Maximum (best available)"
+  },
   "popupPageVideo": {
     "message": "Download video from this page (yt-dlp)"
   },
@@ -113,6 +119,15 @@
   },
   "popupNoDownloads": {
     "message": "No active downloads. Started downloads show their progress here and on the toolbar badge."
+  },
+  "popupOpenFolder": {
+    "message": "Open download folder"
+  },
+  "popupFolderOpened": {
+    "message": "Download folder opened."
+  },
+  "popupFolderError": {
+    "message": "Could not open the download folder."
   },
   "stateQueued": {
     "message": "Queued"

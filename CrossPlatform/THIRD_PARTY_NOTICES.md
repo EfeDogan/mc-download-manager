@@ -7,10 +7,10 @@ checksum-verifies them before packaging.
 ## FFmpeg
 
 - Build provider: <https://github.com/yt-dlp/FFmpeg-Builds>
-- Pinned build: `N-127371-gd9242028a6`
-- Pinned release: `autobuild-2026-10-11-18-51`
-- FFmpeg source revision: <https://github.com/FFmpeg/FFmpeg/commit/d9242028a6>
-- Build scripts: <https://github.com/yt-dlp/FFmpeg-Builds/tree/8fc3fe09d1d84a10cecc2b08706e303e27e64834>
+- Pinned build: `N-128201-g5385979def`
+- Pinned release: `autobuild-2026-10-29-23-03`
+- FFmpeg source revision: <https://github.com/FFmpeg/FFmpeg/commit/5385979def>
+- Build scripts: <https://github.com/yt-dlp/FFmpeg-Builds/tree/58084b7cf4984303a34b610ba3ad8f04059d5d89>
 
 The selected FFmpeg build is distributed under GPL terms. Its complete license
 text is extracted from the verified upstream archive and installed as

@@ -155,6 +155,6 @@ jobs:
           code-signed.
 
           FFmpeg source and build information:
-          - https://github.com/FFmpeg/FFmpeg/commit/d9242028a6
-          - https://github.com/yt-dlp/FFmpeg-Builds/tree/8fc3fe09d1d84a10cecc2b08706e303e27e64834
+          - https://github.com/FFmpeg/FFmpeg/commit/5385979def
+          - https://github.com/yt-dlp/FFmpeg-Builds/tree/58084b7cf4984303a34b610ba3ad8f04059d5d89
           EOF
